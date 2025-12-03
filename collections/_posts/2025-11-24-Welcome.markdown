@@ -1,0 +1,22 @@
+---
+layout: post
+title:  "Welcome to the UK Data Linkage Community"
+date:   2025-11-24 11:13:00 +0000
+categories: main
+---
+Welcome to the first blog post for the UK Data Linkage Community.
+
+The community is built on years of prior discussions, collaboration, and networking within the data linkage space.
+
+The community is funded by DARE UK as part of the ongoing work to support community groups in fostering collaboration, 
+capacity building and public trust in the UK's sensitive data research. Check out the 
+[announcement blog from DARE UK][dare-announcement] for more information.
+
+### <u>Getting Involved</u>
+To sign up to the UK DLC mailing list, [please use the following form][ukdlc-mailing-list].
+
+The community can be found on GitHub as [UK-Data-Linkage-Community][ukdlc-github]
+
+[dare-announcement]: https://dareuk.org.uk/news-and-events/dare-uk-awards-1-2m-to-drive-collaboration-and-public-trust-in-sensitive-data-research/
+[ukdlc-github]: https://github.com/UK-Data-Linkage-Community
+[ukdlc-mailing-list]: https://forms.gle/4TWHQofvEXt97LzF7
