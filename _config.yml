@@ -37,8 +37,11 @@ header_pages:
   - 6_related_groups/related_groups.md
 
 # Build settings
+#remote_theme: pages-themes/minimal@v0.2.0
 theme: minima
+
 plugins:
+  - jekyll-remote-theme
   - jekyll-feed
 
 collections_dir: collections

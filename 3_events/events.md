@@ -3,7 +3,7 @@ layout: page
 title: Events
 permalink: /events/
 ---
-
+<iframe src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Europe%2FLondon&showPrint=0&showCalendars=0&mode=AGENDA&title&src=YmU5NzBhNDBmZWNkOTNkZjE1NDY1M2Y3MmEwMWRjZWExNzZlMTU2YzkzZWI0ODRmODViMjE4YTZhNmMyMDJmZUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%23ef6c00" style="border-width:0" width="700" height="400" frameborder="0" scrolling="no"></iframe>
 The first phase of the UK Data Linkage Community is to set up a shared resource and space for linkage practitioners. 
 It also includes holding several workshops to identify community needs and guide resource development.
 There is also a showcase event planned for the end of the current funding round, to demonstrate current developments in the field.
