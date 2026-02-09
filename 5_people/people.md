@@ -6,8 +6,8 @@ headshot_width: "200px"
 ---
 
 ## <u>Community Co-Chairs</u>
-{% for person in site.people %}
-  ![{{ person.name }}]({{ person.image_path }}){: style="float: right; width: {{ page.headshot_width }}"}
+{% for person in site.data.people %}
+  ![{{ person.name }}]({{ person.image}}){: style="float: right; width: {{ page.headshot_width }}"}
   <h3>{{ person.name }}</h3>{{ person.affiliation | markdownify }}
   <p>{{ person.content | markdownify }}</p>
   <br>

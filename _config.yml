@@ -37,6 +37,9 @@ header_pages:
   - 6_related_groups/related_groups.md
 
 # Build settings
+markdown: kramdown
+permalink: /blog/:year/:month/:day/:title/
+
 #remote_theme: pages-themes/minimal@v0.2.0
 theme: minima
 
