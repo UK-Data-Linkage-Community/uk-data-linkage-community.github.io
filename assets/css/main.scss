@@ -5,38 +5,49 @@
 @import "minimal-mistakes";
 
 /* ==========================================================================
-   Desktop-First Custom Styles - Force Override Theme
+   Custom Theme
    ========================================================================== */
+
 
 .layout--home {
   .page__content,
   .page-content {
-    max-width: none !important;
-    width: 100% !important;
+    max-width: 100% !important;
+    width: auto !important;
+    height: auto;
     padding: 0 !important;
     margin: 0 !important;
   }
 }
 
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
 /* Header Styles */
 .site-header {
-  border-top: 5px solid #424242;
+  border-top: 0px solid #424242;
   border-bottom: 1px solid #e8e8e8;
+  padding: 0px;
   min-height: 70px;
   position: relative;
   background: #fff;
 }
 
 .site-header .wrapper {
-  max-width: 1400px !important;
+  max-width: 2400px !important;
   margin: 0 auto !important;
-  padding: 15px 40px !important;
+  padding: 15px 80px !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 0px;
 }
+
+/* ==========================================================================
+   Site Logo
+   ========================================================================== */
 
 .site-logo {
   display: flex;
@@ -48,7 +59,7 @@
 }
 
 .site-logo:hover {
-  opacity: 0.8;
+  opacity: 0.7;
   text-decoration: none;
 }
 
@@ -61,30 +72,8 @@
   display: block !important;
 }
 
-//.site-nav .nav-links {
-//  display: flex;
-//  gap: 30px;
-//  align-items: center;
-//}
-//
-//.site-nav .page-link {
-//  color: #424242;
-//  text-decoration: none;
-//  font-weight: 500;
-//  font-size: 1rem;
-//  padding: 8px 0;
-//  transition: color 0.2s ease;
-//  white-space: nowrap;
-//}
-//
-//.site-nav .page-link:hover {
-//  color: #111;
-//  text-decoration: none;
-//  border-bottom: 2px solid #111;
-//}
-
 /* ==========================================================================
-   Navigation - Horizontal with Dropdown
+   Navigation - Drop Down Menus
    ========================================================================== */
 
 .site-nav .nav-links {
@@ -112,7 +101,7 @@
 /* Dropdown container */
 .nav-dropdown {
   position: relative;
-  display: inline-block;  /* Ensure it stays inline with other nav items */
+  display: inline-block;
 }
 
 .dropdown-toggle {
@@ -249,7 +238,9 @@
 }
 
 
-/* Full-width hero section */
+/* ==========================================================================
+   Home Hero Image Section
+   ========================================================================== */
 .hero-section {
   position: relative;
   width: 100%;
@@ -321,7 +312,9 @@
   line-height: 1.6;
 }
 
-/* Alternating content sections */
+/* ==========================================================================
+   Home Alternating Sections
+   ========================================================================== */
 .home-sections {
   width: 100%;
 }
@@ -423,6 +416,9 @@
   }
 }
 
+/* ==========================================================================
+   General Page Content
+   ========================================================================== */
 
 .page__content,
 .page-content,
@@ -433,7 +429,7 @@ main,
   width: 100% !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  padding: 40px 100px !important;
+  padding: 0px 0px !important;
 
   /* Scale padding with screen size */
   @media (min-width: 1800px) {
@@ -466,7 +462,9 @@ main,
 }
 
 
-/* Person Grid Layout */
+/* ==========================================================================
+   Person Profile Layout
+   ========================================================================== */
 .person {
   display: grid;
   grid-template-columns: 1fr 200px;

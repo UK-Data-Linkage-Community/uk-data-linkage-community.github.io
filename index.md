@@ -1,7 +1,7 @@
 ---
 layout: home
-hero_title: "Linking Minds and Data"
-hero_subtitle: "Welcome to our community."
+hero_title: "Linking People and Data"
+hero_subtitle: "Welcome to our community for data linkage."
 
 sections:
   - title: "About Us"
