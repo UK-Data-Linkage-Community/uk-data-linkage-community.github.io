@@ -1,0 +1,152 @@
+---
+---
+
+@import "minimal-mistakes/skins/default";
+@import "minimal-mistakes";
+
+/* ==========================================================================
+   Desktop-First Custom Styles - Force Override Theme
+   ========================================================================== */
+
+/* Header Styles */
+.site-header {
+  border-top: 5px solid #424242;
+  border-bottom: 1px solid #e8e8e8;
+  min-height: 70px;
+  position: relative;
+  background: #fff;
+}
+
+.site-header .wrapper {
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding: 15px 40px !important;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.site-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+.site-logo:hover {
+  opacity: 0.8;
+  text-decoration: none;
+}
+
+.logo-svg {
+  height: 80px !important;
+  width: auto !important;
+  min-height: 80px !important;
+  min-width: 80px !important;
+  max-width: 350px !important;
+  display: block !important;
+}
+
+.site-nav .nav-links {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.site-nav .page-link {
+  color: #424242;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 8px 0;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.site-nav .page-link:hover {
+  color: #111;
+  text-decoration: none;
+  border-bottom: 2px solid #111;
+}
+
+
+.page__content,
+.page-content,
+main,
+.main-content,
+#main {
+  max-width: 900px !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding: 40px 40px !important;
+}
+
+.page__inner-wrap,
+.archive,
+.layout--single {
+  max-width: 900px !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+}
+
+/* Typography */
+.page__content p,
+.page-content p {
+  max-width: 900px;
+  line-height: 1.7;
+  margin-bottom: 1.2rem;
+}
+
+
+.person {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+  margin-bottom: 3rem;
+  align-items: start;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.person:last-child {
+  border-bottom: none;
+}
+
+.person-info {
+  /* Text content goes here */
+}
+
+.person-image {
+  /* Image goes here */
+  text-align: right;
+}
+
+.person img {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  border-radius: 50%;
+  display: block;
+  margin-left: auto;
+}
+
+.person h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.person .role {
+  font-style: italic;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.nav-trigger {
+  display: none;
+}
+
+.menu-icon {
+  display: none;
+}

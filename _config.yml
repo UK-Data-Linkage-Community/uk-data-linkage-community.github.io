@@ -27,6 +27,7 @@ url: "" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: UKDLC
 github_username: UK-Data-Linkage-Community
 
+
 header_pages:
   - index.md
   - 1_about/about.md
@@ -36,12 +37,12 @@ header_pages:
   - 5_people/people.md
   - 6_related_groups/related_groups.md
 
+
 # Build settings
 markdown: kramdown
 permalink: /blog/:year/:month/:day/:title/
-
 #remote_theme: pages-themes/minimal@v0.2.0
-theme: minima
+theme: minimal-mistakes-jekyll
 
 plugins:
   - jekyll-remote-theme
