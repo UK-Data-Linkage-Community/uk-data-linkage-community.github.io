@@ -1,20 +1,36 @@
-<!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+---
+layout: default
+---
 
-{%- include head.html -%}
+<!-- Full-width hero section -->
+<section class="hero-section">
+  <img src="/assets/images/banners/ph_home_0.jpg" alt="Hero">
+  <div class="hero-overlay">
+    <h1>{{ page.hero_title | default: "Welcome" }}</h1>
+    <p>{{ page.hero_subtitle | default: "Your message here" }}</p>
+  </div>
+</section>
 
-<body>
+<!-- Alternating content sections -->
+<div class="home-sections">
+  {% if page.sections %}
+    {% for section in page.sections %}
+      <section class="content-section {% cycle 'image-left', 'image-right' %}">
+        <div class="section-image">
+          <img src="{{ section.image }}" alt="{{ section.title }}">
+        </div>
+        <div class="section-text">
+          <h2>{{ section.title }}</h2>
+          <div class="section-content">
+            {{ section.content | markdownify }}
+          </div>
+          {% if section.link %}
+            <a href="{{ section.link.url }}" class="section-link">{{ section.link.text }}</a>
+          {% endif %}
+        </div>
+      </section>
+    {% endfor %}
+  {% endif %}
+</div>
 
-  {%- include header.html -%}
-
-  <main class="page-content" aria-label="Content">
-    <div class="wrapper">
-      {{ content }}
-    </div>
-  </main>
-
-  {%- include footer.html -%}
-
-</body>
-
-</html>
+{{ content }}

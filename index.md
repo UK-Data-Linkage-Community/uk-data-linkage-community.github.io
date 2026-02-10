@@ -1,18 +1,26 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
-
 layout: home
-#title: Home
----
+hero_title: "Linking Minds and Data"
+hero_subtitle: "Sub-message here"
 
-<div class="hero-banner">
-  <div class="hero-banner__inner">
-    <img src="/assets/images/banners/place_holder_hero.jpg" alt="placeholder hero image">
-    <div class="hero-text">
-      <h1>Welcome to the UK Data Linkage Community Page</h1>
-      <p>Sub-message here</p>
-    </div>
-  </div>
-</div>
+sections:
+  - title: "about us"
+    image: "/assets/images/banners/ph_home_1.jpg"
+    content: |
+      The core objective of this group is to establish an open, cross-sector community dedicated to the general practice of data linkage, namely methodologies, applications, and principles. Unlike existing groups, the proposed group will take a broader and more inclusive approach.
+    link:
+      text: "Learn More"
+      url: "/about/"
+      
+  - title: "Our Team"
+    image: "/assets/images/banners/ph_home_1.jpg"
+    content: |
+      Meet our world-class team of researchers and scientists
+      working at the forefront of innovation.
+    link:
+      text: "Meet the Team"
+      url: "/people/"
+      
+
+---
 

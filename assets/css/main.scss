@@ -8,6 +8,16 @@
    Desktop-First Custom Styles - Force Override Theme
    ========================================================================== */
 
+.layout--home {
+  .page__content,
+  .page-content {
+    max-width: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
+
 /* Header Styles */
 .site-header {
   border-top: 5px solid #424242;
@@ -74,63 +84,150 @@
 }
 
 
-/* Hero Section - Aligned with Header Content */
-.hero-banner {
+/* Full-width hero section */
+.hero-section {
   position: relative;
-  max-width: 1400px;  /* Match header wrapper */
-  margin: 0 auto 3rem auto;  /* Center it */
-  padding: 0 00px;  /* Match header padding */
-  height: 500px;
+  width: 100%;
+  height: 100vh;
+  max-height: 600px;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: left;
 }
 
-.hero-banner img {
+.hero-section img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 0px;  /* Optional: subtle rounding */
+  z-index: 1;
 }
 
-.hero-text {
-  position: absolute;
-  left: 40px;  /* Align with container padding */
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.95);
-  padding: 40px 50px;
-  max-width: 500px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+.hero-overlay {
+  position: relative;
+  z-index: 2;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 60px 80px;
+  max-width: 600px;
+  text-align: left;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 }
 
-.hero-text h1 {
-  margin-top: 0;
-  font-size: 2.5rem;
-  margin-bottom: 1rem;
+.hero-overlay h1 {
+  font-size: 3.5rem;
+  margin: 0 0 1rem 0;
   color: #111;
 }
 
-.hero-text p {
-  font-size: 1.1rem;
-  line-height: 1.6;
+.hero-overlay p {
+  font-size: 1.3rem;
   color: #424242;
-  margin-bottom: 0;
+  margin: 0;
+  line-height: 1.6;
 }
 
-@media (max-width: 768px) {
-  .hero-banner {
+/* Alternating content sections */
+.home-sections {
+  width: 100%;
+}
+
+.content-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 600px;
+  width: 100%;
+}
+
+.section-image {
+  position: relative;
+  overflow: hidden;
+}
+
+.section-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.section-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 80px 100px;
+  background: rgba(250, 250, 250, 0.95);
+}
+
+.section-text h2 {
+  font-size: 2.5rem;
+  margin: 0 0 1.5rem 0;
+  color: #111;
+}
+
+.section-content {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #424242;
+  margin-bottom: 2rem;
+}
+
+.section-link {
+  display: inline-block;
+  padding: 12px 30px;
+  background: #424242;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.section-link:hover {
+  background: #424242;
+  text-decoration: none;
+}
+
+/* Image-right: swap order */
+.content-section.image-right {
+  .section-image {
+    order: 2;
+  }
+  .section-text {
+    order: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 968px) {
+  .content-section {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .content-section.image-right {
+    .section-image,
+    .section-text {
+      order: initial;
+    }
+  }
+
+  .section-image {
     height: 400px;
-    padding: 0 20px;
   }
 
-  .hero-text {
-    left: 20px;
-    right: 20px;
-    max-width: none;
-    padding: 30px;
+  .section-text {
+    padding: 60px 40px;
   }
 
-  .hero-text h1 {
-    font-size: 1.8rem;
+  .hero-overlay {
+    padding: 40px;
+    margin: 0 20px;
+  }
+
+  .hero-overlay h1 {
+    font-size: 2.5rem;
   }
 }
 
