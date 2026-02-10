@@ -75,34 +75,48 @@
 main,
 .main-content,
 #main {
-  max-width: 900px !important;
+  max-width: 1600px !important;
   width: 100% !important;
   margin-left: auto !important;
   margin-right: auto !important;
-  padding: 40px 40px !important;
+  padding: 40px 100px !important;
+
+  /* Scale padding with screen size */
+  @media (min-width: 1800px) {
+    max-width: 1800px !important;
+    padding: 40px 150px !important;
+  }
+
+  @media (max-width: 1200px) {
+    padding: 40px 60px !important;
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px 20px !important;
+  }
 }
 
 .page__inner-wrap,
 .archive,
 .layout--single {
-  max-width: 900px !important;
+  max-width: 1600px !important;
   width: 100% !important;
   margin: 0 auto !important;
 }
 
-/* Typography */
 .page__content p,
 .page-content p {
-  max-width: 900px;
+  max-width: none;
   line-height: 1.7;
   margin-bottom: 1.2rem;
 }
 
 
+/* Person Grid Layout */
 .person {
   display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 30px;
+  grid-template-columns: 1fr 200px;
+  gap: 40px;
   margin-bottom: 3rem;
   align-items: start;
   padding-bottom: 2rem;
@@ -111,36 +125,71 @@ main,
 
 .person:last-child {
   border-bottom: none;
+  padding-bottom: 0;
 }
 
 .person-info {
-  /* Text content goes here */
+  min-width: 0;
 }
 
 .person-image {
-  /* Image goes here */
-  text-align: right;
+  text-align: center;
+  position: sticky;  /* Image stays visible while scrolling */
+  top: 100px;
 }
 
 .person img {
-  width: 100%;
-  max-width: 200px;
-  height: auto;
-  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 10%; /* Remove or set to 0 if square img is desired, 50% for circle */
   display: block;
-  margin-left: auto;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .person h3 {
   margin-top: 0;
   margin-bottom: 0.5rem;
-  font-size: 1.5rem;
+  font-size: 1.8rem;
+  color: #111;
 }
 
-.person .role {
+.person .affiliation {
   font-style: italic;
   color: #666;
   margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.person-content {
+  line-height: 1.7;
+}
+
+.person-content p:first-child {
+  margin-top: 1rem;
+}
+
+/* Responsive: Stack on mobile */
+@media (max-width: 768px) {
+  .person {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    text-align: center;
+  }
+
+  .person-image {
+    position: static;
+    text-align: center;
+    order: -1;  /* Image appears first on mobile */
+  }
+
+  .person img {
+    margin: 0 auto;
+  }
+
+  .person-info {
+    text-align: left;
+  }
 }
 
 .nav-trigger {
