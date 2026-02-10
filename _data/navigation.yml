@@ -1,0 +1,28 @@
+main:
+#  - title: "Home"
+#    url: /
+
+  - title: "About"
+    children:
+      - title: "About Us"
+        url: /about/
+      - title: "Meet Our Team"
+        url: /people/
+
+  - title: "Blog"
+    children:
+      - title: "Blog"
+        url: /blog/
+
+  - title: "Events"
+    children:
+      - title: "Events"
+        url: /events/
+
+  - title: "Resources"
+    children:
+      - title: "Materials"
+        url: /materials/
+      - title: "Related Groups"
+        url: /related-groups/
+

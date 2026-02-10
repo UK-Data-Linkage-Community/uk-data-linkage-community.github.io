@@ -1,10 +1,10 @@
 ---
 layout: home
 hero_title: "Linking Minds and Data"
-hero_subtitle: "Sub-message here"
+hero_subtitle: "Welcome to our community."
 
 sections:
-  - title: "about us"
+  - title: "About Us"
     image: "/assets/images/banners/ph_home_1.jpg"
     content: |
       The core objective of this group is to establish an open, cross-sector community dedicated to the general practice of data linkage, namely methodologies, applications, and principles. Unlike existing groups, the proposed group will take a broader and more inclusive approach.
