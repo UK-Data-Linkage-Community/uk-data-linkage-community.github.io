@@ -16,10 +16,3 @@ layout: home
   </div>
 </div>
 
-<!-- Regular page content continues below -->
-
-<div class="page__content">
-
-  {{ content }}
-
-</div>
