@@ -16,9 +16,11 @@ layout: default
   {% if page.sections %}
     {% for section in page.sections %}
       <section class="content-section {% cycle 'image-left', 'image-right' %}">
-        <div class="section-image">
-          <img src="{{ section.image }}" alt="{{ section.title }}">
-        </div>
+        {% if section.image %}
+          <div class="section-image">
+            <img src="{{ section.image }}" alt="{{ section.title }}">
+          </div>
+        {% endif %}
         <div class="section-text">
           <h2>{{ section.title }}</h2>
           <div class="section-content">

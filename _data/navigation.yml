@@ -4,22 +4,22 @@ main:
 
   - title: "About"
     children:
-      - title: "About Us"
+      - title: "UK DLC"
         url: /about/
-      - title: "Meet Our Team"
+      - title: "Members"
         url: /people/
 
   - title: "Blog"
-    children:
-      - title: "Blog"
-        url: /blog/
+    url: /blog/
+
+  - title: "Join"
+    url: /join/
 
   - title: "Events"
-    children:
-      - title: "Events"
-        url: /events/
+    url: /events/
 
   - title: "Resources"
+    url: /materials/
     children:
       - title: "Materials"
         url: /materials/
