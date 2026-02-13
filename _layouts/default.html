@@ -4,17 +4,17 @@
 {%- include head.html -%}
 
 <body>
-
   {%- include header.html -%}
 
-  <main class="page-content" aria-label="Content">
-    <div class="initial-content" style="max-width: none; width: 100%; padding: 0;">
-      {{ content }}
-    </div>
-  </main>
+  <div class="flex-wrapper">
+    <main class="page-content" aria-label="Content">
+      <div class="initial-content" style="max-width: none; width: 100%; padding: 0;">
+        {{ content }}
+      </div>
+    </main>
 
-  {%- include footer.html -%}
-
+    {%- include footer.html -%}
+  </div>
 </body>
 
 </html>
