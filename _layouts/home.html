@@ -3,14 +3,17 @@ layout: default
 ---
 
 <!-- Full-width hero section -->
+{% if page.hero_section %}
 <section class="hero-section">
-  <img src="/assets/images/banners/ph_home_0.jpg" alt="Hero">
+  <img src="{{ page.hero_section.img }}" alt="Hero">
   <div class="hero-overlay">
-    <h1>{{ page.hero_title | default: "Welcome" }}</h1>
-    <p>{{ page.hero_subtitle | default: "Your message here" }}</p>
+    <h1>{{ page.hero_section.hero_title | default: "Welcome" }}</h1>
+    {% if page.hero_section.hero_subtitle %}
+      <p>{{ page.hero_section.hero_subtitle }}</p>
+    {% endif %}
   </div>
 </section>
-
+{% endif %}
 <!-- Alternating content sections -->
 <div class="home-sections">
   {% if page.sections %}
@@ -22,10 +25,14 @@ layout: default
           </div>
         {% endif %}
         <div class="section-text">
-          <h2>{{ section.title }}</h2>
-          <div class="section-content">
-            {{ section.content | markdownify }}
-          </div>
+          {% if section.title %}
+            <h2>{{ section.title }}</h2>
+          {% endif %}
+          {% if section.content %}
+            <div class="section-content">
+              {{ section.content | markdownify }}
+            </div>
+          {% endif %}
           {% if section.link %}
             <a href="{{ section.link.url }}" class="section-link">{{ section.link.text }}</a>
           {% endif %}

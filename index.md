@@ -1,12 +1,14 @@
 ---
 layout: home
-hero_title: "Linking People and Data"
-hero_subtitle: "Welcome to the UK Data Linkage Community"
-hero_img: "/assets/images/banners/pexels-pixabay-163064.jpg"
+
+hero_section:
+    hero_title: "Linking People and Data"
+    hero_subtitle: "Welcome to the UK Data Linkage Community"
+    img: "/assets/images/banners/pexels-pixabay-163064.jpg"
 
 sections:
   - title: "An open, cross-sector community"
-    image: "/assets/images/banners/pexels-pixabay-163064.jpg"
+    image: "/assets/images/banners/ph_home_0.jpg"
     content: |
       An open, cross-sector community for data linkage and entity resolution
     link:
