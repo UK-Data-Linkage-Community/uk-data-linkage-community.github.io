@@ -31,7 +31,7 @@ To sign up to the UK DLC mailing list, [please use the following form][ukdlc-mai
 
 The community can be found on GitHub as [UK-Data-Linkage-Community][ukdlc-github]
 
-## <u>Funding and Affiliation</u>
+### <u>Funding and Affiliation</u>
 The UK Data Linkage Community is funded by the DARE UK Communities.
 
 The UK Data Linkage Community is affiliated with [Administrative Data Research UK (ADR UK)](https://www.adruk.org/).

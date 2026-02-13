@@ -27,6 +27,8 @@ url: "" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: UKDLC
 github_username: UK-Data-Linkage-Community
 contact_email: michael.edwards@swansea.ac.uk
+atom_feed:
+    hide: true
 
 
 header_pages:
