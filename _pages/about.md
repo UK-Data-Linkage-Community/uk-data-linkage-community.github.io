@@ -9,9 +9,9 @@ Its openness and generalist focus will facilitate cross-community pollination, e
 
 ## <u>UK Data Linkage Community is...</u>
 ### Open
-We welcome members of the field to contribute to the ongoing development of a healthy community.
+We welcome members to contribute to the ongoing development of a healthy community.
 This includes by engaging in discussions and workshops, or by providing materials and best practice advice.
-The community is hosted on [GitHub][ukdlc-github] and welcomes contribution. 
+The community is hosted on [GitHub]({{ site.ukdlc_github_url }}) and welcomes contribution. 
 
 ### Collaborative
 The community seeks to foster discussion and knowledge sharing amongst linkage practitioners, with the goal of facilitating collaboration across siloed institutions.
@@ -27,14 +27,11 @@ This includes educational resources around data linkage practice, aimed at a var
 This includes those performing the linkage, using the linked data, and the wider public. 
 
 ## <u>Getting Involved</u>
-To sign up to the UK DLC mailing list, [please use the following form][ukdlc-mailing-list].
-
-The community can be found on GitHub as [UK-Data-Linkage-Community][ukdlc-github]
+To get involved we the UK Data Linkage Community, please see [our Join page][join_page]
 
 ### <u>Funding and Affiliation</u>
-The UK Data Linkage Community is funded by the DARE UK Communities.
+The UK Data Linkage Community is funded by [DARE UK](https://www.dareuk.org.uk) as a Community Interest Group.
 
 The UK Data Linkage Community is affiliated with [Administrative Data Research UK (ADR UK)](https://www.adruk.org/).
 
-[ukdlc-github]: https://github.com/UK-Data-Linkage-Community
-[ukdlc-mailing-list]: https://forms.gle/4TWHQofvEXt97LzF7
+[join_page]: {{ site.baseurl }}{% link _pages/join.md %}

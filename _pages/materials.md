@@ -19,7 +19,7 @@ If you have suggestions for materials that you would like to see, please submit 
 ## Useful links
 ### We also collate a list of [useful links][useful-links] which may be of interest
 
-[general]: {{ site.baseurl }}{% link 4_materials/general.md %}
-[practitioners]: {{ site.baseurl }}{% link 4_materials/linkage_practitioners.md %}
-[users]: {{ site.baseurl }}{% link 4_materials/linked_data_users.md %}
-[useful-links]: {{ site.baseurl }}{% link 4_materials/useful_links.md %}
+[general]: {{ site.baseurl }}{% link _pages/materials_general.md %}
+[practitioners]: {{ site.baseurl }}{% link _pages/materials_practitioners.md %}
+[users]: {{ site.baseurl }}{% link _pages/materials_users.md %}
+[useful-links]: {{ site.baseurl }}{% link _pages/useful_links.md %}

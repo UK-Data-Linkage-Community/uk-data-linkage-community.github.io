@@ -26,7 +26,7 @@
 
 /* Header Styles */
 .site-header {
-  border-top: 0px solid #424242;
+  border-top: 0px solid #494951;
   border-bottom: 1px solid #e8e8e8;
   padding: 0px;
   min-height: 70px;
@@ -104,7 +104,7 @@
 }
 
 .site-nav .page-link {
-  color: #424242;
+  color: #494951;
   text-decoration: none;
   font-weight: 500;
   font-size: 1rem;
@@ -128,7 +128,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #424242;
+  color: #494951;
   text-decoration: none;
   font-weight: 500;
   font-size: 1rem;
@@ -168,7 +168,7 @@
 .dropdown-content a {
   display: block;
   padding: 12px 20px;
-  color: #424242;
+  color: #494951;
   text-decoration: none;
   font-weight: 400;
   border-bottom: 1px solid #f0f0f0;
@@ -213,7 +213,7 @@
   display: block;
   width: 25px;
   height: 3px;
-  background: #424242;
+  background: #494951;
   margin: 5px 0;
   transition: 0.3s;
   border-radius: 2px;
@@ -335,7 +335,7 @@
 .hero-section {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 50vh;
   max-height: 800px;
   overflow: hidden;
   display: flex;
@@ -376,7 +376,7 @@
 
 .hero-overlay p {
   font-size: 1.3rem;
-  color: #424242;
+  color: #494951;
   margin: 0;
   line-height: 1.6;
 }
@@ -481,14 +481,14 @@
 .section-content {
   font-size: 1.1rem;
   line-height: 1.8;
-  color: #424242;
+  color: #494951;
   margin-bottom: 2rem;
 }
 
 .section-link {
   display: inline-block;
   padding: 12px 30px;
-  background: #424242;
+  background: #494951;
   color: #fff;
   text-decoration: none;
   font-weight: 600;
@@ -499,6 +499,12 @@
 .section-link:hover {
   background: #111;
   text-decoration: none;
+}
+.section-link:visited {
+  color: #30CABF;
+}
+.section-link:link {
+  color: #30CABF;
 }
 
 /* Image-right: swap order */

@@ -24,21 +24,23 @@ description: >- # this means to ignore newlines until "baseurl:"
   A community for those working in the data linkage space.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
-#twitter_username: UKDLC
+
 github_username: UK-Data-Linkage-Community
+ukdlc_github_url: https://github.com/UK-Data-Linkage-Community
 contact_email: michael.edwards@swansea.ac.uk
+ukdlc_mailing_list_url: https://forms.gle/4TWHQofvEXt97LzF7
+
 atom_feed:
     hide: true
 
-
 header_pages:
   - index.md
-  - 1_about/about.md
-  - 2_blog/blog.md
-  - 3_events/events.md
-  - 4_materials/materials.md
-  - 5_people/people.md
-  - 6_related_groups/related_groups.md
+  - about.md
+  - blog.md
+  - events.md
+  - materials.md
+  - people.md
+  - related_groups.md
 
 
 # Build settings
@@ -58,6 +60,7 @@ collections:
   people:
     sort_by: sort_key
 
+include: ["_pages"]
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
