@@ -705,3 +705,62 @@ main,
     text-align: left;
   }
 }
+
+/* ==========================================================================
+   Related Groups Layout
+   ========================================================================== */
+
+.community-groups {
+  display: grid;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.group-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background: #fafafa;
+  transition: box-shadow 0.2s;
+}
+
+//.group-card:hover {
+//  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+//}
+
+.group-card h2 {
+  margin-top: 0;
+  color: #2c3e50;
+}
+
+.group-card h2 a {
+  text-decoration: none;
+  color: #2c3e50;
+}
+
+.group-card h2 a:hover {
+  color: #3498db;
+}
+
+.group-description {
+  color: #555;
+  line-height: 1.6;
+}
+
+.group-link a {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.group-link a:hover {
+  text-decoration: underline;
+}
+
+.get-involved {
+  text-align: center;
+  margin-top: 3rem;
+  padding: 1.5rem;
+  background: #f0f8ff;
+  border-radius: 8px;
+}
