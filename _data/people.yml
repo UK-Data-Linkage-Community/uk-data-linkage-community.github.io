@@ -1,5 +1,5 @@
 - name: "Mike Edwards"
-  affiliation: "SeRP UK"
+  affiliation: "SeRP UK, Swansea University"
   content: "Principal Data Linkage Architect for SeRP’s Linkage branch, designing and developing linkage solutions for datasets covering applications including healthcare, justice, and education. His team has experience supporting the scoping of linkage projects, producing custom linkage models, creating operationalised workflows for linkage projects, and supporting end-users of linked cohorts."
   image: "/assets/images/people/michael_edwards.jpg"
 
@@ -14,6 +14,6 @@
   image: "/assets/images/people/sam_lindsay.jpg"
 
 - name: "Simon Thompson"
-  affiliation: "SeRP UK, SAIL Databank"
+  affiliation: "SeRP UK, SAIL Databank, Swansea University"
   content: "CTO of SeRP UK, with strong experience in supporting initiatives for the use of linked data across a wide range of academic and government applications, championing linked data for public good and co-directing the development of SeRP UK’s technology arm for data linkage within trusted research environments."
   image: "/assets/images/people/simon_thompson.jpg"

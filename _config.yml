@@ -30,6 +30,8 @@ ukdlc_github_url: https://github.com/UK-Data-Linkage-Community
 ukdlc_github_discussions: https://github.com/orgs/UK-Data-Linkage-Community/discussions
 contact_email: michael.edwards@swansea.ac.uk
 ukdlc_mailing_list_url: https://forms.gle/4TWHQofvEXt97LzF7
+ukdlc_color_teal: "#30CABF"
+ukdlc_color_grey: "#494951"
 
 atom_feed:
     hide: true
@@ -42,7 +44,6 @@ header_pages:
   - materials.md
   - people.md
   - related_groups.md
-
 
 # Build settings
 markdown: kramdown

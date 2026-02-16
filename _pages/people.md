@@ -1,15 +1,14 @@
 ---
 layout: page
-title: People
 permalink: /people/
 headshot_width: "200px"
 ---
 
-## <u>Community Co-Chairs</u>
+<h1 style="text-align: center;"><u>Co-Chairs</u></h1>
 {% for person in site.data.people %}
 <div class="person">
   <div class="person-info">
-    <h3>{{ person.name }}</h3>
+    <h2>{{ person.name }}</h2>
     <div class="affiliation">{{ person.affiliation }}</div>
     <div class="person-content">
       {{ person.content | markdownify }}
@@ -20,13 +19,3 @@ headshot_width: "200px"
   </div>
 </div>
 {% endfor %}
-
----
-## <u>Public Interest Representative</u>
-\# TODO
-
----
-## <u>Members</u>
-
-
-[splink]: https://moj-analytical-services.github.io/splink/

@@ -4,7 +4,7 @@ layout: home
 hero_section:
     hero_title: "Welcome to the UK Data Linkage Community"
     hero_subtitle: "Strengthening production and use of linked data through collaboration"
-    img: "/assets/images/banners/pexels-pixabay-163064.jpg"
+    img: "/assets/images/banners/ph_home_1.jpg"
 
 sections:
   - title: "An open resource"
@@ -16,7 +16,7 @@ sections:
       url: "/about/"
       
   - title: "Cross-sector and Collaborative"
-    image: "/assets/images/banners/ph_home_1.jpg"
+    image: "/assets/images/banners/pexels-pixabay-163064.jpg"
     content: |
       Members represent a wide range of backgrounds including local and national government, academia, healthcare, and industry.
     link:

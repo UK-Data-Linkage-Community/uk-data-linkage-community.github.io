@@ -1,0 +1,12 @@
+---
+layout: post
+title:  "Publication of the UK DLC website and GitHub Organisation"
+date:   2026-02-16 12:00:00 +0000
+categories: main
+---
+The UK DLC website is now available at [uk-data-linkage-community.github.io](uk-data-linkage-community.github.io).
+
+The website contains information on the UK DLC's purpose, as well as details on co-chairs, how to join, and some initial materials.
+
+A GitHub organisation is also available at [https://github.com/UK-Data-Linkage-Community](https://github.com/UK-Data-Linkage-Community).
+The GitHub org holds public discussions, as well as developed materials.

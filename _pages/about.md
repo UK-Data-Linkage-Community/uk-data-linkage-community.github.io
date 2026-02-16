@@ -1,40 +1,50 @@
 ---
 layout: page
-title: About
 permalink: /about/
 ---
-The UK Data Linkage Community is an open, cross-sector community dedicated to the general practice of data linkage, focusing on methodologies, applications, and principles. 
 
-Its openness and generalist focus will facilitate cross-community pollination, enabling members from a variety of sectors to engage in shared learning and collaborative problem-solving.
+<h1 style="text-align:center;"><u>UK Data Linkage Community is...</u></h1>
+The UK Data Linkage Community (UK DLC) is an open membership community dedicated to the general practice of data linkage and entity resolution.
+With a focus on linkage methodologies, applications, and principles, the UK DLC facilitates cross-sector learning and collaboration.
 
-## <u>UK Data Linkage Community is...</u>
-### Open
-We welcome members to contribute to the ongoing development of a healthy community.
-This includes by engaging in discussions and workshops, or by providing materials and best practice advice.
-The community is hosted on [GitHub]({{ site.ukdlc_github_url }}) and welcomes contribution. 
+### <u>Openly Accessible</u>
+We actively invite members to shape and grow the community by contributing to discussions, participating in workshops, sharing materials, and surfacing best practices.
 
-### Collaborative
-The community seeks to foster discussion and knowledge sharing amongst linkage practitioners, with the goal of facilitating collaboration across siloed institutions.
+The community is hosted on [GitHub]({{ site.ukdlc_github_url }}) and submissions are always welcome.
+For more information on joining or contributing, visit [our Join page][join_page].
 
-### Cross-sector
-Data linkage is a critical component of modern data use across many different sectors and applications. 
-We welcome members from across public and private sector, including academia, government, and industry. 
-We also aim to be agnostic to application domain, supporting linkers in areas such as health, admin, and finance. 
 
-### Productive
-We aim to provide materials to support the field of data linkage.
-This includes educational resources around data linkage practice, aimed at a variety of target audiences. 
-This includes those performing the linkage, using the linked data, and the wider public. 
+### <u>Collaborative</u>
+The community facilitates discussion and knowledge exchange among data linkage practitioners, identifying common practices and challenges across the field.
 
-## <u>Getting Involved</u>
-Interested in joining or contributing? Visit [our Join page][join_page].
+By fostering dialogue across institutional and sectoral boundaries, we aim to promote collaboration and reduce fragmentation within the field.
 
-### <u>Funding and Affiliation</u>
+### <u>Cross-sector and domain agnostic</u>
+Data linkage is a foundational component of contemporary data use across a wide range of sectors and domains.
+While different domains and use cases impose distinct requirements on linked data, the core methodological approaches to linking records and identifying entities are often shared.
+The UK DLC presents a domain and dataset agnostic approach to strengthen and develop this common methodological foundation.
+
+We welcome participation from individuals working in academia, government, and industry.
+The community supports practitioners working in areas including health, administrative data, finance, and related domains.
+
+### <u>Productive</u>
+The community is committed to developing resources that strengthen the practice of data linkage.
+
+These include educational and guidance materials designed to support:
+- Individuals undertaking linkage activities  
+- Researchers and analysts using linked datasets  
+- Members of the public seeking to understand data linkage practices
+
+More details on materials produced as part of the UK DLC project can be found [on the Materials page][materials_page]
+
+---
+
 The UK Data Linkage Community is funded by [DARE UK](https://www.dareuk.org.uk) as a Community Interest Group, and is affiliated with [Administrative Data Research UK (ADR UK)](https://www.adruk.org/).
 
 <p style="display:flex; justify-content: space-evenly">
-<img src="{{ site.baseurl }}/assets/logos/DARE_UK_logo.svg" width="40%">
-<img src="{{ site.baseurl }}/assets/logos/ADRUK - logo colour affiliated.svg" width="40%">
+<img src="{{ site.baseurl }}/assets/logos/DARE_UK_logo.svg" width="30%" alt="DARE UK logo">
+<img src="{{ site.baseurl }}/assets/logos/ADRUK - logo colour affiliated.svg" width="30%" alt="ADR UK Affiliate logo">
 </p>
 
 [join_page]: {{ site.baseurl }}{% link _pages/join.md %}
+[materials_page]: {{ site.baseurl }}{% link _pages/materials.md %}

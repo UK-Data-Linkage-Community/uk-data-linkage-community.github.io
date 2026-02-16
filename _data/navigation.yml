@@ -24,6 +24,8 @@ main:
     children:
       - title: "Materials"
         url: /materials/
+      - title: "Useful Links"
+        url: /materials/useful-links
       - title: "Related Groups"
         url: /related-groups/
 

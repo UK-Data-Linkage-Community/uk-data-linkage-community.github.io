@@ -26,7 +26,7 @@
 
 /* Header Styles */
 .site-header {
-  border-top: 0px solid #494951;
+  border-top: 0px solid {{ site.ukdlc_color_grey}};
   border-bottom: 1px solid #e8e8e8;
   padding: 0px;
   min-height: 70px;
@@ -104,7 +104,7 @@
 }
 
 .site-nav .page-link {
-  color: #494951;
+  color: {{ site.ukdlc_color_grey}};
   text-decoration: none;
   font-weight: 500;
   font-size: 1rem;
@@ -128,7 +128,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  color: #494951;
+  color: {{ site.ukdlc_color_grey}};
   text-decoration: none;
   font-weight: 500;
   font-size: 1rem;
@@ -168,7 +168,7 @@
 .dropdown-content a {
   display: block;
   padding: 12px 20px;
-  color: #494951;
+  color: {{ site.ukdlc_color_grey}};
   text-decoration: none;
   font-weight: 400;
   border-bottom: 1px solid #f0f0f0;
@@ -213,7 +213,7 @@
   display: block;
   width: 25px;
   height: 3px;
-  background: #494951;
+  background: {{ site.ukdlc_color_grey}};
   margin: 5px 0;
   transition: 0.3s;
   border-radius: 2px;
@@ -376,7 +376,7 @@
 
 .hero-overlay p {
   font-size: 1.3rem;
-  color: #494951;
+  color: {{ site.ukdlc_color_grey}};
   margin: 0;
   line-height: 1.6;
 }
@@ -483,7 +483,7 @@
 .section-content {
   font-size: clamp(0.85rem, 1.0vw, 1rem);
   line-height: 1.4;
-  color: #494951;
+  color: {{ site.ukdlc_color_grey}};
   margin-top: 0;
   margin-bottom: clamp(0.0rem, 0.8vw, 0.8rem);
 }
@@ -491,7 +491,7 @@
 .section-link {
   display: inline-block;
   padding: clamp(8px, 0.8vw, 12px) clamp(18px, 1.8vw, 28px);
-  background: #494951;
+  background: {{ site.ukdlc_color_grey}};
   color: #fff;
   text-decoration: none;
   font-weight: 600;
@@ -506,10 +506,10 @@
   text-decoration: none;
 }
 .section-link:visited {
-  color: #30CABF;
+  color: {{ site.ukdlc_color_teal}};
 }
 .section-link:link {
-  color: #30CABF;
+  color: {{ site.ukdlc_color_teal}};
 }
 
 /* Image-right: swap order */

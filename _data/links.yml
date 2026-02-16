@@ -49,9 +49,9 @@ categories:
   - name: "Books"
     description: "Specific books on data linkage and related topics"
     links:
-      - title: "Hands-On Entity Resolution with Splink"
-        url: "https://www.oreilly.com/library/view/hands-on-entity-resolution/9781098148478"
-        description: "Practical entity resolution with Splink and cloud computing."
       - title: "Linking Sensitive Data"
         url: "https://link.springer.com/book/10.1007/978-3-030-59706-1"
         description: "Introduction to privacy-preserving record linkage."
+      - title: "Hands-On Entity Resolution with Splink"
+        url: "https://www.oreilly.com/library/view/hands-on-entity-resolution/9781098148478"
+        description: "Practical entity resolution with Splink and cloud computing."

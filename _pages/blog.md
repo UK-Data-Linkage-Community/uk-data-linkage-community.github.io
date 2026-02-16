@@ -5,6 +5,16 @@ permalink: /blog/
 ---
 
 ## Recent Posts
+<dl>
+  {% for post in site.posts limit:2 %}
+    <dt>
+      <a href="{{ post.url }}">{{ post.date | date: "%Y-%m-%d" }}: {{ post.title }}</a> 
+    </dt>
+    <dd>
+    {{ post.content }} <hr style="border-top: 1px solid {{ site.ukdlc_color_grey }};"> 
+    </dd>
+  {% endfor %}
+</dl>
 
 
 ## Historical Posts
