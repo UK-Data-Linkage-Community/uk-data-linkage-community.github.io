@@ -48,12 +48,12 @@ header_pages:
 # Build settings
 markdown: kramdown
 permalink: /blog/:year/:month/:day/:title/
-#remote_theme: pages-themes/minimal@v0.2.0
-theme: minimal-mistakes-jekyll
+remote_theme: mmistakes/minimal-mistakes
 
 plugins:
   - jekyll-remote-theme
   - jekyll-feed
+  - jekyll-include-cache
 
 collections_dir: collections
 
