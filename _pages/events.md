@@ -17,52 +17,68 @@ To add an event, please make a request [through github]({{ site.ukdlc_github_dis
 
 ---
 
-## Workshops:
-<ul>
-  {% for event in site.events %}
-    {% if event.category == "workshop" %}
-        <li>
-            <h3><u>{{ event.title }}</u></h3>
-            {{ event.content }}
-            {% if event.provisional_date %}
-                Provisional date: {{ event.provisional_date }}<br>
-            {% else %}
-                Date: {{ event.date | date: "%Y-%m-%d" }}<br>
-            {% endif %}
-            {% if event.venue %}
-                Venue: {{ event.venue }}<br>
-            {% endif %}
-            {% if event.registration_link %}
-                Registration link: {{ event.registration_link }}<br>
-            {% endif %}
-        </li>
-        <br>
-    {% endif %}
-  {% endfor %}
-</ul>
+{% assign events_data = site.data.events %}
+
+## Workshops
+
+{% assign workshops = events_data.categories | where: "event_type", "workshops" | first %}
+{% assign sorted_workshops = workshops.events | sort: "date" %}
+
+<div class="events-section workshops-section">
+{% for event in sorted_workshops %}
+  <div class="event-card">
+    <h3>{{ event.title }}</h3>
+    
+    <div class="event-meta">
+      <p><strong>Date:</strong> 
+        {% if event.use_provisional_date %}
+          {{ event.provisional_date }}
+        {% else %}
+          {{ event.date | date: "%B %d, %Y" }}
+        {% endif %}
+      </p>
+      
+      <p><strong>Venue:</strong> {{ event.venue }}</p>
+      
+      <p><strong>Registration:</strong> {{ event.registration_link }}</p>
+    </div>
+    
+    <div class="event-description">
+      {{ event.description }}
+    </div>
+  </div>
+{% endfor %}
+</div>
 
 ---
 
-## Showcase event:
-<ul>
-  {% for event in site.events %}
-    {% if event.category == "showcase" %}
-        <li>
-            <h3><u>{{ event.title }}</u></h3>
-            {{ event.content }}
-            {% if event.provisional_date %}
-                Provisional date: {{ event.provisional_date }}<br>
-            {% else %}
-                Date: {{ event.date | date: "%Y-%m-%d" }}<br>
-            {% endif %}
-            {% if event.venue %}
-                Venue: {{ event.venue }}<br>
-            {% endif %}
-            {% if event.registration_link %}
-                Registration link: {{ event.registration_link }}<br>
-            {% endif %}
-        </li>
-        <br>
-    {% endif %}
-  {% endfor %}
-</ul>
+## Showcases
+
+{% assign showcases = events_data.categories | where: "event_type", "showcases" | first %}
+{% assign sorted_showcases = showcases.events | sort: "date" %}
+
+<div class="events-section showcases-section">
+{% for event in sorted_showcases %}
+  <div class="event-card">
+    <h3>{{ event.title }}</h3>
+    
+    <div class="event-meta">
+      <p><strong>Date:</strong> 
+        {% if event.use_provisional_date %}
+          {{ event.provisional_date }}
+        {% else %}
+          {{ event.date | date: "%B %d, %Y" }}
+        {% endif %}
+      </p>
+      
+      <p><strong>Venue:</strong> {{ event.venue }}</p>
+      
+      <p><strong>Registration:</strong> {{ event.registration_link }}</p>
+    </div>
+    
+    <div class="event-description">
+      {{ event.description }}
+    </div>
+  </div>
+{% endfor %}
+</div>

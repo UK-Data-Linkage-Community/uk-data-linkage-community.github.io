@@ -1,0 +1,36 @@
+categories:
+  - event_type: "showcases"
+    events:
+      - title: "UK Data Linkage Showcase"
+        date: 2027-03-25
+        provisional_date: "Late Q1 2027"
+        use_provisional_date: true
+        registration_link: "To be confirmed"
+        venue: "Swansea, UK"
+        description: "A showcase event will be held to highlight the progress of data linkage within the UK. This event should bring together both core data linkage methodology and related areas under the wider umbrella groups."
+
+  - event_type: "workshops"
+    events:
+      - title: "Supporting Data Linkage Practitioners"
+        date: 2026-03-25
+        provisional_date: "Late Q1 2026"
+        use_provisional_date: true
+        registration_link: "To be confirmed"
+        venue: "Swansea, UK"
+        description: "This initial workshop will look at what linkage practitioners need from a wider community network."
+
+      - title: "Related Topics in Data Linkage"
+        date: 2026-06-25
+        provisional_date: "Late Q2 2026"
+        use_provisional_date: true
+        registration_link: "To be confirmed"
+        venue: "Swansea, UK"
+        description: "This workshop will bring together groups from linkage-related areas, identifying how the wider network can provide support whilst preserving their autonomy."
+
+      - title: "Supporting Linked Data Users"
+        date: 2026-11-20
+        provisional_date: "Early Q4 2026"
+        use_provisional_date: true
+        registration_link: "To be confirmed"
+        venue: "Swansea, UK"
+        description: "This workshop will look to support users of linked data, identifying how data linkage practitioners can support them. This includes exploring issues around communication, transparency, and confident usage of linked data."
