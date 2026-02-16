@@ -27,6 +27,7 @@ url: "" # the base hostname & protocol for your site, e.g. http://example.com
 
 github_username: UK-Data-Linkage-Community
 ukdlc_github_url: https://github.com/UK-Data-Linkage-Community
+ukdlc_github_discussions: https://github.com/orgs/UK-Data-Linkage-Community/discussions
 contact_email: michael.edwards@swansea.ac.uk
 ukdlc_mailing_list_url: https://forms.gle/4TWHQofvEXt97LzF7
 

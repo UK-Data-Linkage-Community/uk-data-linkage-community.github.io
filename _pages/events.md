@@ -12,8 +12,8 @@ For more detail on planned events, please see below.
 
 ## Shared calendar for upcoming events
 
-<iframe src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Europe%2FLondon&showPrint=0&showCalendars=0&mode=AGENDA&src=YmU5NzBhNDBmZWNkOTNkZjE1NDY1M2Y3MmEwMWRjZWExNzZlMTU2YzkzZWI0ODRmODViMjE4YTZhNmMyMDJmZUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%23ef6c00" style="border-width:0" width="700" height="400" frameborder="0" scrolling="no"></iframe>
-To add an event, please make a request [through github](https://github.com/orgs/UK-Data-Linkage-Community/discussions) or via [email](mailto:{{ site.contact_email }}?subject=UK DLC calendar).
+<iframe src="https://calendar.google.com/calendar/embed?height=600&wkst=1&ctz=Europe%2FLondon&showPrint=0&showCalendars=0&mode=AGENDA&src=YmU5NzBhNDBmZWNkOTNkZjE1NDY1M2Y3MmEwMWRjZWExNzZlMTU2YzkzZWI0ODRmODViMjE4YTZhNmMyMDJmZUBncm91cC5jYWxlbmRhci5nb29nbGUuY29t&color=%23ef6c00" style="border-width:0" width="100%" height="400" frameborder="0" scrolling="no"></iframe>
+To add an event, please make a request [through github]({{ site.ukdlc_github_discussions }}) or via [email](mailto:{{ site.contact_email }}?subject=UK DLC: Suggestions for events).
 
 ---
 
@@ -66,4 +66,3 @@ To add an event, please make a request [through github](https://github.com/orgs/
     {% endif %}
   {% endfor %}
 </ul>
-

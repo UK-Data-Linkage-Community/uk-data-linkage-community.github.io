@@ -3,8 +3,8 @@ layout: page
 title: About
 permalink: /about/
 ---
-The core objective of this group is to establish an open, cross-sector community dedicated to the general practice of data linkage, namely methodologies, applications, and principles. 
-Unlike existing groups, the proposed group will take a broader and more inclusive approach. 
+The UK Data Linkage Community is an open, cross-sector community dedicated to the general practice of data linkage, focusing on methodologies, applications, and principles. 
+
 Its openness and generalist focus will facilitate cross-community pollination, enabling members from a variety of sectors to engage in shared learning and collaborative problem-solving.
 
 ## <u>UK Data Linkage Community is...</u>
@@ -27,7 +27,7 @@ This includes educational resources around data linkage practice, aimed at a var
 This includes those performing the linkage, using the linked data, and the wider public. 
 
 ## <u>Getting Involved</u>
-To get involved we the UK Data Linkage Community, please see [our Join page][join_page]
+To get involved with the UK Data Linkage Community, please see [our Join page][join_page]
 
 ### <u>Funding and Affiliation</u>
 The UK Data Linkage Community is funded by [DARE UK](https://www.dareuk.org.uk) as a Community Interest Group.
