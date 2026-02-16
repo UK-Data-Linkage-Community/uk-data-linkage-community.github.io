@@ -1,10 +1,10 @@
 ---
 layout: page
+title: "Co-Chairs"
 permalink: /people/
 headshot_width: "200px"
 ---
 
-# <u>Co-Chairs</u>
 {% for person in site.data.people %}
 <div class="person">
   <div class="person-info">
