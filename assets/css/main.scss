@@ -764,3 +764,29 @@ main,
   background: #f0f8ff;
   border-radius: 8px;
 }
+
+/* ==========================================================================
+   Event Meta Layout
+   ========================================================================== */
+
+.event-card {
+  margin-bottom: 2rem;
+}
+
+.event-description {
+  margin-bottom: 1.5rem;
+}
+
+.event-meta-box {
+  display: flex;
+  gap: 2rem;
+  padding: 0.5rem;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.event-meta-box p {
+  margin: 0;
+  //white-space: nowrap;
+}

@@ -29,7 +29,11 @@ If you have an event you would like to be added, please make a request [through 
   <div class="event-card">
     <h3>{{ event.title }}</h3>
     
-    <div class="event-meta">
+    <div class="event-description">
+      {{ event.description }}
+    </div>
+    
+    <div class="event-meta-box">
       <p><strong>Date:</strong> 
         {% if event.use_provisional_date %}
           {{ event.provisional_date }}
@@ -42,10 +46,7 @@ If you have an event you would like to be added, please make a request [through 
       
       <p><strong>Registration:</strong> {{ event.registration_link }}</p>
     </div>
-    
-    <div class="event-description">
-      {{ event.description }}
-    </div>
+      <hr style="border-top: 1px solid {{ site.ukdlc_color_grey }};"> 
   </div>
 {% endfor %}
 </div>
