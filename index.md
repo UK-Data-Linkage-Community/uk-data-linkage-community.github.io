@@ -26,7 +26,7 @@ sections:
   - title: "Joining"
     image: "/assets/images/banners/pexels-fauxels-3184305.jpg"
     content: |
-      To get involved with the UK Data Linkage community, visit the Join page
+      To get involved with the UK Data Linkage community, visit the Join page.
     link:
       text: "Join"
       url: "/join/"
