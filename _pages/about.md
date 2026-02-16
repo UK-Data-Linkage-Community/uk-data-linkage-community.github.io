@@ -1,7 +1,7 @@
 ---
 layout: page
 title: About
-permalink: /about/
+permalink: /about-original/
 ---
 The UK Data Linkage Community is an open, cross-sector community dedicated to the general practice of data linkage, focusing on methodologies, applications, and principles. 
 
@@ -27,11 +27,14 @@ This includes educational resources around data linkage practice, aimed at a var
 This includes those performing the linkage, using the linked data, and the wider public. 
 
 ## <u>Getting Involved</u>
-To get involved with the UK Data Linkage Community, please see [our Join page][join_page]
+Interested in joining or contributing? Visit [our Join page][join_page].
 
 ### <u>Funding and Affiliation</u>
-The UK Data Linkage Community is funded by [DARE UK](https://www.dareuk.org.uk) as a Community Interest Group.
+The UK Data Linkage Community is funded by [DARE UK](https://www.dareuk.org.uk) as a Community Interest Group, and is affiliated with [Administrative Data Research UK (ADR UK)](https://www.adruk.org/).
 
-The UK Data Linkage Community is affiliated with [Administrative Data Research UK (ADR UK)](https://www.adruk.org/).
+<p style="display:flex; justify-content: space-evenly">
+<img src="{{ site.baseurl }}/assets/logos/DARE_UK_logo.svg" width="40%">
+<img src="{{ site.baseurl }}/assets/logos/ADRUK - logo colour affiliated.svg" width="40%">
+</p>
 
 [join_page]: {{ site.baseurl }}{% link _pages/join.md %}
