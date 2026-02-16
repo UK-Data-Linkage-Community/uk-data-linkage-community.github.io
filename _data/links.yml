@@ -13,12 +13,19 @@ categories:
       - title: "Splink"
         url: "https://moj-analytical-services.github.io/splink"
         description: "Scalable Fellegi-Sunter and rule-based entity resolution using your choice of SQL or Spark backend."
+        icons:
+          - "fas fa-database"
+          - "fab fa-python"
       - title: "FastLink"
         url: "https://github.com/kosukeimai/fastLink"
         description: "Easy, scalable Fellegi-Sunter entity resolution on your laptop."
+        icons:
+          - "fab fa-r-project"
       - title: "RecordLinkage"
         url: "https://github.com/J535D165/recordlinkage"
         description: "Toolkit for prototyping entity resolution systems."
+        icons:
+          - "fab fa-python"
 
 
   - name: "Evaluation"
@@ -27,6 +34,8 @@ categories:
       - title: "ER-Evaluation"
         url: "https://github.com/Valires/er-evaluation"
         description: "End-to-End evaluation, including summary statistics for monitoring, principled performance metric estimators, and error analysis."
+        icons:
+          - "fab fa-python"
 
   - name: "Blocking, Candidate Selection, and Search"
     description: "Specific resources for blocking, candidate selection, and searching"
@@ -34,6 +43,8 @@ categories:
       - title: "BlockingPy"
         url: "https://github.com/ncn-foreigners/BlockingPy"
         description: "Blocking based on approximate nearest neighbours."
+        icons:
+          - "fab fa-python"
 
   - name: "Books"
     description: "Specific books on data linkage and related topics"

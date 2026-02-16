@@ -7,8 +7,7 @@ permalink: /materials/useful-links
 <div class="links-page">
   <div class="page-header">
     <h1>Useful Links</h1>
-    <p class="page-intro">Below is a list of various interesting and helpful resources. 
-Please let us know if we've missed any, or if links are broken.</p>
+    <p class="page-intro">A curated collection of helpful resources and tools</p>
   </div>
 
   {% for category in site.data.links.categories %}
@@ -19,7 +18,17 @@ Please let us know if we've missed any, or if links are broken.</p>
     <div class="links-grid">
       {% for link in category.links %}
       <a href="{{ link.url }}" class="link-card" target="_blank" rel="noopener noreferrer">
-        <h3 class="link-title">{{ link.title }}</h3>
+        <div class="link-header">
+          <h3 class="link-title">{{ link.title }}</h3>    
+          {% if link.icons %}
+          <div class="link-icons">
+            {% for icon in link.icons %}
+            <i class="{{ icon }}"></i>
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+        </div>
         <p class="link-description">{{ link.description }}</p>
         <span class="link-arrow">→</span>
       </a>
@@ -106,11 +115,72 @@ Please let us know if we've missed any, or if links are broken.</p>
   transform: translateX(5px);
 }
 
+.link-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0.5rem;
+}
+
+.link-icons {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.link-icons i {
+  font-size: 1.4rem;
+  color: #494951;
+  transition: color 0.3s ease;
+}
+
+.link-card:hover .link-icons i {
+  color: #111;
+}
+
+/* Specific icon colors (optional) */
+.fa-python {
+  color: #3776ab;
+}
+
+.fa-database {
+  color: #336791;
+}
+
+.fa-bolt {
+  color: #e25a1c;
+}
+
+.fa-js {
+  color: #f7df1e;
+}
+
+.fa-react {
+  color: #61dafb;
+}
+
+.fa-node-js {
+  color: #339933;
+}
+
+.fa-java {
+  color: #007396;
+}
+
+.fa-docker {
+  color: #2496ed;
+}
+
+.fa-git-alt {
+  color: #f05032;
+}
+
 .link-title {
   font-size: 1.3rem;
   color: #111;
-  margin: 0 0 0.5rem 0;
+  margin: 0;
   font-weight: 600;
+  flex-grow: 1;
 }
 
 .link-description {
@@ -151,6 +221,10 @@ Please let us know if we've missed any, or if links are broken.</p>
   .link-card {
     padding: 20px;
   }
+  
+  .link-icons i {
+    font-size: 1.2rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -164,6 +238,14 @@ Please let us know if we've missed any, or if links are broken.</p>
   
   .category-title {
     font-size: 1.3rem;
+  }
+  
+  .link-header {
+    gap: 8px;
+  }
+  
+  .link-icons {
+    gap: 6px;
   }
 }
 </style>
