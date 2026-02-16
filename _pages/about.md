@@ -1,7 +1,7 @@
 ---
 layout: page
 title: About
-permalink: /about-original/
+permalink: /about/
 ---
 The UK Data Linkage Community is an open, cross-sector community dedicated to the general practice of data linkage, focusing on methodologies, applications, and principles. 
 
