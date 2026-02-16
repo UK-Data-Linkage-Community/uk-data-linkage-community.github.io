@@ -8,7 +8,7 @@ hero_section:
 
 sections:
   - title: "An open resource"
-    image: "/assets/images/banners/ph_home_0.jpg"
+    image: "/assets/images/banners/pexels-element5-1370296.jpg"
     content: |
       Sharing knowledge, best practice, and materials for those working in data linkage and entity resolution.
     link:

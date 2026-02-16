@@ -35,7 +35,12 @@ These include educational and guidance materials designed to support:
 - Researchers and analysts using linked datasets  
 - Members of the public seeking to understand data linkage practices
 
-More details on materials produced as part of the UK DLC project can be found [on the Materials page][materials_page]
+More details on materials produced as part of the UK DLC project can be found on [the Resources page][resources_page]
+
+### <u> Supporting Experts </u>
+UK DLC recognises the ongoing efforts of experts in the field of data linkage, and looks to act as a supporting umbrella network working alongside existing communities to highlight and signpost to existing knowledge within data linkage themes.
+
+For more details on related themes within the community, please see [the Related Groups page][related_groups_page].
 
 <hr style="border-top: 1px solid {{ site.ukdlc_color_grey }}; height: 30px"> 
 
@@ -47,4 +52,5 @@ The UK Data Linkage Community is funded by [DARE UK](https://www.dareuk.org.uk) 
 </p>
 
 [join_page]: {{ site.baseurl }}{% link _pages/join.md %}
-[materials_page]: {{ site.baseurl }}{% link _pages/materials.md %}
+[resources_page]: {{ site.baseurl }}{% link _pages/resources.md %}
+[related_groups_page]: {{ site.baseurl }}{% link _pages/related_groups.md %}

@@ -22,7 +22,7 @@ If you have an event you would like to be added, please make a request [through 
 ## Workshops
 
 {% assign workshops = events_data.categories | where: "event_type", "workshops" | first %}
-{% assign sorted_workshops = workshops.events | sort: "date" %}
+{% assign sorted_workshops = workshops.events | sort: "event_num" %}
 
 <div class="events-section workshops-section">
 {% for event in sorted_workshops %}
@@ -34,16 +34,14 @@ If you have an event you would like to be added, please make a request [through 
     </div>
     
     <div class="event-meta-box">
-      <p><strong>Date:</strong> 
-        {% if event.use_provisional_date %}
-          {{ event.provisional_date }}
-        {% else %}
-          {{ event.date | date: "%B %d, %Y" }}
-        {% endif %}
-      </p>
-      
+      {% if event.use_provisional_date %}
+        <p><strong>Provisional Date:</strong> {{ event.date }}</p>
+      {% else %}
+        <p><strong>Date:</strong> {{ event.date | date: "%b %d, %Y" }}</p>
+      {% endif %}
+
       <p><strong>Venue:</strong> {{ event.venue }}</p>
-      
+
       <p><strong>Registration:</strong> {{ event.registration_link }}</p>
     </div>
       <hr style="border-top: 1px solid {{ site.ukdlc_color_grey }};"> 

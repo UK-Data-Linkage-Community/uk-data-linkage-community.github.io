@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Materials
-permalink: /materials/
+title: Resources
+permalink: /resources/
 ---
 
 One of the key targets of the community is to provide a range of publicly accessible and persistent materials related to data linkage, driven by community requirements.

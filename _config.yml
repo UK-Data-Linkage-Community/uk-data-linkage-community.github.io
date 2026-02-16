@@ -56,11 +56,6 @@ plugins:
   - jekyll-feed
 
 collections_dir: collections
-collections:
-  groups:
-  events:
-  people:
-    sort_by: sort_key
 
 include: ["_pages"]
 # Exclude from processing.

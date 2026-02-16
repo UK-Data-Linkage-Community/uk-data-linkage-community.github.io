@@ -5,9 +5,9 @@ permalink: /related-groups/
 ---
 
 The field of data linkage is a varied landscape, and we support the ongoing work in these areas. 
-Below are some links to related groups in the data linkage field, including, and we encourage those interested to reach out to these groups.
+Below are some links to related groups in the data linkage field, and we encourage those interested to reach out to these groups for further information.
 
-We also encourage those working in related topics to reach out to UK DLC to see how we can offer support to reach wider audiences.
+We also encourage those working in related topics to [reach out to UK DLC](mailto:{{ site.contact_email }}?subject=UK DLC) to see how we can offer support.
 
 ---
 

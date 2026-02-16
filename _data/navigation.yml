@@ -20,12 +20,12 @@ main:
     url: /events/
 
   - title: "Resources"
-    url: /materials/
+    url: /resources/
     children:
-      - title: "Materials"
-        url: /materials/
+      - title: "Resources"
+        url: /resources/
       - title: "Useful Links"
-        url: /materials/useful-links
+        url: /resources/useful-links
       - title: "Related Groups"
         url: /related-groups/
 

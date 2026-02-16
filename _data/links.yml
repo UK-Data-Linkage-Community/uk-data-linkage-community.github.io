@@ -1,57 +1,54 @@
 categories:
-  - name: "Tutorials"
+  - name: "Tutorials and books"
     description: "Guides and tutorials for various topics in data linkage"
     links:
-      - title: "Robin Linarce Blog"
+      - title: "Robin Linacre's Blog"
         url: "https://www.robinlinacre.com"
         description: "A fantastic blog on many different aspects of record linkage"
+        icons: "fa-solid fa-book"
+
+      - title: "Linking Sensitive Data"
+        url: "https://link.springer.com/book/10.1007/978-3-030-59706-1"
+        description: "Comprehensive book covering privacy-preserving record linkage"
+        icons: "fa-solid fa-book"
 
 
-  - name: "End-to-End Entity Resolution"
+  - name: "Software and tools"
     description: "Software development tools and libraries for data linkage"
     links:
       - title: "Splink"
         url: "https://moj-analytical-services.github.io/splink"
-        description: "Scalable Fellegi-Sunter and rule-based entity resolution using your choice of SQL or Spark backend."
+        description: "Python package for fast, accurate and scalable probabilistic data linkage"
         icons:
-          - "fas fa-database"
           - "fab fa-python"
+
       - title: "FastLink"
         url: "https://github.com/kosukeimai/fastLink"
-        description: "Easy, scalable Fellegi-Sunter entity resolution on your laptop."
+        description: "Fast Probabilistic Record Linkage in R"
         icons:
           - "fab fa-r-project"
+
       - title: "RecordLinkage"
         url: "https://github.com/J535D165/recordlinkage"
-        description: "Toolkit for prototyping entity resolution systems."
+        description: "Powerful and modular Python record linkage toolkit"
         icons:
           - "fab fa-python"
 
-
-  - name: "Evaluation"
-    description: "Tools for data analysis and evaluation"
-    links:
-      - title: "ER-Evaluation"
-        url: "https://github.com/Valires/er-evaluation"
-        description: "End-to-End evaluation, including summary statistics for monitoring, principled performance metric estimators, and error analysis."
-        icons:
-          - "fab fa-python"
-
-  - name: "Blocking, Candidate Selection, and Search"
-    description: "Specific resources for blocking, candidate selection, and searching"
+  - name: "Blocking and candidate edge proposal"
+    description: "Resources for blocking and edge prediction"
     links:
       - title: "BlockingPy"
         url: "https://github.com/ncn-foreigners/BlockingPy"
-        description: "Blocking based on approximate nearest neighbours."
+        description: "Efficient blocking methods using Approximate Nearest Neighbor"
         icons:
           - "fab fa-python"
 
-  - name: "Books"
-    description: "Specific books on data linkage and related topics"
+  - name: "Quality insights and metrics"
+    description: "Quality review and performance frameworks"
     links:
-      - title: "Linking Sensitive Data"
-        url: "https://link.springer.com/book/10.1007/978-3-030-59706-1"
-        description: "Introduction to privacy-preserving record linkage."
-      - title: "Hands-On Entity Resolution with Splink"
-        url: "https://www.oreilly.com/library/view/hands-on-entity-resolution/9781098148478"
-        description: "Practical entity resolution with Splink and cloud computing."
+      - title: "ER-Evaluation"
+        url: "https://github.com/Valires/er-evaluation"
+        description: "Framework for evaluation of entity resolution via summary statistics, metrics, and visualizations"
+        icons:
+          - "fab fa-python"
+

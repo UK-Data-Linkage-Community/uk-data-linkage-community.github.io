@@ -11,8 +11,9 @@ permalink: /blog/
       <a href="{{ post.url }}">{{ post.date | date: "%Y-%m-%d" }}: {{ post.title }}</a> 
     </dt>
     <dd>
-    {{ post.content }} <hr style="border-top: 1px solid {{ site.ukdlc_color_grey }};"> 
+    {{ post.content }} 
     </dd>
+    <hr style="border-top: 1px solid {{ site.ukdlc_color_grey }};"> 
   {% endfor %}
 </dl>
 
