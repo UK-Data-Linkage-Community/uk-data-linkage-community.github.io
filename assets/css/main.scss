@@ -335,7 +335,7 @@
 .hero-section {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: 70vh;
   max-height: 800px;
   overflow: hidden;
   display: flex;
@@ -466,33 +466,39 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 10px 100px;
+  padding: clamp(20px, 3vw, 60px) clamp(30px, 5vw, 80px);
   background: rgba(250, 250, 250, 0.95);
   flex-grow: 1;
+  overflow: hidden; // Prevents text from expanding beyond image
 }
 
 .section-text h2 {
-  font-size: 1.5rem;
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
   color: #111;
-  line-height: 1.2;
+  line-height: 1.15;
+  margin-bottom: clamp(0.0rem, 0.5vw, 0.8rem);
+  margin-top: 0;
 }
 
 .section-content {
-  font-size: 1rem;
-  line-height: 1.8;
+  font-size: clamp(0.85rem, 1.0vw, 1rem);
+  line-height: 1.4;
   color: #494951;
-  margin-bottom: 2rem;
+  margin-top: 0;
+  margin-bottom: clamp(0.0rem, 0.8vw, 0.8rem);
 }
 
 .section-link {
   display: inline-block;
-  padding: 12px 30px;
+  padding: clamp(8px, 0.8vw, 12px) clamp(18px, 1.8vw, 28px);
   background: #494951;
   color: #fff;
   text-decoration: none;
   font-weight: 600;
+  font-size: clamp(0.8rem, 0.9vw, 0.95rem);
   transition: background 0.3s ease;
   align-self: flex-start;
+  margin-top: 0;
 }
 
 .section-link:hover {
@@ -513,17 +519,17 @@
 
 /* Tablet adjustments */
 @media (max-width: 1200px) {
-  .section-text {
-    padding: 60px 60px;
-  }
-
-  .section-text h2 {
-    font-size: 1.5rem;
-  }
-
-  .section-content {
-    font-size: 1rem;
-  }
+  //.section-text {
+  //  padding: 60px 60px;
+  //}
+  //
+  //.section-text h2 {
+  //  font-size: 1.5rem;
+  //}
+  //
+  //.section-content {
+  //  font-size: 1rem;
+  //}
 }
 
 /* Mobile Responsive - Stack vertically */
