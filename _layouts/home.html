@@ -1,0 +1,47 @@
+---
+layout: default
+---
+
+<!-- Full-width hero section -->
+{% if page.hero_section %}
+<section class="hero-section">
+  <img src="{{ page.hero_section.img }}" alt="Hero">
+  <div class="hero-overlay">
+    <h1>{{ page.hero_section.hero_title | default: "Welcome" }}</h1>
+    {% if page.hero_section.hero_subtitle %}
+      <p>{{ page.hero_section.hero_subtitle }}</p>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+<!-- Alternating content sections -->
+<div class="home-sections">
+  {% if page.sections %}
+    {% for section in page.sections %}
+      <section class="content-section {% cycle 'image-left', 'image-right' %}">
+        {% if section.image %}
+          <div class="section-image">
+            <img src="{{ section.image }}" alt="{{ section.title }}">
+          </div>
+        {% endif %}
+        <div class="section-text">
+          {% if section.title %}
+            <h2>{{ section.title }}</h2>
+          {% endif %}
+          {% if section.content %}
+            <div class="section-content">
+              {{ section.content | markdownify }}
+            </div>
+          {% endif %}
+          {% if section.link %}
+            <a href="{{ section.link.url }}" class="section-link">{{ section.link.text }}</a>
+          {% endif %}
+        </div>
+      </section>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<div class="content">
+  {{ content }}
+</div>

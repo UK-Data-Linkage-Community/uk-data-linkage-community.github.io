@@ -1,0 +1,31 @@
+main:
+  - title: "Home"
+    url: /
+
+  - title: "About"
+    url: /about/
+    children:
+      - title: "UK DLC"
+        url: /about/
+      - title: "Members"
+        url: /people/
+
+  - title: "Blog"
+    url: /blog/
+
+  - title: "Join"
+    url: /join/
+
+  - title: "Events"
+    url: /events/
+
+  - title: "Resources"
+    url: /resources/
+    children:
+      - title: "Resources"
+        url: /resources/
+      - title: "Useful Links"
+        url: /resources/useful-links
+      - title: "Related Groups"
+        url: /related-groups/
+

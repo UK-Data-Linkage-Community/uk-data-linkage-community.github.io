@@ -1,0 +1,65 @@
+<!--<header class="site-header">-->
+<!--  <div class="wrapper">-->
+<!--    <a class="site-logo" href="{{ "/" | relative_url }}">-->
+<!--      &lt;!&ndash; Option A: Link to external SVG file &ndash;&gt;-->
+<!--      <img src="{{ "/assets/logos/UKDLC_DARK_NEW.svg" | relative_url }}" alt="{{ site.title }}" class="logo-svg">-->
+<!--    </a>-->
+
+<!--    <nav class="site-nav">-->
+<!--      <input type="checkbox" id="nav-trigger" class="nav-trigger" />-->
+<!--      <label for="nav-trigger" class="menu-icon">-->
+<!--        <span></span>-->
+<!--        <span></span>-->
+<!--        <span></span>-->
+<!--      </label>-->
+
+<!--      <div class="nav-links">-->
+<!--        {% for page in site.header_pages %}-->
+<!--          {% assign page_obj = site.pages | where: "path", page | first %}-->
+<!--          {% if page_obj.title %}-->
+<!--            <a class="page-link" href="{{ page_obj.url | relative_url }}">-->
+<!--              {{ page_obj.title | escape }}-->
+<!--            </a>-->
+<!--          {% endif %}-->
+<!--        {% endfor %}-->
+<!--      </div>-->
+<!--    </nav>-->
+<!--  </div>-->
+<!--</header>-->
+
+<header class="site-header">
+  <div class="wrapper">
+    <a class="site-logo" href="{{ "/" | relative_url }}">
+      <img src="/assets/logos/UKDLC_DARK_NEW.svg" alt="UKDLC_logo" class="logo-svg">
+    </a>
+
+    <nav class="site-nav">
+      <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+      <label for="nav-trigger" class="menu-icon">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
+
+      <div class="nav-links">
+        {% for item in site.data.navigation.main %}
+          {% if item.children %}
+            <div class="nav-dropdown">
+              <a href="{{ item.url | relative_url }}" class="page-link dropdown-toggle">
+                {{ item.title }}
+                <span class="dropdown-arrow">▾</span>
+              </a>
+              <div class="dropdown-content">
+                {% for child in item.children %}
+                  <a href="{{ child.url | relative_url }}">{{ child.title }}</a>
+                {% endfor %}
+              </div>
+            </div>
+          {% else %}
+            <a class="page-link" href="{{ item.url | relative_url }}">{{ item.title }}</a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </nav>
+  </div>
+</header>

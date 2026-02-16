@@ -1,0 +1,19 @@
+- name: "Mike Edwards"
+  affiliation: "SeRP UK, Swansea University"
+  content: "Principal Data Linkage Architect for SeRP’s Linkage branch, designing and developing linkage solutions for datasets covering applications including healthcare, justice, and education. His team has experience supporting the scoping of linkage projects, producing custom linkage models, creating operationalised workflows for linkage projects, and supporting end-users of linked cohorts."
+  image: "/assets/images/people/michael_edwards.jpg"
+
+- name: "Josie Plachta"
+  affiliation: "Office for National Statistics"
+  content: "Co-lead of the Methodology Data Linkage team within the ONS, responsible for leading projects that require bespoke linkage methods and development of new linkage methodologies. Josie, alongside her team, has extensive knowledge of linkage methods and their applications."
+  image: "/assets/images/people/josie_plachta.jpg"
+
+- name: "Sam Lindsay"
+  affiliation: "Data First, Ministry of Justice"
+  content: "Lead Data Scientist for Core Data Linking for the Data First initiative, focusing on linked administrative data for the UK justice system. Sam is also a member of the team behind Splink, an open-source record linkage package in Python, and has extensive experience in linkage methodologies and best practices."
+  image: "/assets/images/people/sam_lindsay.jpg"
+
+- name: "Simon Thompson"
+  affiliation: "SeRP UK, SAIL Databank, Swansea University"
+  content: "CTO of SeRP UK, with strong experience in supporting initiatives for the use of linked data across a wide range of academic and government applications, championing linked data for public good and co-directing the development of SeRP UK’s technology arm for data linkage within trusted research environments."
+  image: "/assets/images/people/simon_thompson.jpg"
