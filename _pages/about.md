@@ -7,7 +7,7 @@ permalink: /about/
 The UK Data Linkage Community (UK DLC) is an open membership community dedicated to the general practice of data linkage and entity resolution.
 With a focus on linkage methodologies, applications, and principles, the UK DLC facilitates cross-sector learning and collaboration.
 
-### <u>Openly Accessible</u>
+### <u>Openly accessible</u>
 We actively invite members to shape and grow the community by contributing to discussions, participating in workshops, sharing materials, and surfacing best practices.
 
 The community is hosted on [GitHub]({{ site.ukdlc_github_url }}) and submissions are always welcome.
@@ -37,7 +37,7 @@ These include educational and guidance materials designed to support:
 
 More details on materials produced as part of the UK DLC project can be found [on the Materials page][materials_page]
 
----
+<hr style="border-top: 1px solid {{ site.ukdlc_color_grey }}; height: 30px"> 
 
 The UK Data Linkage Community is funded by [DARE UK](https://www.dareuk.org.uk) as a Community Interest Group, and is affiliated with [Administrative Data Research UK (ADR UK)](https://www.adruk.org/).
 

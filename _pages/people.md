@@ -4,7 +4,7 @@ permalink: /people/
 headshot_width: "200px"
 ---
 
-<h1 style="text-align: center;"><u>Co-Chairs</u></h1>
+# <u>Co-Chairs</u>
 {% for person in site.data.people %}
 <div class="person">
   <div class="person-info">

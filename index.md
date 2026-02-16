@@ -4,7 +4,7 @@ layout: home
 hero_section:
     hero_title: "Welcome to the UK Data Linkage Community"
     hero_subtitle: "Strengthening production and use of linked data through collaboration"
-    img: "/assets/images/banners/ph_home_1.jpg"
+    img: "/assets/images/banners/guerrillabuzz-7hA2wqBcSF8-unsplash.jpg"
 
 sections:
   - title: "An open resource"
