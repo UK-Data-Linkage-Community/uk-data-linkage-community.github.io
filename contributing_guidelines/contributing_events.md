@@ -1,4 +1,6 @@
+### [Back to home](../README.md)
 
+--- 
 # Contributing Events
 
 Events are stored in a single file: `_data/events.yml`.
@@ -14,14 +16,14 @@ The file is organised by event type. Each type contains a list of events:
 categories:
   - event_type: "workshops"  
     events:  
-        - event_num:   
-            title:  
-            date:  
+        - event_num: 5
+            title: "Event Title"
+            date: "2027-01-15" "Q1 2027"
             use_provisional_date: true  
-            registration_link:  
-            venue:  
+            registration_link: "https://example.com/register"
+            venue: "Venue Name, Location" "Online"
             description: >  
-            Lorum ipsum  
+            Lorum ipsum
 ```
 ## Fields
 
