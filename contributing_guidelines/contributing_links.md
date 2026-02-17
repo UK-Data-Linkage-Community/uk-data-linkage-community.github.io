@@ -13,7 +13,7 @@ categories:
     links:
       - title: "Resource Title"
         url: "https://example.com"
-        description: "One sentence about the resource and who it helps."
+        description: "One sentence about the resource."
         icons: "fa-solid fa-icon-name"
 ```
 
@@ -33,10 +33,10 @@ categories:
 Icons use Font Awesome class strings. Browse available icons at [fontawesome.com/icons](https://fontawesome.com/icons) and copy the class shown for your chosen icon. Some useful examples:
 
 ```
-fa-solid fa-book     → a book for reading materials
-fab fa-github        → the GitHub logo for code and dataset repositories
-fab fa-python        → the python logo for python libraries and resources
-fab fa-r-project     → the R language logo for R libraries and resources
+fa-solid fa-book     → a book, use for reading materials
+fab fa-github        → the GitHub logo, use for code and dataset repositories
+fab fa-python        → the python logo, use for python libraries and resources
+fab fa-r-project     → the R language logo, use for R libraries and resources
 ```
 
 ## Adding a New Category
@@ -51,3 +51,10 @@ If your link doesn't belong in any existing category, add a new block at the end
 ```
 
 Open an issue first to discuss whether a new category is the right approach — it's often better to add to an existing one.
+
+## Quality Guidelines
+
+- The resource must be directly relevant to the community's focus (data linkage, record linkage, entity resolution, etc.)
+- No affiliate links or referral codes
+- Avoid linking to outdated content unless it is a foundational reference
+- If you are the author of the resource, disclose this in your PR description
