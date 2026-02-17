@@ -1,6 +1,8 @@
 # ukdlc-website
 Website for the UK Data Linkage Community
 
+## Code of conduct for contributing:
+- [Code of Conduct](contributing_guidelines/code_of_conduct.md)
 
 ## Guides for contributing to the UK Data Linkage Community website:
 

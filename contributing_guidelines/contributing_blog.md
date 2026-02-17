@@ -1,3 +1,6 @@
+### [Back to home](../README.md)
+
+--- 
 # Contributing Blog Posts
 
 Blog posts live in `collections/_posts/` as individual Markdown files.
