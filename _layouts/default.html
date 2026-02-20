@@ -1,20 +1,28 @@
-<!DOCTYPE html>
-<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+<!doctype html>
+{% include copyright.html %}
+<html lang="{{ site.locale | replace: "_", "-" | default: "en" }}" class="no-js">
+  <head>
+    {% include head.html %}
+    {% include head/custom.html %}
+  </head>
 
-{%- include head.html -%}
+  <body class="layout--{{ page.layout | default: layout.layout }}{% if page.classes or layout.classes %}{{ page.classes | default: layout.classes | join: ' ' | prepend: ' ' }}{% endif %}" dir="{% if site.rtl %}rtl{% else %}ltr{% endif %}">
+    {% include_cached skip-links.html %}
+    <div class="flex-wrapper">
+      <main class="page-content" aria-label="Content">
+        <div class="initial-content" style="max-width: none; width: 100%; padding: 0;">
+          {{ content }}
+        </div>
+      </main>
 
-<body>
-  {%- include header.html -%}
+    <div id="footer" class="page__footer">
+      <footer>
+        {% include footer/custom.html %}
+        {% include_cached footer.html %}
+      </footer>
+    </div>
 
-  <div class="flex-wrapper">
-    <main class="page-content" aria-label="Content">
-      <div class="initial-content" style="max-width: none; width: 100%; padding: 0;">
-        {{ content }}
-      </div>
-    </main>
-
-    {%- include footer.html -%}
-  </div>
-</body>
-
+    {% include scripts.html %}
+    </div>
+  </body>
 </html>

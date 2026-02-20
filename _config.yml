@@ -33,6 +33,11 @@ ukdlc_mailing_list_url: https://forms.gle/4TWHQofvEXt97LzF7
 ukdlc_color_teal: "#30CABF"
 ukdlc_color_grey: "#494951"
 
+analytics:
+  provider: "google-gtag"
+  google:
+    tracking_id: "G-Q8V57PFZMZ"
+
 atom_feed:
     hide: true
 
