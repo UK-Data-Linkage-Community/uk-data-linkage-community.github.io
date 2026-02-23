@@ -24,3 +24,7 @@ categories: main
 ---
 ```
 Where +0000 suffex refers to timezone.
+
+This title and date will automatically be displayed so do not include a main heading in your text body. Additionally, all subheadings should use `##` or smaller to maintain a clear hierarchy.
+
+> For guidance on writing in Markdown, see the **Markdown Guide** pages on [Basic Syntax](https://www.markdownguide.org/basic-syntax/) and the [Cheat Sheet](https://www.markdownguide.org/cheat-sheet/).
