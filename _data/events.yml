@@ -3,9 +3,9 @@ categories:
     events:
       - event_num: 1
         title: "Supporting Data Linkage Practitioners"
-        date: "Q1 2026"
-        use_provisional_date: true
-        registration_link: "To be confirmed"
+        date: "31/03/2026"
+        use_provisional_date: false
+        registration_link: "https://uk-dlc-data-linkers-workshop.eventbrite.co.uk"
         venue: "Swansea, UK"
         description: >
           Supporting data linkage practitioners to examine shared methodological challenges, compare approaches, and 
@@ -17,7 +17,7 @@ categories:
         title: "Supporting Linked Data Users"
         date: "Q2 2026"
         use_provisional_date: true
-        registration_link: "To be confirmed"
+        registration_link: false
         venue: "To be confirmed"
         description: >
           Bringing users of linked data together with linkage practitioners to explore analytical, interpretative, 
@@ -29,7 +29,7 @@ categories:
         title: "Related Topics in Data Linkage"
         date: "Q3 2026"
         use_provisional_date: true
-        registration_link: "To be confirmed"
+        registration_link: false
         venue: "To be confirmed"
         description: >
           Exploring specialised areas of data linkage in collaboration with expert groups, including privacy-preserving 
