@@ -37,12 +37,15 @@ If you have an event you would like to be added, please make a request [through 
       {% if event.use_provisional_date %}
         <p><strong>Provisional Date:</strong> {{ event.date }}</p>
       {% else %}
-        <p><strong>Date:</strong> {{ event.date | date: "%b %d, %Y" }}</p>
+        <p><strong>Date:</strong> {{ event.date | date: "%B %d, %Y" }}</p>
       {% endif %}
 
       <p><strong>Venue:</strong> {{ event.venue }}</p>
-
-      <p><strong>Registration:</strong> {{ event.registration_link }}</p>
+      {% if event.registration_link %}
+        <p><strong>Registration:</strong> <a href="{{ event.registration_link }}">Click here</a></p>
+      {% else %}
+        <p><strong>Registration:</strong> To be confirmed </p>
+      {% endif %}
     </div>
       <hr style="border-top: 1px solid {{ site.ukdlc_color_grey }};"> 
   </div>
