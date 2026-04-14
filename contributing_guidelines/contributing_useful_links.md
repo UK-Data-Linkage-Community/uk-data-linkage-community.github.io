@@ -2,9 +2,9 @@
 
 --- 
 # Useful Links
-Useful links are stored in a single file: in `_data/links.yml`. 
+Useful links are stored in a single file: in `_data/useful-links.yml`. 
 
-Find the appropriate category in the file and add your link to its `links` list. If no suitable category exists, see [Adding a New Category](#adding-a-new-category) below.
+Find the appropriate category in the file and add your link to its `useful-links` list. If no suitable category exists, see [Adding a New Category](#adding-a-new-category) below.
 
 ```yaml
 categories:

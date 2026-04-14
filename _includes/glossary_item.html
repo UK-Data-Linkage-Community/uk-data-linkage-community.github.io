@@ -1,0 +1,30 @@
+<div class="glossary-item" id="{{ include.item.id }}">
+  <button class="glossary-toggle">
+    <span>{{ include.item.term }}</span>
+    <i class="fa fa-chevron-down"></i>
+  </button>
+
+  <div class="glossary-body">
+    <p><strong>Definition:</strong> {{ include.item.definition }}</p>
+
+    {% if include.item.disambiguation %}
+      <p><strong>Disambiguation:</strong> {{ include.item.disambiguation }}</p>
+    {% endif %}
+
+    {% if include.item.notes %}
+      <ul>
+        {% for note in include.item.notes %}
+          <li>{{ note }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if include.item.children %}
+      <div class="glossary-children">
+        {% for child in include.item.children %}
+          {% include glossary_item.html item=child %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</div>

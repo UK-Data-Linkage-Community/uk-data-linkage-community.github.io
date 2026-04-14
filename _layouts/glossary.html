@@ -1,0 +1,31 @@
+---
+layout: default
+---
+
+<link rel="stylesheet" href="/assets/css/glossary.css">
+<script src="/assets/js/glossary.js" defer></script>
+
+<article class="glossary-page">
+  <div class="page-header">
+    <h1>{{ page.title }}</h1>
+    <input type="text" id="glossary-search" placeholder="Search terms...">
+  </div>
+
+  <div class="glossary-nav">
+    {% for category in site.data.glossary.categories %}
+      <a href="#{{ category.id }}">{{ category.name }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="glossary-content">
+    {% for category in site.data.glossary.categories %}
+      <section id="{{ category.id }}">
+        <h2>{{ category.name }}</h2>
+
+        {% for item in category.terms %}
+          {% include glossary_item.html item=item %}
+        {% endfor %}
+      </section>
+    {% endfor %}
+  </div>
+</article>
