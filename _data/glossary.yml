@@ -1,0 +1,38 @@
+categories:
+  - name: Core Concepts
+    id: core-concepts
+    terms:
+      - term: Entity Resolution
+        id: entity-resolution
+        definition: Identifying and merging records that refer to the same real-world entity.
+        disambiguation: >
+          Often used interchangeably with record linkage, but may include clustering and merging.
+        notes:
+          - Umbrella term in most modern usage
+          - Includes multiple pipeline stages
+        related:
+          - record-linkage
+          - deduplication
+
+      - term: Record Linkage
+        id: record-linkage
+        definition: Matching records across datasets referring to the same entity.
+        disambiguation: >
+          Sometimes restricted to pairwise matching, excluding clustering.
+        related:
+          - entity-resolution
+
+  - name: Techniques
+    id: techniques
+    terms:
+      - term: Blocking
+        id: blocking
+        definition: Reducing candidate comparisons by partitioning data.
+        disambiguation: >
+          Sometimes confused with indexing; blocking is a subset.
+        children:
+          - term: Canopy Clustering
+            id: canopy-clustering
+            definition: Uses loose similarity thresholds to create overlapping groups.
+            disambiguation: >
+              Pre-processing step, not final clustering.

@@ -28,4 +28,10 @@ main:
         url: /resources/useful-links
       - title: "Related Groups"
         url: /related-groups/
+      - title: "Glossary"
+        url: /resources/glossary/
+      - title: "Bibliography"
+        url: /resources/bibliography/
+      - title: "Datasets"
+        url: /resources/datasets/
 
