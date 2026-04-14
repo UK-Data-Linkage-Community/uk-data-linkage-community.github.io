@@ -2,7 +2,7 @@
 layout: post
 title:  "The First UK DLC Workshop: Supporting Data Linkage Practitioners"
 date:   2026-03-31 00:00:00 +0000
-categories: main
+categories: [main]
 ---
 
 Our first UK Data Linkage Community workshop took place on the 31st of March. The primary aim of this first session was to identify the current shared and diverging practices of data linkage practitioners around the UK and discuss the objectives and directions of this focused community. Around 30 data linkage practitioners for administrative, governmental, health, and other data contexts attended the day, majoritively in-person but also online. We completed four main sessions, bookended by survey polls and community planning discussions. The workshop was delivered using mostly structured discussions and group activities.
@@ -15,4 +15,3 @@ Here we present the details and outcomes from the first UK DLC workshop, Support
 A poll was conducted at the start of the workshop to understand the backgrounds and experiences of the attendees. The workshop was attended by # participants.
 
 Ranging from ### sectors, using ### languages
-
