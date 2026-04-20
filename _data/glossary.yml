@@ -1,38 +1,38 @@
-categories:
-  - name: Core Concepts
-    id: core-concepts
-    terms:
-      - term: Entity Resolution
-        id: entity-resolution
-        definition: Identifying and merging records that refer to the same real-world entity.
-        disambiguation: >
-          Often used interchangeably with record linkage, but may include clustering and merging.
-        notes:
-          - Umbrella term in most modern usage
-          - Includes multiple pipeline stages
-        related:
-          - record-linkage
-          - deduplication
+- id: entity_resolution
+  label: "Entity Resolution"
+  definition: "Identifying and merging records that refer to the same real-world entity."
+  related:
+    - record_linkage
+    - blocking
+    - probabilistic_matching
+  conflicts:
+    - record_linkage_scope_confusion
 
-      - term: Record Linkage
-        id: record-linkage
-        definition: Matching records across datasets referring to the same entity.
-        disambiguation: >
-          Sometimes restricted to pairwise matching, excluding clustering.
-        related:
-          - entity-resolution
+- id: record_linkage
+  label: "Record Linkage"
+  definition: "Linking records across datasets that refer to the same entity."
+  related:
+    - entity_resolution
+    - blocking
+  conflicts:
+    - record_linkage_scope_confusion
 
-  - name: Techniques
-    id: techniques
-    terms:
-      - term: Blocking
-        id: blocking
-        definition: Reducing candidate comparisons by partitioning data.
-        disambiguation: >
-          Sometimes confused with indexing; blocking is a subset.
-        children:
-          - term: Canopy Clustering
-            id: canopy-clustering
-            definition: Uses loose similarity thresholds to create overlapping groups.
-            disambiguation: >
-              Pre-processing step, not final clustering.
+- id: blocking
+  label: "Blocking"
+  definition: "Reducing comparisons by grouping records into candidate sets."
+  related:
+    - record_linkage
+    - entity_resolution
+
+- id: probabilistic_matching
+  label: "Probabilistic Matching"
+  definition: "Matching based on likelihood rather than exact rules."
+  related:
+    - entity_resolution
+
+- id: record_linkage_scope_confusion
+  label: "Scope Confusion"
+  definition: "Ambiguity between record linkage and entity resolution definitions."
+  related:
+    - record_linkage
+    - entity_resolution
