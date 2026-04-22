@@ -1,0 +1,95 @@
+---
+layout: default
+---
+
+<div class="glossary-page">
+
+  <!-- ═══ TOP ═══════════════════════════════════════════════════════ -->
+  <div class="top-section">
+    <div class="top-left">
+      <h1>{{ site.data.glossary.pipeline.title }}</h1>
+      <p>{{ site.data.glossary.pipeline.description }}</p>
+    </div>
+
+    <div class="top-right">
+      <div class="search-box">
+        <div class="search-row">
+          <input type="text" id="search" placeholder="Search terms…" autocomplete="off" />
+          <button id="search-btn">Go</button>
+        </div>
+        <div id="suggestions"></div>
+        <div id="search-message"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ PIPELINE ══════════════════════════════════════════════════ -->
+  <div class="pipeline-wrapper">
+    <div class="pipeline">
+      {% for section in site.data.glossary.sections %}
+      <div class="pipeline-step" data-section="{{ section.id }}">
+        {{ section.title }}
+      </div>
+      {% endfor %}
+    </div>
+
+    <div id="connector"></div>
+
+    <div id="detail-panel">
+      <div id="detail-content"></div>
+    </div>
+  </div>
+
+  <!-- ═══ GLOSSARY ══════════════════════════════════════════════════ -->
+  <section class="glossary-section">
+
+    <div class="glossary-controls">
+      <h2>Concept Glossary</h2>
+      <div id="tag-filters" class="tag-filters"></div>
+    </div>
+
+    <div class="glossary-body">
+
+      <!-- Left: alphabetical term list -->
+      <div class="glossary-list-panel">
+        <div id="glossary-list"></div>
+      </div>
+
+      <!-- Right: relation graph + detail -->
+      <div class="glossary-detail-panel">
+
+        <div id="graph-empty-state" class="graph-empty-state">
+          <div class="empty-inner">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="5"  cy="12" r="2"/><circle cx="19" cy="5"  r="2"/>
+              <circle cx="19" cy="19" r="2"/><line x1="7"  y1="11" x2="17" y2="6"/>
+              <line   x1="7"  y1="13" x2="17" y2="18"/>
+            </svg>
+            <p>Select a term to explore its relationships</p>
+          </div>
+        </div>
+
+        <div id="concept-graph-container" style="display:none">
+          <svg id="concept-graph"></svg>
+
+          <div class="graph-legend">
+            <span class="legend-item legend-center">Selected</span>
+            <span class="legend-item legend-broader">Broader</span>
+            <span class="legend-item legend-narrower">Narrower</span>
+            <span class="legend-item legend-related">Related</span>
+          </div>
+
+          <div id="concept-detail"></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  window.glossaryData = {{ site.data.glossary | jsonify }};
+</script>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="{{ '/assets/js/glossary.js' | relative_url }}"></script>
