@@ -228,18 +228,48 @@ $bp-mobile: 600px;
   letter-spacing: 0.01em;
 }
 
-.tag-chip--method        { background: #dbeafe; color: #1d4ed8; }
-.tag-chip--model         { background: #ede9fe; color: #6d28d9; }
-.tag-chip--evaluation    { background: #fef3c7; color: #92400e; }
-.tag-chip--metric        { background: #fef3c7; color: #92400e; }
-.tag-chip--tool          { background: #d1fae5; color: #065f46; }
-.tag-chip--datatype      { background: #fee2e2; color: #991b1b; }
-.tag-chip--comparison    { background: #fce7f3; color: #9d174d; }
-.tag-chip--probabilistic { background: #ede9fe; color: #5b21b6; }
-.tag-chip--deterministic { background: #fef3c7; color: #78350f; }
-.tag-chip--visualisation { background: #d1fae5; color: #065f46; }
-.tag-chip--python        { background: #fef9c3; color: #713f12; }
-.tag-chip--core          { background: #e0f2fe; color: #075985; }
+.glossary-term .tag-chip {
+  padding: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  font-size: 0;
+  line-height: 0;
+}
+
+.glossary-term .tag-chip {
+  opacity: 0.8;
+}
+
+.glossary-term:hover .tag-chip {
+  opacity: 1;
+}
+
+//.tag-chip--method        { background: #dbeafe; color: #1d4ed8; }
+//.tag-chip--model         { background: #ede9fe; color: #6d28d9; }
+//.tag-chip--evaluation    { background: #fef3c7; color: #92400e; }
+//.tag-chip--metric        { background: #fef3c7; color: #92400e; }
+//.tag-chip--tool          { background: #d1fae5; color: #065f46; }
+//.tag-chip--datatype      { background: #fee2e2; color: #991b1b; }
+//.tag-chip--comparison    { background: #fce7f3; color: #9d174d; }
+//.tag-chip--probabilistic { background: #ede9fe; color: #5b21b6; }
+//.tag-chip--deterministic { background: #fef3c7; color: #78350f; }
+//.tag-chip--visualisation { background: #d1fae5; color: #065f46; }
+//.tag-chip--python        { background: #fef9c3; color: #713f12; }
+//.tag-chip--core          { background: #e0f2fe; color: #075985; }
+
+.tag-chip--method        { background: #3b82f6; }
+.tag-chip--model         { background: #8b5cf6; }
+.tag-chip--evaluation    { background: #f59e0b; }
+.tag-chip--metric        { background: #f59e0b; }
+.tag-chip--tool          { background: #10b981; }
+.tag-chip--datatype      { background: #ef4444; }
+.tag-chip--comparison    { background: #ec4899; }
+.tag-chip--probabilistic { background: #7c3aed; }
+.tag-chip--deterministic { background: #d97706; }
+.tag-chip--visualisation { background: #059669; }
+.tag-chip--python        { background: #eab308; }
+.tag-chip--core          { background: #0284c7; }
 
 
 // =============================================================================
@@ -372,10 +402,16 @@ $bp-mobile: 600px;
   text-overflow: ellipsis;
 }
 
+//.term-tags-inline {
+//  flex-shrink: 0;
+//  display: flex;
+//  gap: 0.2rem;
+//}
 .term-tags-inline {
   flex-shrink: 0;
   display: flex;
-  gap: 0.2rem;
+  gap: 0.25rem;
+  align-items: center;
 }
 
 
