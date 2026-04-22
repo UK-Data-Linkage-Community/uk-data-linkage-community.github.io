@@ -144,6 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       message.textContent = "No match found in glossary.";
     }
+    btn.title = tag;
   }
 
   searchBtn.addEventListener("click", runSearch);
