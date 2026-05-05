@@ -113,8 +113,8 @@ $bp-mobile: 600px;
 // ── Shared sizing variables ───────────────────────────────────────────────────
 // $step-h sets the fixed row height.  $half-h must equal $step-h / 2 exactly
 // so the ::before / ::after triangles tile flush with the step top/bottom.
-$step-h:   64px;
-$half-h:   32px;   // = $step-h / 2
+$step-h:   72px;
+$half-h:   36px;   // = $step-h / 2
 $arrow-w:  13px;   // horizontal depth of the arrow tip
 $bdr-w:    1.5px;  // border thickness
 $bdr-c:    #c4cad8;
@@ -173,13 +173,13 @@ $hover-bg: #dde3ec;
 
   // ── First step: rounded left cap ─────────────────────────────────────────
   &:first-child {
-    border-radius: 7px 0 0 7px;
+    border-radius: 1px 0 0 1px;
   }
 
   // ── Last step: right border restored, rounded right cap, no arrow ────────
   &:last-child {
     border-right: $bdr-w solid $bdr-c;
-    border-radius: 0 7px 7px 0;
+    border-radius: 0 1px 1px 0;
     padding-right: 0.9rem;
 
     &::before,
