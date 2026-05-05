@@ -1,9 +1,13 @@
-FROM ruby:3.3-slim
+FROM ruby:3.3
 
 # Install minimal dependencies for native gems
 RUN apt-get update -qq && apt-get install -y \
-  libxml2-dev \
   build-essential \
+  libffi-dev \
+  libxml2-dev \
+  libxslt1-dev \
+  zlib1g-dev \
+  git \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /site
@@ -12,7 +16,10 @@ WORKDIR /site
 COPY Gemfile Gemfile.lock ./
 
 # Install bundler + gems
-RUN gem install bundler -v 2.7.2 && bundle install
+RUN gem install bundler && bundle install
+
+# Copy the rest of the project
+COPY . .
 
 EXPOSE 4000
 

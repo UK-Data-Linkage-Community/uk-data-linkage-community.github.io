@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
           const c = conceptMap[cid];
           if (!c) return;
           const tagHtml = (c.tags || [])
-            .map(t => `<span class="tag-chip tag-chip--${t}">${t}</span>`)
+            .map(t => `<span class="tag-chip tag-chip--${t}" data-tag="${t}">${t}</span>`)
             .join("");
           html += `
             <p class="panel-concept">
@@ -76,6 +76,22 @@ document.addEventListener("DOMContentLoaded", function () {
         selectGlossaryConcept(el.dataset.id, true)
       );
     });
+
+    // content.querySelectorAll(".tag-chip").forEach(chip => {
+    //   chip.addEventListener("click", e => {
+    //     e.stopPropagation(); // prevent parent clicks
+    //
+    //     const tag = chip.dataset.tag;
+    //
+    //     const filter = document.querySelector(`.tag-filter[data-tag="${tag}"]`);
+    //     if (filter) {
+    //       filter.click();
+    //     }
+    //
+    //     document.querySelector('.glossary-section')
+    //       ?.scrollIntoView({ behavior: 'smooth' });
+    //   });
+    // });
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -144,7 +160,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       message.textContent = "No match found in glossary.";
     }
-    btn.title = tag;
+    // btn.title = tag;
   }
 
   searchBtn.addEventListener("click", runSearch);
@@ -167,8 +183,28 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderTagFilters() {
-    const tags      = getAllTags();
-    const container = document.getElementById("tag-filters");
+    const tags = getAllTags();
+
+    // Wrap the tag-filters div in a labelled wrapper so it serves as
+    // the category colour key as well as the filter control.
+    const filtersDiv = document.getElementById("tag-filters");
+    const parent     = filtersDiv.parentElement;
+
+    // Build wrapper (idempotent – only once)
+    if (!document.querySelector(".tag-filters-wrapper")) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "tag-filters-wrapper";
+
+      const label = document.createElement("span");
+      label.className   = "tag-filters-label";
+      label.textContent = "Category key / filter";
+
+      parent.insertBefore(wrapper, filtersDiv);
+      wrapper.appendChild(label);
+      wrapper.appendChild(filtersDiv);
+    }
+
+    const container = filtersDiv;
 
     let html = `<button class="tag-filter active" data-tag="">All</button>`;
     tags.forEach(t => {
@@ -208,7 +244,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const isActive = c.id === activeConceptId ? " active" : "";
       const tagHtml  = (c.tags || [])
-        .map(t => `<span class="tag-chip tag-chip--${t}">${t}</span>`)
+        .map(t => `<span class="tag-chip tag-chip--${t}" data-tag="${t}">${t}</span>`)
         .join("");
 
       html += `<div class="glossary-term${isActive}" data-id="${c.id}">
@@ -276,7 +312,7 @@ document.addEventListener("DOMContentLoaded", function () {
       .join("");
 
     const tagHtml = (concept.tags || [])
-      .map(t => `<span class="tag-chip tag-chip--${t}">${t}</span>`)
+      .map(t => `<span class="tag-chip tag-chip--${t}" data-tag="${t}">${t}</span>`)
       .join("");
 
     document.getElementById("concept-detail").innerHTML = `
@@ -299,6 +335,22 @@ document.addEventListener("DOMContentLoaded", function () {
         selectGlossaryConcept(el.dataset.id, false)
       );
     });
+
+    // document.querySelectorAll("#concept-detail .tag-chip").forEach(chip => {
+    //   chip.addEventListener("click", e => {
+    //     e.stopPropagation();
+    //
+    //     const tag = chip.dataset.tag;
+    //
+    //     const filter = document.querySelector(`.tag-filter[data-tag="${tag}"]`);
+    //     if (filter) {
+    //       filter.click();
+    //     }
+    //
+    //     document.querySelector('.glossary-section')
+    //       ?.scrollIntoView({ behavior: 'smooth' });
+    //   });
+    // });
 
     // ── Build graph data ────────────────────────────────────────────
     const nodes = [{ id: conceptId, label: concept.prefLabel, type: "center" }];
@@ -436,6 +488,28 @@ document.addEventListener("DOMContentLoaded", function () {
       node.attr("transform", d => `translate(${d.x},${d.y})`);
     });
   }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // GLOBAL TAG CLICK HANDLER (works everywhere)
+  // ═══════════════════════════════════════════════════════════════════
+  document.addEventListener("click", e => {
+    const chip = e.target.closest(".tag-chip");
+    if (!chip) return;
+
+    const tag = chip.dataset.tag;
+    if (!tag) return;
+
+    // Prevent parent click handlers (important for graph + panels)
+    e.stopPropagation();
+
+    const filter = document.querySelector(`.tag-filter[data-tag="${tag}"]`);
+    if (filter) {
+      filter.click();
+    }
+
+    document.querySelector(".glossary-section")
+      ?.scrollIntoView({ behavior: "smooth" });
+  });
 
   // ═══════════════════════════════════════════════════════════════════
   // INIT

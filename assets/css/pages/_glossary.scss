@@ -99,7 +99,7 @@ $bp-mobile: 600px;
 
 
 // =============================================================================
-// PIPELINE
+// PIPELINE  –  bordered steps with right-pointing arrow between each
 // =============================================================================
 .pipeline-wrapper {
   margin-top: 1rem;
@@ -110,45 +110,106 @@ $bp-mobile: 600px;
   position: relative;
 }
 
-.pipeline::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: #eee;
-  z-index: 0;
-}
+// ── Shared sizing variables ───────────────────────────────────────────────────
+// $step-h sets the fixed row height.  $half-h must equal $step-h / 2 exactly
+// so the ::before / ::after triangles tile flush with the step top/bottom.
+$step-h:   64px;
+$half-h:   32px;   // = $step-h / 2
+$arrow-w:  13px;   // horizontal depth of the arrow tip
+$bdr-w:    1.5px;  // border thickness
+$bdr-c:    #c4cad8;
+$step-bg:  #eef1f5;
+$hover-bg: #dde3ec;
 
 .pipeline-step {
   flex: 1;
-  padding: 0.6rem 0.4rem;
+  height: $step-h;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // Right padding leaves room for the arrow tip; left padding is symmetric
+  padding: 0 ($arrow-w + 8px) 0 0.9rem;
   font-size: 0.85rem;
   text-align: center;
-  background: #fff;
-  border: 1px solid #ddd;
+
+  background: $step-bg;
+  color: #555;
+
+  // Border on three sides – right edge is handled by the arrow pseudo-elements
+  border: $bdr-w solid $bdr-c;
   border-right: none;
+
   cursor: pointer;
   position: relative;
-  z-index: 1;
   transition: background 0.15s ease, color 0.15s ease;
+
+  // ── Arrow border outline (sits behind the fill) ───────────────────────────
+  // Slightly oversized so it peeks out around the fill triangle like a stroke.
+  &::before {
+    content: '';
+    position: absolute;
+    top: -$bdr-w;
+    right: -($arrow-w + $bdr-w);
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: ($half-h + $bdr-w) 0 ($half-h + $bdr-w) ($arrow-w + $bdr-w);
+    border-color: transparent transparent transparent $bdr-c;
+    z-index: 1;
+  }
+
+  // ── Arrow fill (matches step background) ─────────────────────────────────
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -$arrow-w;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: $half-h 0 $half-h $arrow-w;
+    border-color: transparent transparent transparent $step-bg;
+    z-index: 2;
+  }
+
+  // ── First step: rounded left cap ─────────────────────────────────────────
+  &:first-child {
+    border-radius: 7px 0 0 7px;
+  }
+
+  // ── Last step: right border restored, rounded right cap, no arrow ────────
+  &:last-child {
+    border-right: $bdr-w solid $bdr-c;
+    border-radius: 0 7px 7px 0;
+    padding-right: 0.9rem;
+
+    &::before,
+    &::after { display: none; }
+  }
+
+  // ── Hover ────────────────────────────────────────────────────────────────
+  &:hover {
+    background: $hover-bg;
+    color: #333;
+    &::after { border-left-color: $hover-bg; }
+  }
 }
 
-.pipeline-step:last-child {
-  border-right: 1px solid #ddd;
+// Decreasing z-index ensures each step's arrow pseudo-elements are drawn
+// in front of the following step's left border.
+@for $i from 1 through 20 {
+  .pipeline-step:nth-child(#{$i}) { z-index: #{21 - $i}; }
 }
 
-.pipeline-step:hover {
-  background: #f7f7f7;
-}
-
+// ── Active step ───────────────────────────────────────────────────────────────
 .pipeline-step.active {
   background: var(--color-teal);
   color: #fff;
-  border-color: var(--color-teal);
+  border-color: var(--color-teal-dark);
 }
+.pipeline-step.active::before { border-left-color: var(--color-teal-dark); }
+.pipeline-step.active::after  { border-left-color: var(--color-teal); }
 
+// ── Connector bar below pipeline ──────────────────────────────────────────────
 #connector {
   height: 4px;
   width: 0;
@@ -219,15 +280,22 @@ $bp-mobile: 600px;
 // =============================================================================
 .tag-chip {
   display: inline-block;
-  padding: 0.1rem 0.45rem;
-  border-radius: 3px;
+  padding: 0.15rem 0.5rem;
   font-size: 0.7rem;
-  font-weight: 500;
-  background: #eee;
-  color: #555;
-  letter-spacing: 0.01em;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.15s ease;
 }
 
+.tag-chip:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+// In the glossary term list, chips become small colour dots
 .glossary-term .tag-chip {
   padding: 0;
   width: 8px;
@@ -235,41 +303,58 @@ $bp-mobile: 600px;
   border-radius: 50%;
   font-size: 0;
   line-height: 0;
-}
-
-.glossary-term .tag-chip {
-  opacity: 0.8;
+  opacity: 0.55;
+  transition: opacity 0.1s ease;
 }
 
 .glossary-term:hover .tag-chip {
   opacity: 1;
 }
 
-//.tag-chip--method        { background: #dbeafe; color: #1d4ed8; }
-//.tag-chip--model         { background: #ede9fe; color: #6d28d9; }
-//.tag-chip--evaluation    { background: #fef3c7; color: #92400e; }
-//.tag-chip--metric        { background: #fef3c7; color: #92400e; }
-//.tag-chip--tool          { background: #d1fae5; color: #065f46; }
-//.tag-chip--datatype      { background: #fee2e2; color: #991b1b; }
-//.tag-chip--comparison    { background: #fce7f3; color: #9d174d; }
-//.tag-chip--probabilistic { background: #ede9fe; color: #5b21b6; }
-//.tag-chip--deterministic { background: #fef3c7; color: #78350f; }
-//.tag-chip--visualisation { background: #d1fae5; color: #065f46; }
-//.tag-chip--python        { background: #fef9c3; color: #713f12; }
-//.tag-chip--core          { background: #e0f2fe; color: #075985; }
+// ── Chip colour palette ───────────────────────────────────────────────────────
+//
+// All 12 tags are assigned colours spaced ~30° apart on the hue wheel so
+// none are perceptually similar even when shown as small dots.
+//
+//  datatype     red      #dc2626   ~  0°
+//  evaluation   orange   #ea580c   ~ 25°
+//  python       gold     #ca8a04   ~ 55°
+//  deterministic lime    #65a30d   ~ 90°
+//  tool         green    #16a34a   ~145°
+//  visualisation teal    #0d9488   ~175°
+//  metric       cyan     #06b6d4   ~195°
+//  core         navy     #0369a1   ~215°
+//  method       blue     #2563eb   ~230°
+//  probabilistic violet  #7c3aed   ~265°
+//  model        magenta  #a21caf   ~300°
+//  comparison   pink     #db2777   ~335°
 
-.tag-chip--method        { background: #3b82f6; }
-.tag-chip--model         { background: #8b5cf6; }
-.tag-chip--evaluation    { background: #f59e0b; }
-.tag-chip--metric        { background: #f59e0b; }
-.tag-chip--tool          { background: #10b981; }
-.tag-chip--datatype      { background: #ef4444; }
-.tag-chip--comparison    { background: #ec4899; }
-.tag-chip--probabilistic { background: #7c3aed; }
-.tag-chip--deterministic { background: #d97706; }
-.tag-chip--visualisation { background: #059669; }
-.tag-chip--python        { background: #eab308; }
-.tag-chip--core          { background: #0284c7; }
+.tag-chip--datatype      { color: #dc2626; }
+.tag-chip--evaluation    { color: #ea580c; }
+.tag-chip--python        { color: #ca8a04; }
+.tag-chip--deterministic { color: #65a30d; }
+.tag-chip--tool          { color: #16a34a; }
+.tag-chip--visualisation { color: #0d9488; }
+.tag-chip--metric        { color: #06b6d4; }
+.tag-chip--core          { color: #0369a1; }
+.tag-chip--method        { color: #2563eb; }
+.tag-chip--probabilistic { color: #7c3aed; }
+.tag-chip--model         { color: #a21caf; }
+.tag-chip--comparison    { color: #db2777; }
+
+// Dot overrides: solid background colour for the 8 px circles in the list
+.glossary-term .tag-chip--datatype      { background: #dc2626; border-color: #dc2626; }
+.glossary-term .tag-chip--evaluation    { background: #ea580c; border-color: #ea580c; }
+.glossary-term .tag-chip--python        { background: #ca8a04; border-color: #ca8a04; }
+.glossary-term .tag-chip--deterministic { background: #65a30d; border-color: #65a30d; }
+.glossary-term .tag-chip--tool          { background: #16a34a; border-color: #16a34a; }
+.glossary-term .tag-chip--visualisation { background: #0d9488; border-color: #0d9488; }
+.glossary-term .tag-chip--metric        { background: #06b6d4; border-color: #06b6d4; }
+.glossary-term .tag-chip--core          { background: #0369a1; border-color: #0369a1; }
+.glossary-term .tag-chip--method        { background: #2563eb; border-color: #2563eb; }
+.glossary-term .tag-chip--probabilistic { background: #7c3aed; border-color: #7c3aed; }
+.glossary-term .tag-chip--model         { background: #a21caf; border-color: #a21caf; }
+.glossary-term .tag-chip--comparison    { background: #db2777; border-color: #db2777; }
 
 
 // =============================================================================
@@ -294,32 +379,86 @@ $bp-mobile: 600px;
   margin: 0;
 }
 
+// ── Tag filter row (also serves as the category colour key) ───────────────────
+.tag-filters-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.tag-filters-label {
+  font-size: 0.72rem;
+  color: #aaa;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  align-self: flex-end;
+}
+
 .tag-filters {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
+  justify-content: flex-end;
   padding-top: 0.2rem;
 }
 
+// Base filter button – neutral until a category colour is applied
 .tag-filter {
   padding: 0.2rem 0.65rem;
-  border: 1px solid #ddd;
+  border: 1.5px solid #ddd;
   border-radius: 999px;
-  background: #fff;
+  background: #f3f3f3;
   font-size: 0.78rem;
   cursor: pointer;
-  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  color: #666;
+  font-weight: 500;
+  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
 }
 
 .tag-filter:hover {
   background: #f3f3f3;
 }
 
+// ── Active state: teal border, no fill ───────────────────────────────────────
 .tag-filter.active {
-  background: var(--color-teal);
+  background: transparent;
   border-color: var(--color-teal);
-  color: #fff;
+  border-width: 3px;
 }
+
+// ── Per-category colour (text colour acts as the key swatch) ─────────────────
+.tag-filter--method        { color: #3b82f6; border-color: rgba(59,  130, 246, 0.3); }
+.tag-filter--model         { color: #8b5cf6; border-color: rgba(139, 92,  246, 0.3); }
+.tag-filter--evaluation    { color: #f59e0b; border-color: rgba(245, 158, 11,  0.3); }
+.tag-filter--metric        { color: #f59e0b; border-color: rgba(245, 158, 11,  0.3); }
+.tag-filter--tool          { color: #10b981; border-color: rgba(16,  185, 129, 0.3); }
+.tag-filter--datatype      { color: #ef4444; border-color: rgba(239, 68,  68,  0.3); }
+.tag-filter--comparison    { color: #ec4899; border-color: rgba(236, 72,  153, 0.3); }
+.tag-filter--probabilistic { color: #7c3aed; border-color: rgba(124, 58,  237, 0.3); }
+.tag-filter--deterministic { color: #d97706; border-color: rgba(217, 119, 6,   0.3); }
+.tag-filter--visualisation { color: #059669; border-color: rgba(5,   150, 105, 0.3); }
+.tag-filter--python        { color: #ca8a04; border-color: rgba(202, 138, 4,   0.3); }
+.tag-filter--core          { color: #0284c7; border-color: rgba(2,   132, 199, 0.3); }
+
+// When a category button is active it keeps its own colour but gains the teal border
+.tag-filter--method.active,
+.tag-filter--model.active,
+.tag-filter--evaluation.active,
+.tag-filter--metric.active,
+.tag-filter--tool.active,
+.tag-filter--datatype.active,
+.tag-filter--comparison.active,
+.tag-filter--probabilistic.active,
+.tag-filter--deterministic.active,
+.tag-filter--visualisation.active,
+.tag-filter--python.active,
+.tag-filter--core.active {
+  border-color: var(--color-teal);
+  border-width: 3px;
+  // colour is inherited from the .tag-filter--X rule above
+}
+
 
 .glossary-body {
   display: flex;
@@ -402,11 +541,6 @@ $bp-mobile: 600px;
   text-overflow: ellipsis;
 }
 
-//.term-tags-inline {
-//  flex-shrink: 0;
-//  display: flex;
-//  gap: 0.2rem;
-//}
 .term-tags-inline {
   flex-shrink: 0;
   display: flex;
@@ -585,21 +719,35 @@ $bp-mobile: 600px;
     align-items: flex-start;
   }
 
+  // On mobile, revert pipeline to a simple vertical stacked list
   .pipeline {
     flex-direction: column;
+    gap: 2px;
   }
 
-  .pipeline::before {
-    display: none;
-  }
-
-  .pipeline-step {
-    border-right: 1px solid #ddd;
-    border-bottom: none;
-  }
-
+  .pipeline-step,
+  .pipeline-step:first-child,
   .pipeline-step:last-child {
-    border-bottom: 1px solid #ddd;
+    clip-path: none;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    margin-right: 0;
+    padding: 0.6rem 1rem;
+    background: #f5f7fa;
+  }
+
+  .pipeline-step.active {
+    background: var(--color-teal);
+    border-color: var(--color-teal);
+    color: #fff;
+  }
+
+  .tag-filters-wrapper {
+    align-items: flex-start;
+  }
+
+  .tag-filters {
+    justify-content: flex-start;
   }
 
   .glossary-controls {
