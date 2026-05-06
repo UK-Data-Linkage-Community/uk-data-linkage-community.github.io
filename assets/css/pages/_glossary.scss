@@ -111,12 +111,10 @@ $bp-mobile: 600px;
 }
 
 // ── Shared sizing variables ───────────────────────────────────────────────────
-// $step-h sets the fixed row height.  $half-h must equal $step-h / 2 exactly
-// so the ::before / ::after triangles tile flush with the step top/bottom.
 $step-h:   72px;
-$half-h:   36px;   // = $step-h / 2
-$arrow-w:  13px;   // horizontal depth of the arrow tip
-$bdr-w:    1.5px;  // border thickness
+$half-h:   36px;
+$arrow-w:  12px;
+$bdr-w:    0.0px;
 $bdr-c:    #c4cad8;
 $step-bg:  #eef1f5;
 $hover-bg: #dde3ec;
@@ -127,25 +125,17 @@ $hover-bg: #dde3ec;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  // Right padding leaves room for the arrow tip; left padding is symmetric
   padding: 0 ($arrow-w + 8px) 0 0.9rem;
   font-size: 0.85rem;
   text-align: center;
-
   background: $step-bg;
   color: #555;
-
-  // Border on three sides – right edge is handled by the arrow pseudo-elements
-  border: $bdr-w solid $bdr-c;
+  border: $bdr-w none $bdr-c;
   border-right: none;
-
   cursor: pointer;
   position: relative;
   transition: background 0.15s ease, color 0.15s ease;
 
-  // ── Arrow border outline (sits behind the fill) ───────────────────────────
-  // Slightly oversized so it peeks out around the fill triangle like a stroke.
   &::before {
     content: '';
     position: absolute;
@@ -158,7 +148,6 @@ $hover-bg: #dde3ec;
     z-index: 1;
   }
 
-  // ── Arrow fill (matches step background) ─────────────────────────────────
   &::after {
     content: '';
     position: absolute;
@@ -171,22 +160,18 @@ $hover-bg: #dde3ec;
     z-index: 2;
   }
 
-  // ── First step: rounded left cap ─────────────────────────────────────────
   &:first-child {
     border-radius: 1px 0 0 1px;
   }
 
-  // ── Last step: right border restored, rounded right cap, no arrow ────────
   &:last-child {
     border-right: $bdr-w solid $bdr-c;
     border-radius: 0 1px 1px 0;
     padding-right: 0.9rem;
-
     &::before,
     &::after { display: none; }
   }
 
-  // ── Hover ────────────────────────────────────────────────────────────────
   &:hover {
     background: $hover-bg;
     color: #333;
@@ -194,13 +179,10 @@ $hover-bg: #dde3ec;
   }
 }
 
-// Decreasing z-index ensures each step's arrow pseudo-elements are drawn
-// in front of the following step's left border.
 @for $i from 1 through 20 {
   .pipeline-step:nth-child(#{$i}) { z-index: #{21 - $i}; }
 }
 
-// ── Active step ───────────────────────────────────────────────────────────────
 .pipeline-step.active {
   background: var(--color-teal);
   color: #fff;
@@ -209,7 +191,6 @@ $hover-bg: #dde3ec;
 .pipeline-step.active::before { border-left-color: var(--color-teal-dark); }
 .pipeline-step.active::after  { border-left-color: var(--color-teal); }
 
-// ── Connector bar below pipeline ──────────────────────────────────────────────
 #connector {
   height: 4px;
   width: 0;
@@ -312,23 +293,6 @@ $hover-bg: #dde3ec;
 }
 
 // ── Chip colour palette ───────────────────────────────────────────────────────
-//
-// All 12 tags are assigned colours spaced ~30° apart on the hue wheel so
-// none are perceptually similar even when shown as small dots.
-//
-//  datatype     red      #dc2626   ~  0°
-//  evaluation   orange   #ea580c   ~ 25°
-//  python       gold     #ca8a04   ~ 55°
-//  deterministic lime    #65a30d   ~ 90°
-//  tool         green    #16a34a   ~145°
-//  visualisation teal    #0d9488   ~175°
-//  metric       cyan     #06b6d4   ~195°
-//  core         navy     #0369a1   ~215°
-//  method       blue     #2563eb   ~230°
-//  probabilistic violet  #7c3aed   ~265°
-//  model        magenta  #a21caf   ~300°
-//  comparison   pink     #db2777   ~335°
-
 .tag-chip--datatype      { color: #dc2626; }
 .tag-chip--evaluation    { color: #ea580c; }
 .tag-chip--python        { color: #ca8a04; }
@@ -342,7 +306,7 @@ $hover-bg: #dde3ec;
 .tag-chip--model         { color: #a21caf; }
 .tag-chip--comparison    { color: #db2777; }
 
-// Dot overrides: solid background colour for the 8 px circles in the list
+// Dot variants in the glossary list use background, not text colour
 .glossary-term .tag-chip--datatype      { background: #dc2626; border-color: #dc2626; }
 .glossary-term .tag-chip--evaluation    { background: #ea580c; border-color: #ea580c; }
 .glossary-term .tag-chip--python        { background: #ca8a04; border-color: #ca8a04; }
@@ -358,81 +322,54 @@ $hover-bg: #dde3ec;
 
 
 // =============================================================================
-// GLOSSARY SECTION
+// TAG FILTERS (category key + filter controls)
 // =============================================================================
-.glossary-section {
-  margin-top: 3rem;
-  border-top: 2px solid #f0f0f0;
-  padding-top: 2rem;
-}
-
-.glossary-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.25rem;
-}
-
-.glossary-controls h2 {
-  margin: 0;
-}
-
-// ── Tag filter row (also serves as the category colour key) ───────────────────
 .tag-filters-wrapper {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.35rem;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
 }
 
 .tag-filters-label {
   font-size: 0.72rem;
-  color: #aaa;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  align-self: flex-end;
+  color: #999;
+  white-space: nowrap;
+  font-style: italic;
 }
 
 .tag-filters {
   display: flex;
   flex-wrap: wrap;
   gap: 0.35rem;
-  justify-content: flex-end;
-  padding-top: 0.2rem;
 }
 
-// Base filter button – neutral until a category colour is applied
 .tag-filter {
   padding: 0.2rem 0.65rem;
-  border: 1.5px solid #ddd;
+  font-size: 0.75rem;
   border-radius: 999px;
-  background: #f3f3f3;
-  font-size: 0.78rem;
-  cursor: pointer;
-  color: #666;
-  font-weight: 500;
-  transition: border-color 0.12s ease, color 0.12s ease, background 0.12s ease;
-}
-
-.tag-filter:hover {
-  background: #f3f3f3;
-}
-
-// ── Active state: teal border, no fill ───────────────────────────────────────
-.tag-filter.active {
+  border: 1.5px solid rgba(0,0,0,0.12);
   background: transparent;
-  border-color: var(--color-teal);
-  border-width: 3px;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(0,0,0,0.04);
+  }
+
+  &.active {
+    background: rgba(0,0,0,0.05);
+    font-weight: 500;
+  }
 }
 
-// ── Per-category colour (text colour acts as the key swatch) ─────────────────
-.tag-filter--method        { color: #3b82f6; border-color: rgba(59,  130, 246, 0.3); }
-.tag-filter--model         { color: #8b5cf6; border-color: rgba(139, 92,  246, 0.3); }
-.tag-filter--evaluation    { color: #f59e0b; border-color: rgba(245, 158, 11,  0.3); }
-.tag-filter--metric        { color: #f59e0b; border-color: rgba(245, 158, 11,  0.3); }
-.tag-filter--tool          { color: #10b981; border-color: rgba(16,  185, 129, 0.3); }
+// Per-category filter colours
+.tag-filter--method        { color: #2563eb; border-color: rgba(37,  99,  235, 0.3); }
+.tag-filter--model         { color: #a21caf; border-color: rgba(162, 28,  175, 0.3); }
+.tag-filter--evaluation    { color: #ea580c; border-color: rgba(234, 88,  12,  0.3); }
+.tag-filter--metric        { color: #06b6d4; border-color: rgba(6,   182, 212, 0.3); }
+.tag-filter--tool          { color: #16a34a; border-color: rgba(22,  163, 74,  0.3); }
 .tag-filter--datatype      { color: #ef4444; border-color: rgba(239, 68,  68,  0.3); }
 .tag-filter--comparison    { color: #ec4899; border-color: rgba(236, 72,  153, 0.3); }
 .tag-filter--probabilistic { color: #7c3aed; border-color: rgba(124, 58,  237, 0.3); }
@@ -441,7 +378,7 @@ $hover-bg: #dde3ec;
 .tag-filter--python        { color: #ca8a04; border-color: rgba(202, 138, 4,   0.3); }
 .tag-filter--core          { color: #0284c7; border-color: rgba(2,   132, 199, 0.3); }
 
-// When a category button is active it keeps its own colour but gains the teal border
+// Active state gains a teal border for all categories
 .tag-filter--method.active,
 .tag-filter--model.active,
 .tag-filter--evaluation.active,
@@ -456,7 +393,6 @@ $hover-bg: #dde3ec;
 .tag-filter--core.active {
   border-color: var(--color-teal);
   border-width: 3px;
-  // colour is inherited from the .tag-filter--X rule above
 }
 
 
@@ -559,11 +495,12 @@ $hover-bg: #dde3ec;
   align-self: flex-start;
 }
 
+// Empty state (shown before JS initialises the graph)
 .graph-empty-state {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 460px;
+  height: 420px;
   border: 1px dashed #ddd;
   border-radius: 6px;
   background: #fafafa;
@@ -586,19 +523,77 @@ $hover-bg: #dde3ec;
   opacity: 0.4;
 }
 
+// =============================================================================
+// CONCEPT GRAPH
+// =============================================================================
+
+// Container holds both the SVG canvas and the floating zoom controls
+#concept-graph-container {
+  position: relative;
+}
+
 #concept-graph {
   width: 100%;
-  height: 280px;
+  height: 420px;           // taller than before to give the graph room to breathe
   display: block;
   background: #fafafa;
   border: 1px solid #e8e8e8;
   border-radius: 6px;
+
+  // Globe parallax — JS applies a CSS 3D perspective tilt on mousemove.
+  // The transition gives it a smooth, fluid feel.
+  transition: transform 0.1s ease-out;
+  // Prevent layout shifts when the 3D transform is applied
+  will-change: transform;
 }
 
+// Smooth circle transitions (kept from original)
 .graph-node circle {
-  transition: fill-opacity 0.12s ease;
+  transition: fill-opacity 0.15s ease;
 }
 
+// ── Floating zoom controls ────────────────────────────────────────────────────
+.graph-controls {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  z-index: 10;
+  // Prevent the 3D SVG tilt from misaligning the buttons
+  pointer-events: auto;
+}
+
+.graph-ctrl-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  color: #555;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+
+  &:hover {
+    background: #fff;
+    border-color: rgba(0, 0, 0, 0.22);
+    color: #222;
+  }
+
+  &:active {
+    background: #f0f0f0;
+  }
+}
+
+// ── Graph legend ──────────────────────────────────────────────────────────────
 .graph-legend {
   display: flex;
   gap: 1.25rem;
@@ -719,7 +714,6 @@ $hover-bg: #dde3ec;
     align-items: flex-start;
   }
 
-  // On mobile, revert pipeline to a simple vertical stacked list
   .pipeline {
     flex-direction: column;
     gap: 2px;
@@ -769,7 +763,15 @@ $hover-bg: #dde3ec;
     width: 100%;
   }
 
+  // Shorter graph on mobile, globe tilt disabled
   .graph-empty-state {
-    height: 200px;
+    height: 260px;
+  }
+
+  #concept-graph {
+    height: 300px;
+    // Disable 3D globe effect on touch devices to avoid interaction conflicts
+    touch-action: pan-x pan-y;
+    &:hover { transform: none !important; }
   }
 }
