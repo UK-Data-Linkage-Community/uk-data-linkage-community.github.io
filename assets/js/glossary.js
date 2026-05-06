@@ -22,6 +22,21 @@ document.addEventListener("DOMContentLoaded", function () {
   data.skos.concepts.forEach(c => { conceptMap[c.id] = c; });
 
   // ═══════════════════════════════════════════════════════════════════
+  // INFER BROADER FROM NARROWER DECLARATIONS
+  // Only 'narrower' needs to be specified in the YAML data.
+  // For each concept with narrower: [childId, ...], we automatically push
+  // the parent's id into each child's .broader array.
+  // ═══════════════════════════════════════════════════════════════════
+  Object.values(conceptMap).forEach(concept => {
+    (concept.narrower || []).forEach(childId => {
+      const child = conceptMap[childId];
+      if (!child) return;
+      if (!child.broader) child.broader = [];
+      if (!child.broader.includes(concept.id)) child.broader.push(concept.id);
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
   // SEARCH INDEX  (built from pipeline → concept refs + altLabels)
   // ═══════════════════════════════════════════════════════════════════
   const allTerms = [];
@@ -70,28 +85,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     content.innerHTML = html;
 
-    // Concept links in panel → jump to glossary
     content.querySelectorAll(".concept-link").forEach(el => {
       el.addEventListener("click", () =>
         selectGlossaryConcept(el.dataset.id, true)
       );
     });
-
-    // content.querySelectorAll(".tag-chip").forEach(chip => {
-    //   chip.addEventListener("click", e => {
-    //     e.stopPropagation(); // prevent parent clicks
-    //
-    //     const tag = chip.dataset.tag;
-    //
-    //     const filter = document.querySelector(`.tag-filter[data-tag="${tag}"]`);
-    //     if (filter) {
-    //       filter.click();
-    //     }
-    //
-    //     document.querySelector('.glossary-section')
-    //       ?.scrollIntoView({ behavior: 'smooth' });
-    //   });
-    // });
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -160,7 +158,6 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
       message.textContent = "No match found in glossary.";
     }
-    // btn.title = tag;
   }
 
   searchBtn.addEventListener("click", runSearch);
@@ -185,12 +182,9 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderTagFilters() {
     const tags = getAllTags();
 
-    // Wrap the tag-filters div in a labelled wrapper so it serves as
-    // the category colour key as well as the filter control.
     const filtersDiv = document.getElementById("tag-filters");
     const parent     = filtersDiv.parentElement;
 
-    // Build wrapper (idempotent – only once)
     if (!document.querySelector(".tag-filters-wrapper")) {
       const wrapper = document.createElement("div");
       wrapper.className = "tag-filters-wrapper";
@@ -268,8 +262,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Navigate to a concept: re-render list (to show active state), render graph,
-  // optionally scroll the glossary section into view
+  // Navigate to a concept: re-render list, update detail card + graph focus
   function selectGlossaryConcept(id, scrollIntoView) {
     activeConceptId = id;
     renderGlossaryList();
@@ -278,7 +271,6 @@ document.addEventListener("DOMContentLoaded", function () {
       document.querySelector(".glossary-section")
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    // Scroll the term into view inside the list panel
     requestAnimationFrame(() => {
       document.querySelector(`.glossary-term[data-id="${id}"]`)
         ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -286,26 +278,23 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // RENDER CONCEPT DETAIL + GRAPH
+  // RENDER CONCEPT DETAIL CARD
+  // (graph update is now handled separately by ConceptGraphManager)
   // ═══════════════════════════════════════════════════════════════════
-  function renderConceptGraph(conceptId) {
+  function renderConceptDetail(conceptId) {
     const concept = conceptMap[conceptId];
     if (!concept) return;
 
-    document.getElementById("graph-empty-state").style.display       = "none";
-    document.getElementById("concept-graph-container").style.display = "block";
-
-    // ── Detail card ─────────────────────────────────────────────────
-    const makeLinks = (ids, type) =>
+    const makeLinks = ids =>
       ids.map(id => {
         const label = conceptMap[id]?.prefLabel || id;
         return `<span class="rel-link" data-id="${id}">${label}</span>`;
       }).join(", ");
 
     const relationRows = [];
-    if (concept.broader?.length)  relationRows.push(`<span class="rel-label broader-label">Broader</span> ${makeLinks(concept.broader,  "broader")}`);
-    if (concept.narrower?.length) relationRows.push(`<span class="rel-label narrower-label">Narrower</span> ${makeLinks(concept.narrower, "narrower")}`);
-    if (concept.related?.length)  relationRows.push(`<span class="rel-label related-label">Related</span> ${makeLinks(concept.related,  "related")}`);
+    if (concept.broader?.length)  relationRows.push(`<span class="rel-label broader-label">Broader</span> ${makeLinks(concept.broader)}`);
+    if (concept.narrower?.length) relationRows.push(`<span class="rel-label narrower-label">Narrower</span> ${makeLinks(concept.narrower)}`);
+    if (concept.related?.length)  relationRows.push(`<span class="rel-label related-label">Related</span> ${makeLinks(concept.related)}`);
 
     const altHtml = (concept.altLabel || [])
       .map(a => `<span class="alt-label">${a}</span>`)
@@ -329,163 +318,447 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="concept-tag-chips">${tagHtml}</div>
       </div>`;
 
-    // Wire up relation links
     document.querySelectorAll(".rel-link").forEach(el => {
       el.addEventListener("click", () =>
         selectGlossaryConcept(el.dataset.id, false)
       );
     });
+  }
 
-    // document.querySelectorAll("#concept-detail .tag-chip").forEach(chip => {
-    //   chip.addEventListener("click", e => {
-    //     e.stopPropagation();
-    //
-    //     const tag = chip.dataset.tag;
-    //
-    //     const filter = document.querySelector(`.tag-filter[data-tag="${tag}"]`);
-    //     if (filter) {
-    //       filter.click();
-    //     }
-    //
-    //     document.querySelector('.glossary-section')
-    //       ?.scrollIntoView({ behavior: 'smooth' });
-    //   });
-    // });
-
-    // ── Build graph data ────────────────────────────────────────────
-    const nodes = [{ id: conceptId, label: concept.prefLabel, type: "center" }];
-    const links = [];
-
-    const addNode = (id, type) => {
-      const c = conceptMap[id];
-      if (!c || nodes.find(n => n.id === id)) return;
-      nodes.push({ id, label: c.prefLabel, type });
-      links.push({ source: conceptId, target: id, type });
-    };
-
-    (concept.broader  || []).forEach(id => addNode(id, "broader"));
-    (concept.narrower || []).forEach(id => addNode(id, "narrower"));
-    (concept.related  || []).forEach(id => addNode(id, "related"));
-
-    drawD3Graph(nodes, links);
+  // Unified entry point: update detail card AND graph focus
+  function renderConceptGraph(conceptId) {
+    renderConceptDetail(conceptId);
+    if (graphManager) graphManager.setFocus(conceptId);
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // D3 FORCE GRAPH
+  // CONCEPT GRAPH MANAGER
+  // ─────────────────────────────────────────────────────────────────
+  // Builds the full graph ONCE from all concepts. On every setFocus()
+  // call it runs a BFS to compute hop-distance from the selected node
+  // and transitions node/link visual weights accordingly — no DOM
+  // teardown, no simulation restart, no redundant physics.
+  //
+  // Features:
+  //   • Persistent D3 force simulation (runs → settles → stays)
+  //   • BFS depth-fade: nodes dim/shrink with distance from focus
+  //   • Smooth pan-to-node via d3.zoom.transform transition
+  //   • Globe parallax: CSS 3D perspective tilt on mousemove
+  //   • Draggable nodes (locally reheat simulation)
+  //   • Zoom controls (in / out / fit-all)
   // ═══════════════════════════════════════════════════════════════════
-  function drawD3Graph(nodes, links) {
-    const svgEl = document.getElementById("concept-graph");
-    const svg   = d3.select(svgEl);
-    svg.selectAll("*").remove();
 
-    const W = svgEl.clientWidth  || 560;
-    const H = 280;
-    svg.attr("viewBox", `0 0 ${W} ${H}`).attr("height", H);
+  // Colour palette (mirrors SCSS variables)
+  const PALETTE = {
+    center:   "#2a9d8f",
+    broader:  "#e07b39",
+    narrower: "#4a7fc1",
+    related:  "#9b8ea8",
+    ghost:    "#94a3b8",
+    link:     "#c8d0da",
+  };
 
-    // Colour palette aligned with SCSS variables
-    const palette = {
-      center:   "#2a9d8f",
-      broader:  "#e07b39",
-      narrower: "#4a7fc1",
-      related:  "#9b8ea8"
-    };
+  class ConceptGraphManager {
 
-    // Defs: arrowhead markers
-    const defs = svg.append("defs");
-    ["broader","narrower","related"].forEach(type => {
-      defs.append("marker")
-        .attr("id",         `arrow-${type}`)
-        .attr("viewBox",    "0 -5 10 10")
-        .attr("refX",       20)
-        .attr("refY",       0)
-        .attr("markerWidth", 6)
-        .attr("markerHeight", 6)
-        .attr("orient",     "auto")
-        .append("path")
-          .attr("d",    "M0,-5L10,0L0,5")
-          .attr("fill", palette[type])
-          .attr("opacity", 0.6);
-    });
+    constructor(svgEl, conceptMap, onNodeClick) {
+      this.svgEl       = svgEl;
+      this.conceptMap  = conceptMap;
+      this.onNodeClick = onNodeClick;
+      this.focusId     = null;
+      this.W = svgEl.clientWidth  || 560;
+      this.H = 420;
 
-    const simulation = d3.forceSimulation(nodes)
-      .force("link",      d3.forceLink(links).id(d => d.id).distance(110))
-      .force("charge",    d3.forceManyBody().strength(-250))
-      .force("center",    d3.forceCenter(W / 2, H / 2))
-      .force("collision", d3.forceCollide(38));
+      this._buildData();
+      this._initSVG();
+      this._startSimulation();
+      this._attachControls();
+      this._attachGlobe();
+    }
 
-    // Links
-    const link = svg.append("g").attr("class", "links")
-      .selectAll("line")
-      .data(links)
-      .join("line")
-        .attr("stroke",          d => palette[d.type])
-        .attr("stroke-width",    1.5)
-        .attr("stroke-opacity",  0.45)
-        .attr("marker-end",      d => `url(#arrow-${d.type})`);
+    // ── Build all nodes + edges (called once) ───────────────────────
+    _buildData() {
+      this.nodes = Object.values(this.conceptMap).map(c => ({
+        id: c.id, label: c.prefLabel, tags: c.tags || []
+      }));
 
-    // Nodes
-    const node = svg.append("g").attr("class", "nodes")
-      .selectAll("g")
-      .data(nodes)
-      .join("g")
-        .attr("class",  "graph-node")
-        .style("cursor", d => d.type === "center" ? "default" : "pointer")
-        .call(
-          d3.drag()
-            .on("start", (event, d) => {
-              if (!event.active) simulation.alphaTarget(0.3).restart();
-              d.fx = d.x; d.fy = d.y;
-            })
-            .on("drag",  (event, d) => { d.fx = event.x; d.fy = event.y; })
-            .on("end",   (event, d) => {
-              if (!event.active) simulation.alphaTarget(0);
-              d.fx = null; d.fy = null;
-            })
-        );
+      // Undirected adjacency map for BFS
+      this.adj = new Map(this.nodes.map(n => [n.id, new Set()]));
 
-    // Outer glow ring for center node
-    node.filter(d => d.type === "center")
-      .append("circle")
-        .attr("r",            26)
-        .attr("fill",         palette.center)
+      const seen = new Set();
+      this.links = [];
+
+      const addEdge = (src, tgt, type) => {
+        if (!this.adj.has(src) || !this.adj.has(tgt)) return;
+        // Stable dedup key regardless of direction
+        const key = src < tgt ? `${src}§${tgt}` : `${tgt}§${src}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        this.links.push({ source: src, target: tgt, type });
+        this.adj.get(src).add(tgt);
+        this.adj.get(tgt).add(src);
+      };
+
+      // Process narrower + related; broader is already inferred above
+      // and would produce duplicate edges — the dedup handles it safely,
+      // but we skip it to avoid unnecessary type-shadowing.
+      Object.values(this.conceptMap).forEach(c => {
+        (c.narrower || []).forEach(t => addEdge(c.id, t, "narrower"));
+        (c.related  || []).forEach(t => addEdge(c.id, t, "related"));
+      });
+    }
+
+    // ── BFS: returns Map<id, hopDistance> from startId ─────────────
+    _bfs(startId) {
+      const dist = new Map([[startId, 0]]);
+      const q    = [startId];
+      while (q.length) {
+        const cur = q.shift();
+        const d   = dist.get(cur);
+        this.adj.get(cur)?.forEach(nb => {
+          if (!dist.has(nb)) { dist.set(nb, d + 1); q.push(nb); }
+        });
+      }
+      return dist;
+    }
+
+    // ── Determine the semantic relationship from focusId → neighborId
+    _relType(focusId, neighborId) {
+      const c  = this.conceptMap[focusId];
+      const nb = this.conceptMap[neighborId];
+      if ((c?.narrower || []).includes(neighborId)) return "narrower";
+      if ((c?.broader  || []).includes(neighborId)) return "broader";
+      if ((c?.related  || []).includes(neighborId)) return "related";
+      // Inverse: if neighbor declared narrower→focus, focus is broader
+      if ((nb?.narrower || []).includes(focusId))   return "broader";
+      if ((nb?.broader  || []).includes(focusId))   return "narrower";
+      return "related";
+    }
+
+    // ── Build SVG structure ─────────────────────────────────────────
+    _initSVG() {
+      const svg = d3.select(this.svgEl);
+      svg.selectAll("*").remove();
+      svg.attr("viewBox", `0 0 ${this.W} ${this.H}`)
+         .attr("height",   this.H);
+
+      // Arrow markers for typed depth-1 links
+      const defs = svg.append("defs");
+      ["broader", "narrower", "related"].forEach(t => {
+        defs.append("marker")
+          .attr("id",           `cgm-arrow-${t}`)
+          .attr("viewBox",      "0 -5 10 10")
+          .attr("refX",         18).attr("refY", 0)
+          .attr("markerWidth",  5).attr("markerHeight", 5)
+          .attr("orient",       "auto")
+          .append("path")
+            .attr("d",       "M0,-5L10,0L0,5")
+            .attr("fill",    PALETTE[t])
+            .attr("opacity", 0.55);
+      });
+
+      // Root group that d3.zoom transforms
+      this._g = svg.append("g").attr("class", "cgm-root");
+
+      // Zoom behaviour (pan + scroll-to-zoom)
+      this._zoom = d3.zoom()
+        .scaleExtent([0.08, 6])
+        .on("zoom", e => this._g.attr("transform", e.transform));
+      svg.call(this._zoom);
+
+      // ── Links layer ──────────────────────────────────────────────
+      this._linkSel = this._g.append("g").attr("class", "cgm-links")
+        .selectAll("line")
+        .data(this.links)
+        .join("line")
+          .attr("stroke",         PALETTE.link)
+          .attr("stroke-width",   0.8)
+          .attr("stroke-opacity", 0.28);
+
+      // ── Nodes layer ──────────────────────────────────────────────
+      const nodeG = this._g.append("g").attr("class", "cgm-nodes")
+        .selectAll("g")
+        .data(this.nodes)
+        .join("g")
+          .attr("class",  "graph-node")
+          .style("cursor", "pointer");
+
+      // Glow ring (only visible on the focused center node)
+      nodeG.append("circle")
+        .attr("class",        "node-glow")
+        .attr("r",            0)
+        .attr("fill",         PALETTE.center)
         .attr("fill-opacity", 0.12)
         .attr("stroke",       "none");
 
-    node.append("circle")
-      .attr("r",            d => d.type === "center" ? 19 : 13)
-      .attr("fill",         d => palette[d.type])
-      .attr("fill-opacity", d => d.type === "center" ? 1 : 0.7)
-      .attr("stroke",       d => palette[d.type])
-      .attr("stroke-width", d => d.type === "center" ? 0 : 1.5)
-      .attr("stroke-opacity", 0.5);
+      // Main circle
+      nodeG.append("circle")
+        .attr("class",          "node-circle")
+        .attr("r",              5)
+        .attr("fill",           PALETTE.ghost)
+        .attr("fill-opacity",   0.55)
+        .attr("stroke",         PALETTE.ghost)
+        .attr("stroke-width",   1.2)
+        .attr("stroke-opacity", 0.3);
 
-    node.append("text")
-      .text(d => d.label)
-      .attr("text-anchor", "middle")
-      .attr("dy",          d => d.type === "center" ? 32 : 26)
-      .attr("font-size",   d => d.type === "center" ? "12px" : "11px")
-      .attr("font-weight", d => d.type === "center" ? "600"  : "400")
-      .attr("fill",        "#333")
-      .style("pointer-events", "none")
-      .style("user-select",    "none");
+      // Label
+      nodeG.append("text")
+        .attr("class",        "node-label")
+        .text(d => d.label.length > 20 ? d.label.slice(0, 18) + "…" : d.label)
+        .attr("text-anchor",  "middle")
+        .attr("dy",           15)
+        .attr("font-size",    "10.5px")
+        .attr("fill",         "#222")
+        .attr("fill-opacity", 0.75)
+        .style("pointer-events", "none")
+        .style("user-select",    "none");
 
-    // Click satellite nodes to navigate
-    node.filter(d => d.type !== "center")
-      .on("click", (event, d) => selectGlossaryConcept(d.id, false))
-      .on("mouseenter", function (event, d) {
-        d3.select(this).select("circle:last-of-type")
-          .attr("fill-opacity", 1);
-      })
-      .on("mouseleave", function (event, d) {
-        d3.select(this).select("circle:last-of-type")
-          .attr("fill-opacity", 0.7);
+      // Hover highlight
+      nodeG
+        .on("mouseenter", function () {
+          d3.select(this).select(".node-circle").attr("stroke-width", 2.4);
+        })
+        .on("mouseleave", function () {
+          d3.select(this).select(".node-circle").attr("stroke-width", 1.2);
+        })
+        .on("click", (e, d) => {
+          e.stopPropagation();
+          this.onNodeClick(d.id);
+        });
+
+      // Drag (locally reheats simulation)
+      nodeG.call(
+        d3.drag()
+          .on("start", (e, d) => {
+            if (!e.active) this._sim.alphaTarget(0.3).restart();
+            d.fx = d.x; d.fy = d.y;
+          })
+          .on("drag",  (e, d) => { d.fx = e.x; d.fy = e.y; })
+          .on("end",   (e, d) => {
+            if (!e.active) this._sim.alphaTarget(0);
+            d.fx = null; d.fy = null;
+          })
+      );
+
+      this._nodeG = nodeG;
+    }
+
+    // ── Force simulation (runs once, settles naturally) ─────────────
+    _startSimulation() {
+      const { W, H } = this;
+
+      this._sim = d3.forceSimulation(this.nodes)
+        .force("link",
+          d3.forceLink(this.links)
+            .id(d => d.id)
+            .distance(110)
+            .strength(0.35)
+        )
+        .force("charge",  d3.forceManyBody().strength(-220))
+        .force("center",  d3.forceCenter(W / 2, H / 2))
+        .force("collide", d3.forceCollide(20))
+        .on("tick", () => {
+          this._linkSel
+            .attr("x1", d => d.source.x).attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
+          this._nodeG.attr("transform", d => `translate(${d.x ?? 0},${d.y ?? 0})`);
+        });
+    }
+
+    // ── Floating zoom controls ──────────────────────────────────────
+    _attachControls() {
+      const container = this.svgEl.parentElement;
+      const ctrl = document.createElement("div");
+      ctrl.className = "graph-controls";
+
+      const makeBtn = (icon, title, fn) => {
+        const b = document.createElement("button");
+        b.className   = "graph-ctrl-btn";
+        b.title       = title;
+        b.textContent = icon;
+        b.addEventListener("click", e => { e.stopPropagation(); fn(); });
+        ctrl.appendChild(b);
+      };
+
+      makeBtn("＋", "Zoom in",  () => d3.select(this.svgEl).transition().duration(220).call(this._zoom.scaleBy, 1.5));
+      makeBtn("－", "Zoom out", () => d3.select(this.svgEl).transition().duration(220).call(this._zoom.scaleBy, 0.67));
+      makeBtn("⤢",  "Fit all",  () => this.fitAll());
+
+      container.appendChild(ctrl);
+    }
+
+    _attachGlobe() {
+      const el = this.svgEl;
+      el.style.transition = "transform 0.1s ease-out";
+    }
+
+    // ── Update all visuals for a new focus concept ──────────────────
+    // This is the hot path — called on every concept selection.
+    // It never rebuilds the DOM or restarts the simulation.
+    setFocus(id) {
+      this.focusId = id;
+      const dist   = this._bfs(id);
+
+      // ── Node visuals (circle size + opacity) ──────────────────────
+      this._nodeG.each((d, i, nodes) => {
+        const g    = d3.select(nodes[i]);
+        const circ = g.select(".node-circle");
+        const glow = g.select(".node-glow");
+        const lbl  = g.select(".node-label");
+        const dv   = dist.get(d.id) ?? 99;
+        const isCenter = d.id === id;
+
+        let r, fill, fillOp, strokeOp, glowR, fontSize, fontOp;
+
+        if (isCenter) {
+          // Focused node: full size + colour + glow ring
+          r = 13; fill = PALETTE.center;
+          fillOp = 1; strokeOp = 0.7;
+          glowR = 22; fontSize = "13px"; fontOp = 1;
+
+        } else if (dv === 1) {
+          // Immediate neighbours: coloured by relationship type
+          const t = this._relType(id, d.id);
+          r = 8.5; fill = PALETTE[t] || PALETTE.ghost;
+          fillOp = 0.85; strokeOp = 0.55;
+          glowR = 0; fontSize = "11px"; fontOp = 0.92;
+
+        } else if (dv === 2) {
+          r = 6; fill = PALETTE.ghost;
+          fillOp = 0.42; strokeOp = 0.22;
+          glowR = 0; fontSize = "9.5px"; fontOp = 0.5;
+
+        } else if (dv === 3) {
+          r = 4.5; fill = PALETTE.ghost;
+          fillOp = 0.22; strokeOp = 0.1;
+          glowR = 0; fontSize = "7.5px"; fontOp = 0.25;
+
+        } else {
+          // Far nodes: tiny ghost dots, labels hidden
+          r = 3; fill = PALETTE.ghost;
+          fillOp = 0.09; strokeOp = 0.05;
+          glowR = 0; fontSize = "0px"; fontOp = 0;
+        }
+
+        const T = 380; // ms transition
+        circ.transition().duration(T)
+          .attr("r",              r)
+          .attr("fill",           fill)
+          .attr("fill-opacity",   fillOp)
+          .attr("stroke",         fill)
+          .attr("stroke-opacity", strokeOp);
+
+        glow.transition().duration(T)
+          .attr("r",    glowR)
+          .attr("fill", isCenter ? PALETTE.center : fill);
+
+        lbl.transition().duration(T)
+          .attr("dy",           r + 8)
+          .attr("font-size",    fontSize)
+          .attr("fill-opacity", fontOp);
       });
 
-    simulation.on("tick", () => {
-      link
-        .attr("x1", d => d.source.x).attr("y1", d => d.source.y)
-        .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
-      node.attr("transform", d => `translate(${d.x},${d.y})`);
+      // ── Link visuals (colour + opacity) ───────────────────────────
+      this._linkSel.each((l, i, links) => {
+        const srcId = typeof l.source === "object" ? l.source.id : l.source;
+        const tgtId = typeof l.target === "object" ? l.target.id : l.target;
+        const ds    = dist.get(srcId) ?? 99;
+        const dt    = dist.get(tgtId) ?? 99;
+        const minD  = Math.min(ds, dt);
+        const maxD  = Math.max(ds, dt);
+
+        const lk = d3.select(links[i]);
+
+        if (minD === 0 && maxD === 1) {
+          // Direct edge from focus: coloured + arrow
+          lk.transition().duration(380)
+            .attr("stroke",       PALETTE[l.type] || PALETTE.related)
+            .attr("stroke-width", 1.9)
+            .attr("stroke-opacity", 0.62)
+            .attr("marker-end",   `url(#cgm-arrow-${l.type})`);
+
+        } else if (minD <= 1 && maxD === 2) {
+          lk.transition().duration(380)
+            .attr("stroke",         PALETTE.link)
+            .attr("stroke-width",   1)
+            .attr("stroke-opacity", 0.18)
+            .attr("marker-end",     null);
+
+        } else if (minD <= 2 && maxD <= 3) {
+          lk.transition().duration(380)
+            .attr("stroke",         PALETTE.link)
+            .attr("stroke-width",   0.7)
+            .attr("stroke-opacity", 0.08)
+            .attr("marker-end",     null);
+
+        } else {
+          lk.transition().duration(380)
+            .attr("stroke",         PALETTE.link)
+            .attr("stroke-width",   0.5)
+            .attr("stroke-opacity", 0.03)
+            .attr("marker-end",     null);
+        }
+      });
+
+      // ── Smooth pan to the focused node ───────────────────────────
+      const node = this.nodes.find(n => n.id === id);
+      if (node?.x != null) {
+        this._panTo(node.x, node.y);
+      } else {
+        // Simulation may not have placed it yet — retry briefly
+        const check = setInterval(() => {
+          const n = this.nodes.find(n => n.id === id);
+          if (n?.x != null) { this._panTo(n.x, n.y); clearInterval(check); }
+        }, 80);
+        setTimeout(() => clearInterval(check), 3000);
+      }
+    }
+
+    _panTo(nx, ny, scale = 1.35) {
+      const { W, H } = this;
+      d3.select(this.svgEl)
+        .transition().duration(600).ease(d3.easeCubicInOut)
+        .call(
+          this._zoom.transform,
+          d3.zoomIdentity
+            .translate(W / 2 - nx * scale, H / 2 - ny * scale)
+            .scale(scale)
+        );
+    }
+
+    // Zoom out to show the whole graph
+    fitAll() {
+      d3.select(this.svgEl)
+        .transition().duration(500).ease(d3.easeCubicOut)
+        .call(this._zoom.transform, d3.zoomIdentity);
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // GRAPH BOOTSTRAP — called once on page load
+  // ═══════════════════════════════════════════════════════════════════
+  let graphManager = null;
+
+  function initConceptGraph() {
+    const svgEl = document.getElementById("concept-graph");
+    if (!svgEl || graphManager) return;
+
+    // Show the graph container immediately (unfocused full view)
+    // The empty state placeholder is no longer needed.
+    const emptyState = document.getElementById("graph-empty-state");
+    const container  = document.getElementById("concept-graph-container");
+    if (emptyState) emptyState.style.display = "none";
+    if (container)  container.style.display  = "block";
+
+    // Wait one frame so the SVG has its final rendered width
+    requestAnimationFrame(() => {
+      graphManager = new ConceptGraphManager(
+        svgEl,
+        conceptMap,
+        id => selectGlossaryConcept(id, false)
+      );
+
+      // If a concept was already selected before the graph was ready, apply focus
+      if (activeConceptId) graphManager.setFocus(activeConceptId);
     });
   }
 
@@ -499,13 +772,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const tag = chip.dataset.tag;
     if (!tag) return;
 
-    // Prevent parent click handlers (important for graph + panels)
     e.stopPropagation();
 
     const filter = document.querySelector(`.tag-filter[data-tag="${tag}"]`);
-    if (filter) {
-      filter.click();
-    }
+    if (filter) filter.click();
 
     document.querySelector(".glossary-section")
       ?.scrollIntoView({ behavior: "smooth" });
@@ -517,6 +787,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function initGlossary() {
     renderTagFilters();
     renderGlossaryList();
+    initConceptGraph();
   }
 
   requestAnimationFrame(initGlossary);

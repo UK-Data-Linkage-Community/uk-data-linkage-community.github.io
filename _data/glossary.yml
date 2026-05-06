@@ -117,22 +117,289 @@ sections:
             tags: ["evaluation"]
 
 
+#skos:
+#  concepts:
+#
+#    # ── Data Structures ──────────────────────────────────────────────
+#    - id: entity
+#      prefLabel: Entity
+#      definition: A thing, place, event, object, or person about which data has been collected.
+#      tags: [datatype]
+#      narrower: [record, cluster]
+#
+#    - id: record
+#      prefLabel: Record
+#      definition: A single observation or entity instance within a dataset, typically represented as a row in a table.
+#      tags: [datatype]
+#      broader: [entity]
+#      related: [table, candidate_pairs]
+#
+#    - id: table
+#      prefLabel: Table
+#      definition: A structured dataset composed of rows (records) and columns (fields).
+#      tags: [datatype]
+#      related: [record]
+#
+#    - id: cluster
+#      prefLabel: Cluster
+#      definition: A group of records inferred to represent the same real-world entity.
+#      tags: [datatype]
+#      broader: [entity]
+#      narrower: [cluster_id]
+#      related: [entity_resolution, deduplicate, clerical_review, link]
+#
+#    - id: cluster_id
+#      prefLabel: Cluster ID
+#      definition: A unique identifier assigned to a cluster of records representing the same entity.
+#      tags: [datatype]
+#      broader: [cluster]
+#      related: [entity_resolution, link]
+#
+#    - id: link
+#      prefLabel: Link
+#      definition: An asserted connection between two records identified as representing the same entity.
+#      tags: [datatype]
+#      related: [entity_resolution, cluster, data_linkage]
+#
+#    - id: graph
+#      prefLabel: Graph
+#      definition: A data structure or visual model representing relationships between entities (nodes) connected by edges.
+#      tags: [datatype, visualisation]
+#      narrower: [node, edge]
+#      related: [chart, cluster, entity]
+#
+#    - id: chart
+#      prefLabel: Chart
+#      definition: A visual representation of data for analysis or reporting.
+#      tags: [visualisation]
+#      related: [graph]
+#
+#    - id: node
+#      prefLabel: Node
+#      definition: An individual point in a graph representing an entity or record.
+#      tags: [datatype]
+#      broader: [graph]
+#      related: [edge, entity, record]
+#
+#    - id: edge
+#      prefLabel: Edge
+#      definition: A connection between two nodes in a graph, representing a relationship such as a link between records.
+#      tags: [datatype]
+#      broader: [graph]
+#      related: [node, link]
+#
+#    # ── Entity Resolution Methods ─────────────────────────────────────
+#    - id: entity_resolution
+#      prefLabel: Entity Resolution
+#      altLabel: [Record Linkage, Entity Matching]
+#      definition: The process of determining whether multiple records in one or more datasets refer to the same real-world entity.
+#      tags: [method]
+#      narrower: [probabilistic_linkage, deterministic_linkage, deduplicate, data_linkage]
+#      related: [blocking, comparisons, cluster, splink]
+#
+#    - id: data_linkage
+#      prefLabel: Data Linkage
+#      altLabel: [Record Linkage]
+#      definition: Another term for entity resolution, emphasising the joining of records across different datasets.
+#      tags: [method]
+#      broader: [entity_resolution]
+#      related: [link, splink, cluster]
+#
+#    - id: deduplicate
+#      prefLabel: Deduplicate
+#      altLabel: [Deduplication]
+#      definition: Identifying and removing duplicate records within a single dataset.
+#      tags: [method]
+#      broader: [entity_resolution]
+#      related: [cluster, data_cleaning]
+#
+#    # ── Linkage Approaches ────────────────────────────────────────────
+#    - id: probabilistic_linkage
+#      prefLabel: Probabilistic Linkage
+#      altLabel: [Probabilistic Matching]
+#      definition: An evidence-based approach to matching records that uses weighted comparisons and probability thresholds rather than exact rules.
+#      tags: [method, probabilistic]
+#      broader: [entity_resolution]
+#      narrower: [fellegi_sunter]
+#      related: [deterministic_linkage, comparisons, linkage_metrics, weight, splink]
+#
+#    - id: deterministic_linkage
+#      prefLabel: Deterministic Linkage
+#      altLabel: [Rules-based Linkage]
+#      definition: A strict rules-based approach where records must satisfy exact matching criteria to be considered a match.
+#      tags: [method, deterministic]
+#      broader: [entity_resolution]
+#      related: [probabilistic_linkage, match_key, blocking_rules]
+#
+#    # ── Probabilistic Models ──────────────────────────────────────────
+#    - id: fellegi_sunter
+#      prefLabel: Fellegi-Sunter Model
+#      definition: A foundational probabilistic model that assigns match weights to record pairs based on the pattern of field agreements and disagreements.
+#      tags: [model, probabilistic]
+#      broader: [probabilistic_linkage]
+#      related: [agreement_pattern, comparisons, weight, splink]
+#
+#    - id: weight
+#      prefLabel: Match Weight
+#      definition: A numerical score derived from comparison vectors indicating the cumulative evidence that two records refer to the same entity.
+#      tags: [model, probabilistic]
+#      related: [fellegi_sunter, comparisons, agreement_pattern, probabilistic_linkage]
+#
+#    # ── Blocking & Indexing ───────────────────────────────────────────
+#    - id: blocking
+#      prefLabel: Blocking
+#      definition: A strategy for reducing the number of record pairs to compare by only comparing records that share a common blocking key value. More technically, it reduces the number of edges to be considered during matching. In Splink, this is normally done through a series of Blocking Rules, which are used to focus what the matching process considers during running.
+#      tags: [method, comparison]
+#      narrower: [blocking_rules, blocking_key]
+#      related: [comparisons, candidate_pairs, splink]
+#
+#    - id: blocking_rules
+#      prefLabel: Blocking Rules
+#      definition: Rules used in the Blocking process to direct the linking algorithm as to what variables and as to what manner blocking should be performed on.
+#      tags: [method]
+#      broader: [blocking, comparison]
+#      related: [blocking_key, match_key, deterministic_linkage]
+#
+#    - id: blocking_key
+#      prefLabel: Blocking Key
+#      definition: A derived value or field transformation used to partition records into groups for efficient pairwise comparison.
+#      tags: [method, comparison]
+#      broader: [blocking]
+#      related: [blocking_rules, candidate_pairs, match_key]
+#
+#    - id: candidate_pairs
+#      prefLabel: Candidate Pairs
+#      definition: The set of record pairs selected after blocking and passed forward for full field-level comparison.
+#      tags: [method, comparison]
+#      related: [blocking, comparisons, record]
+#
+#    # ── Comparison ────────────────────────────────────────────────────
+#    - id: comparisons
+#      prefLabel: Comparisons
+#      definition: The process of evaluating similarity or equality across fields for a candidate record pair.
+#      tags: [method, comparison]
+#      related: [agreement_pattern, blocking, string_similarity, candidate_pairs, splink]
+#
+#    - id: agreement_pattern
+#      prefLabel: Agreement Pattern
+#      definition: A vector encoding the pattern of agreements and disagreements across all compared fields for a given record pair.
+#      tags: [evaluation, comparison]
+#      related: [comparisons, fellegi_sunter, weight]
+#
+#    - id: string_similarity
+#      prefLabel: String Similarity
+#      definition: A measure of lexical closeness between two text strings, used for comparing name, address, or other text fields.
+#      tags: [comparison, method]
+#      narrower: [edit_distance, jaro_winkler]
+#      related: [comparisons, address_matching]
+#
+#    - id: edit_distance
+#      prefLabel: Edit Distance
+#      altLabel: [Levenshtein Distance]
+#      definition: The minimum number of single-character insertions, deletions, or substitutions required to transform one string into another.
+#      tags: [comparison, method]
+#      broader: [string_similarity]
+#      related: [jaro_winkler, comparisons]
+#
+#    - id: jaro_winkler
+#      prefLabel: Jaro-Winkler
+#      definition: A string similarity metric that gives extra weight to matching prefixes, making it well-suited for name matching.
+#      tags: [comparison, method]
+#      broader: [string_similarity]
+#      related: [edit_distance, comparisons]
+#
+#    - id: match_key
+#      prefLabel: Match Key
+#      definition: A deterministic rule that declares two records a match when specific field values are identical.
+#      tags: [comparison, deterministic]
+#      related: [deterministic_linkage, blocking_key, blocking_rules]
+#
+#    # ── Evaluation ────────────────────────────────────────────────────
+#    - id: linkage_metrics
+#      prefLabel: Linkage Metrics
+#      definition: Quantitative measures used to evaluate the quality of a record linkage result against a reference set.
+#      tags: [evaluation]
+#      narrower: [precision, recall, f_measure]
+#      related: [probabilistic_linkage, clerical_review, gold_standard]
+#
+#    - id: precision
+#      prefLabel: Precision
+#      definition: The proportion of predicted matches that are true matches. High precision means few false positive links.
+#      tags: [evaluation, metric]
+#      broader: [linkage_metrics]
+#      related: [recall, f_measure]
+#
+#    - id: recall
+#      prefLabel: Recall
+#      definition: The proportion of all true matches that are correctly identified. High recall means few missed links.
+#      tags: [evaluation, metric]
+#      broader: [linkage_metrics]
+#      related: [precision, f_measure]
+#
+#    - id: f_measure
+#      prefLabel: F-measure
+#      altLabel: [F1 Score]
+#      definition: The harmonic mean of precision and recall, providing a single balanced performance score.
+#      tags: [evaluation, metric]
+#      broader: [linkage_metrics]
+#      related: [precision, recall]
+#
+#    - id: gold_standard
+#      prefLabel: Gold Standard
+#      definition: A trusted, manually verified set of labelled record pairs used as the reference for evaluating linkage quality.
+#      tags: [evaluation]
+#      related: [clerical_review, linkage_metrics]
+#
+#    - id: clerical_review
+#      prefLabel: Clerical Review
+#      definition: Manual human inspection of uncertain or borderline record pairs to produce verified match decisions.
+#      tags: [method]
+#      related: [linkage_metrics, cluster, gold_standard]
+#
+#    # ── Data Preparation ──────────────────────────────────────────────
+#    - id: data_cleaning
+#      prefLabel: Data Cleaning
+#      definition: Correcting errors, inconsistencies, and missing values in source data before linkage to improve match rates.
+#      tags: [method]
+#      related: [entity_resolution, lexicon_mapping, address_matching, deduplicate]
+#
+#    - id: lexicon_mapping
+#      prefLabel: Lexicon Mapping
+#      definition: Translating free-text or coded values to a shared controlled vocabulary or canonical form.
+#      tags: [method]
+#      related: [data_cleaning, address_matching]
+#
+#    - id: address_matching
+#      prefLabel: Address Matching
+#      definition: Process of matching/mapping addresses or postcodes to a known reference point/database of address data.
+#      tags: [method]
+#      related: [data_cleaning, lexicon_mapping, string_similarity]
+#
+#    # ── Tools ─────────────────────────────────────────────────────────
+#    - id: splink
+#      prefLabel: Splink
+#      definition: An open-source Python library for probabilistic record linkage at scale, implementing the Fellegi-Sunter model with a SQL backend.
+#      tags: [tool, python]
+#      related: [probabilistic_linkage, blocking, fellegi_sunter, data_linkage, comparisons]
+#
+
+
 skos:
   concepts:
 
-    # ── Data Structures ──────────────────────────────────────────────
+    # datatype
     - id: entity
       prefLabel: Entity
       definition: A thing, place, event, object, or person about which data has been collected.
       tags: [datatype]
       narrower: [record, cluster]
 
-    - id: record
-      prefLabel: Record
-      definition: A single observation or entity instance within a dataset, typically represented as a row in a table.
-      tags: [datatype]
-      broader: [entity]
-      related: [table, candidate_pairs]
+    - id: graph
+      prefLabel: Graph
+      definition: A data structure or visual model representing relationships between entities (nodes) connected by edges.
+      tags: [datatype, visualisation]
+      narrower: [node, edge]
+      related: [chart, cluster, entity]
 
     - id: table
       prefLabel: Table
@@ -140,221 +407,132 @@ skos:
       tags: [datatype]
       related: [record]
 
+    - id: record
+      prefLabel: Record
+      definition: A single observation or entity instance within a dataset, typically represented as a row in a table.
+      tags: [datatype]
+      related: [table, candidate_pairs]
+
+    - id: node
+      prefLabel: Node
+      definition: An individual point in a graph representing an entity or record.
+      tags: [datatype]
+      related: [edge, entity, record]
+
+    - id: edge
+      prefLabel: Edge
+      definition: A connection between two nodes in a graph, representing a relationship such as a link.
+      tags: [datatype]
+      related: [node, link]
+
     - id: cluster
       prefLabel: Cluster
-      definition: A set of records resolved to represent the same underlying entity, the output of entity resolution.
+      definition: A group of records inferred to represent the same real-world entity.
       tags: [datatype]
-      broader: [entity]
+      narrower: [cluster_id]
       related: [entity_resolution, deduplicate, clerical_review, link]
 
-    - id: link
-      prefLabel: Link
-      definition: An asserted connection between two records identified as representing the same entity.
+    - id: cluster_id
+      prefLabel: Cluster ID
+      definition: A unique identifier assigned to a cluster of records representing the same entity.
       tags: [datatype]
-      related: [entity_resolution, cluster, data_linkage]
+      related: [entity_resolution, link]
 
-    - id: graph
-      prefLabel: Graph
-      definition: A network structure representing relationships between entities as nodes and edges.
-      tags: [datatype, visualisation]
-      related: [chart, cluster, entity]
+    # method
 
-    - id: chart
-      prefLabel: Chart
-      definition: A visual representation of data for analysis or reporting.
-      tags: [visualisation]
-      related: [graph]
-
-    # ── Entity Resolution Methods ─────────────────────────────────────
     - id: entity_resolution
       prefLabel: Entity Resolution
-      altLabel: [Record Linkage, Entity Matching]
+      altLabel: [Record Linkage, Entity Matching, Data Linkage]
       definition: The process of determining whether multiple records in one or more datasets refer to the same real-world entity.
       tags: [method]
-      narrower: [probabilistic_linkage, deterministic_linkage, deduplicate, data_linkage]
+      narrower: [probabilistic_linkage, deterministic_linkage, deduplicate, data_linkage, entity]
       related: [blocking, comparisons, cluster, splink]
-
-    - id: data_linkage
-      prefLabel: Data Linkage
-      altLabel: [Record Linkage]
-      definition: Another term for entity resolution, emphasising the joining of records across different datasets.
-      tags: [method]
-      broader: [entity_resolution]
-      related: [link, splink, cluster]
 
     - id: deduplicate
       prefLabel: Deduplicate
       altLabel: [Deduplication]
-      definition: Identifying and removing duplicate records within a single dataset.
-      tags: [method]
-      broader: [entity_resolution]
+      definition: Identification and removal of duplicate/redundant data in order to improve efficiency and reduce dataset size.
+      tags: [method, processing]
       related: [cluster, data_cleaning]
-
-    # ── Linkage Approaches ────────────────────────────────────────────
-    - id: probabilistic_linkage
-      prefLabel: Probabilistic Linkage
-      altLabel: [Probabilistic Matching]
-      definition: An evidence-based approach to matching records that uses weighted comparisons and probability thresholds rather than exact rules.
-      tags: [method, probabilistic]
-      broader: [entity_resolution]
-      narrower: [fellegi_sunter]
-      related: [deterministic_linkage, comparisons, linkage_metrics, weight, splink]
-
-    - id: deterministic_linkage
-      prefLabel: Deterministic Linkage
-      altLabel: [Rules-based Linkage]
-      definition: A strict rules-based approach where records must satisfy exact matching criteria to be considered a match.
-      tags: [method, deterministic]
-      broader: [entity_resolution]
-      related: [probabilistic_linkage, match_key, blocking_rules]
-
-    # ── Probabilistic Models ──────────────────────────────────────────
-    - id: fellegi_sunter
-      prefLabel: Fellegi-Sunter Model
-      definition: A foundational probabilistic model that assigns match weights to record pairs based on the pattern of field agreements and disagreements.
-      tags: [model, probabilistic]
-      broader: [probabilistic_linkage]
-      related: [agreement_pattern, comparisons, weight, splink]
-
-    - id: weight
-      prefLabel: Match Weight
-      definition: A numerical score derived from comparison vectors indicating the cumulative evidence that two records refer to the same entity.
-      tags: [model, probabilistic]
-      related: [fellegi_sunter, comparisons, agreement_pattern, probabilistic_linkage]
-
-    # ── Blocking & Indexing ───────────────────────────────────────────
-    - id: blocking
-      prefLabel: Blocking
-      definition: A strategy for reducing the number of record pairs to compare by only comparing records that share a common blocking key value.
-      tags: [method]
-      narrower: [blocking_rules, blocking_key]
-      related: [comparisons, candidate_pairs, splink]
-
-    - id: blocking_rules
-      prefLabel: Blocking Rules
-      definition: Logical conditions that define which record pairs are admitted as candidates for comparison.
-      tags: [method]
-      broader: [blocking]
-      related: [blocking_key, deterministic_linkage]
-
-    - id: blocking_key
-      prefLabel: Blocking Key
-      definition: A derived value or field transformation used to partition records into groups for efficient pairwise comparison.
-      tags: [method, comparison]
-      broader: [blocking]
-      related: [blocking_rules, candidate_pairs, match_key]
-
-    - id: candidate_pairs
-      prefLabel: Candidate Pairs
-      definition: The set of record pairs selected after blocking and passed forward for full field-level comparison.
-      tags: [method, comparison]
-      related: [blocking, comparisons, record]
-
-    # ── Comparison ────────────────────────────────────────────────────
-    - id: comparisons
-      prefLabel: Comparisons
-      definition: The process of evaluating similarity or equality across fields for a candidate record pair.
-      tags: [method, comparison]
-      related: [agreement_pattern, blocking, string_similarity, candidate_pairs, splink]
-
-    - id: agreement_pattern
-      prefLabel: Agreement Pattern
-      definition: A vector encoding the pattern of agreements and disagreements across all compared fields for a given record pair.
-      tags: [evaluation, comparison]
-      related: [comparisons, fellegi_sunter, weight]
-
-    - id: string_similarity
-      prefLabel: String Similarity
-      definition: A measure of lexical closeness between two text strings, used for comparing name, address, or other text fields.
-      tags: [comparison, method]
-      narrower: [edit_distance, jaro_winkler]
-      related: [comparisons, address_matching]
-
-    - id: edit_distance
-      prefLabel: Edit Distance
-      altLabel: [Levenshtein Distance]
-      definition: The minimum number of single-character insertions, deletions, or substitutions required to transform one string into another.
-      tags: [comparison, method]
-      broader: [string_similarity]
-      related: [jaro_winkler, comparisons]
-
-    - id: jaro_winkler
-      prefLabel: Jaro-Winkler
-      definition: A string similarity metric that gives extra weight to matching prefixes, making it well-suited for name matching.
-      tags: [comparison, method]
-      broader: [string_similarity]
-      related: [edit_distance, comparisons]
-
-    - id: match_key
-      prefLabel: Match Key
-      definition: A deterministic rule that declares two records a match when specific field values are identical.
-      tags: [comparison, deterministic]
-      related: [deterministic_linkage, blocking_key, blocking_rules]
-
-    # ── Evaluation ────────────────────────────────────────────────────
-    - id: linkage_metrics
-      prefLabel: Linkage Metrics
-      definition: Quantitative measures used to evaluate the quality of a record linkage result against a reference set.
-      tags: [evaluation]
-      narrower: [precision, recall, f_measure]
-      related: [probabilistic_linkage, clerical_review, gold_standard]
-
-    - id: precision
-      prefLabel: Precision
-      definition: The proportion of predicted matches that are true matches. High precision means few false positive links.
-      tags: [evaluation, metric]
-      broader: [linkage_metrics]
-      related: [recall, f_measure]
-
-    - id: recall
-      prefLabel: Recall
-      definition: The proportion of all true matches that are correctly identified. High recall means few missed links.
-      tags: [evaluation, metric]
-      broader: [linkage_metrics]
-      related: [precision, f_measure]
-
-    - id: f_measure
-      prefLabel: F-measure
-      altLabel: [F1 Score]
-      definition: The harmonic mean of precision and recall, providing a single balanced performance score.
-      tags: [evaluation, metric]
-      broader: [linkage_metrics]
-      related: [precision, recall]
-
-    - id: gold_standard
-      prefLabel: Gold Standard
-      definition: A trusted, manually verified set of labelled record pairs used as the reference for evaluating linkage quality.
-      tags: [evaluation]
-      related: [clerical_review, linkage_metrics]
 
     - id: clerical_review
       prefLabel: Clerical Review
-      definition: Manual human inspection of uncertain or borderline record pairs to produce verified match decisions.
-      tags: [method]
+      definition: Manual evaluation of clusters that cannot be confidently defined as a match or non-match during linkage. This is usually done by a small team or person.
+      tags: [method, evaluation, comparison]
       related: [linkage_metrics, cluster, gold_standard]
-
-    # ── Data Preparation ──────────────────────────────────────────────
-    - id: data_cleaning
-      prefLabel: Data Cleaning
-      definition: Correcting errors, inconsistencies, and missing values in source data before linkage to improve match rates.
-      tags: [method]
-      related: [entity_resolution, lexicon_mapping, address_matching, deduplicate]
 
     - id: lexicon_mapping
       prefLabel: Lexicon Mapping
-      definition: Translating free-text or coded values to a shared controlled vocabulary or canonical form.
-      tags: [method]
+      definition: Process of matching/mapping different vocabularies, terminologies or coding systems to a common format using a pre-defined lexicon (e.g. mapping nicknames to their original source name).
+      tags: [method, processing]
       related: [data_cleaning, address_matching]
 
     - id: address_matching
       prefLabel: Address Matching
-      definition: Parsing and matching address strings to a reference dataset to produce a geocoded or standardised form.
-      tags: [method]
+      definition: Process of matching/mapping addresses or postcodes to a known reference point/database of address data.
+      tags: [method, processing]
       related: [data_cleaning, lexicon_mapping, string_similarity]
 
-    # ── Tools ─────────────────────────────────────────────────────────
-    - id: splink
-      prefLabel: Splink
-      definition: An open-source Python library for probabilistic record linkage at scale, implementing the Fellegi-Sunter model with a SQL backend.
-      tags: [tool, python]
-      related: [probabilistic_linkage, blocking, fellegi_sunter, data_linkage, comparisons]
+    # tool
+    # probabilistic
+
+    - id: probabilistic_linkage
+      prefLabel: Probabilistic Linkage
+      altLabel: [Probabilistic Matching]
+      definition: An evidence based approach to matching records. Takes data from across the entire dataset to determine matches based on using a threshold value instead of using concrete rules. Generally good for lower quality datasets where thresholds can be adjusted to account for errors or studies that don’t need to follow specific linkage requirements.
+      tags: [method, probabilistic]
+      narrower: [fellegi_sunter]
+      related: [deterministic_linkage, comparisons, linkage_metrics, weight, splink]
+
+    # deterministic
+
+    - id: deterministic_linkage
+      prefLabel: Deterministic Linkage
+      altLabel: [Rules-based Linkage]
+      definition: A strict rules-based approach where records must satisfy exact matching criteria to be considered a match. It works more directly than probabilistic linkage using set rules to determine what is classed as a match. This form of matching generally tends to be faster to run and good for higher quality datasets or those that have very specific linking requirements.
+      tags: [method, deterministic]
+      related: [probabilistic_linkage, match_key, blocking_rules]
+
+    # comparison
+
+    - id: blocking
+      prefLabel: Blocking
+      definition: A strategy for reducing the number of record pairs to compare by only comparing records that share a common blocking key value. More technically, it reduces the number of edges to be considered during matching. In Splink, this is normally done through a series of Blocking Rules, which are used to focus what the matching process considers during running.
+      tags: [ method, comparison ]
+      narrower: [ blocking_rules, blocking_key ]
+      related: [ comparisons, candidate_pairs, splink ]
+
+    - id: blocking_rules
+      prefLabel: Blocking Rules
+      definition: Rules used in the Blocking process to direct the linking algorithm as to what variables and as to what manner blocking should be performed on.
+      tags: [ method ]
+      related: [ blocking_key, match_key, deterministic_linkage ]
+
+    - id: blocking_key
+      prefLabel: Blocking Key
+      definition: A derived value or field transformation used to partition records into groups for efficient pairwise comparison.
+      tags: [ method, comparison ]
+      related: [ blocking_rules, candidate_pairs, match_key ]
+
+    - id: comparisons
+      prefLabel: Comparisons
+      definition: The process or resulting features derived from evaluating similarity or equality between fields of record pairs.
+      tags: [ method, comparison, evaluation ]
+      narrower: [ cosine_similarity, string_similarity ]
+      related: [ agreement_pattern, blocking, candidate_pairs, splink ]
+
+    # evaluation
+    # visualisation
+    # processing
+
+    - id: data_cleaning
+      prefLabel: Data Cleaning
+      definition: The Process of cleaning unwanted or incorrect records or data errors from a dataset prior to linkage being performed. an example of this would be removing non-standard characters from a name column.
+      tags: [method, processing]
+      related: [entity_resolution, lexicon_mapping, address_matching, deduplicate]
+
+
+
+    # model
+
+    # privacy
