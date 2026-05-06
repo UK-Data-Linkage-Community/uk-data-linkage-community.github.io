@@ -457,7 +457,7 @@ skos:
 
     - id: clerical_review
       prefLabel: Clerical Review
-      definition: Manual evaluation of clusters that cannot be confidently defined as a match or non-match during linkage. This is usually done by a small team or person.
+      definition: Manual evaluation of {{cluster}}s that cannot be confidently defined as a match or non-match during linkage. This is usually done by a small team or person.
       tags: [method, evaluation, comparison]
       related: [linkage_metrics, cluster, gold_standard]
 
