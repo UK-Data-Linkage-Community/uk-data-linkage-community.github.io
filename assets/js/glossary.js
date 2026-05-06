@@ -21,6 +21,19 @@ document.addEventListener("DOMContentLoaded", function () {
   const conceptMap = {};
   data.skos.concepts.forEach(c => { conceptMap[c.id] = c; });
 
+  function linkifyDefinition(text) {
+    return text.replace(/\{\{(.*?)\}\}(\w*)/g, (_, term, suffix) => {
+      const concept = Object.values(conceptMap)
+        .find(c => c.prefLabel.toLowerCase() === term.toLowerCase());
+
+      if (!concept) return term + suffix;
+
+      const fullWord = term + suffix;
+
+      return `<span class="def-link" data-id="${concept.id}">${fullWord}</span>`;
+    });
+  }
+
   // ═══════════════════════════════════════════════════════════════════
   // INFER BROADER FROM NARROWER DECLARATIONS
   // Only 'narrower' needs to be specified in the YAML data.
@@ -73,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <p class="panel-concept">
               <strong class="concept-link" data-id="${c.id}">${c.prefLabel}</strong>
               <span class="panel-tags">${tagHtml}</span>
-              <span class="panel-def">${c.definition}</span>
+              <span class="panel-def">${linkifyDefinition(c.definition)}</span>
             </p>`;
         });
       } else {
@@ -86,6 +99,11 @@ document.addEventListener("DOMContentLoaded", function () {
     content.innerHTML = html;
 
     content.querySelectorAll(".concept-link").forEach(el => {
+      el.addEventListener("click", () =>
+        selectGlossaryConcept(el.dataset.id, true)
+      );
+    });
+    content.querySelectorAll(".def-link").forEach(el => {
       el.addEventListener("click", () =>
         selectGlossaryConcept(el.dataset.id, true)
       );
@@ -309,7 +327,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="concept-detail-header">
           <h3>${concept.prefLabel} ${altHtml}</h3>
         </div>
-        <p class="concept-def">${concept.definition}</p>
+        <p class="concept-def">${linkifyDefinition(concept.definition)}</p>
         ${relationRows.length
           ? `<div class="concept-relations">
                ${relationRows.map(r => `<div class="relation-row">${r}</div>`).join("")}
@@ -319,6 +337,11 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>`;
 
     document.querySelectorAll(".rel-link").forEach(el => {
+      el.addEventListener("click", () =>
+        selectGlossaryConcept(el.dataset.id, false)
+      );
+    });
+    document.querySelectorAll(".def-link").forEach(el => {
       el.addEventListener("click", () =>
         selectGlossaryConcept(el.dataset.id, false)
       );

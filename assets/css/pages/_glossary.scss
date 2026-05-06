@@ -552,6 +552,17 @@ $hover-bg: #dde3ec;
   transition: fill-opacity 0.15s ease;
 }
 
+.def-link {
+  color: var(--color-teal);
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 500;
+
+  &:hover {
+    color: #1f5fcc;
+  }
+}
+
 // ── Floating zoom controls ────────────────────────────────────────────────────
 .graph-controls {
   position: absolute;
