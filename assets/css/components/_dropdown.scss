@@ -76,7 +76,6 @@
   display: none;
 }
 
-// Hide hamburger icon by default
 .menu-icon {
   display: none;
   cursor: pointer;
@@ -91,5 +90,11 @@
     margin: 5px 0;
     transition: 0.3s;
     border-radius: 2px;
+  }
+}
+
+@media (max-width: 1060px) {
+  .menu-icon {
+    display: block;
   }
 }
