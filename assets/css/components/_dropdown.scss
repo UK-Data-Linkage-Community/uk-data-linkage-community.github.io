@@ -97,4 +97,26 @@
   .menu-icon {
     display: block;
   }
+    .dropdown-content {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    margin-top: 0;
+    padding-left: 15px;
+  }
+
+  .nav-dropdown {
+    display: block;
+    width: 100%;
+  }
+
+  .dropdown-toggle {
+    pointer-events: none; // optional: prevents click-to-toggle behavior
+  }
+
+  .dropdown-arrow {
+    display: none;
+  }
 }
