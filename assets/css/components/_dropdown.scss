@@ -76,7 +76,6 @@
   display: none;
 }
 
-// Hide hamburger icon by default
 .menu-icon {
   display: none;
   cursor: pointer;
@@ -91,5 +90,33 @@
     margin: 5px 0;
     transition: 0.3s;
     border-radius: 2px;
+  }
+}
+
+@media (max-width: 1060px) {
+  .menu-icon {
+    display: block;
+  }
+    .dropdown-content {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    margin-top: 0;
+    padding-left: 15px;
+  }
+
+  .nav-dropdown {
+    display: block;
+    width: 100%;
+  }
+
+  .dropdown-toggle {
+    pointer-events: none; // optional: prevents click-to-toggle behavior
+  }
+
+  .dropdown-arrow {
+    display: none;
   }
 }
