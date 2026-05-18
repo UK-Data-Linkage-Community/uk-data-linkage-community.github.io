@@ -43,7 +43,7 @@ If you have an event you would like to be added, please make a request [through 
               Complete
             </span>
           {% when "materials" %}
-            <a href="/materials/?event={{ event.id }}"
+            <a href="/resources/materials/?event={{ event.id }}"
                class="event-badge event-badge--materials">
               Materials Available →
             </a>

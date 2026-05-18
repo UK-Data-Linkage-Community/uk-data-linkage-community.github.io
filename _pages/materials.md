@@ -11,10 +11,6 @@ permalink: /resources/materials/
 
   <div class="materials-hero">
 
-    <h1 class="materials-title">
-      Materials Library
-    </h1>
-
     <p class="materials-subtitle">
       Browse workshop slides, recordings, and supporting resources.
     </p>

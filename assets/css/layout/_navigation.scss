@@ -51,7 +51,7 @@
     width: 100%;
     max-width: 300px;
     padding: 20px 0;
-    z-index: 999;
+    z-index: 1003;
     max-height: calc(100vh - #{$header-height});
     overflow-y: auto;
   }

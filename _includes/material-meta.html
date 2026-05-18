@@ -1,0 +1,17 @@
+{% assign material = site.data.materials_metadata.materials
+  | where: "id", include.id
+  | first %}
+{% if material %}
+  {% assign value = material[include.field] %}
+  {% if value %}
+    {% if value.first %}
+      {% for item in value %}
+        <span class="material-tag">
+          {{ item }}
+        </span>
+      {% endfor %}
+    {% else %}
+      {{ value }}
+    {% endif %}
+  {% endif %}
+{% endif %}

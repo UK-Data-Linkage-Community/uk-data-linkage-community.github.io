@@ -3,7 +3,7 @@ categories:
     events:
       - event_num: 1
         id: "ukdlc-workshop-1-data-linkers"
-        title: "Supporting Data Linkage Practitioners"
+        title: "Workshop 1: Supporting Data Linkage Practitioners"
         date: "31/03/2026"
         status: "materials"
         use_provisional_date: false
@@ -17,7 +17,7 @@ categories:
 
       - event_num: 2
         id: "ukdlc-workshop-2-linked-data-users"
-        title: "Supporting Linked Data Users"
+        title: "Workshop 2: Supporting Linked Data Users"
         date: "Q2 2026"
         status: "upcoming"
         use_provisional_date: true
@@ -31,7 +31,7 @@ categories:
 
       - event_num: 3
         id: "ukdlc-workshop-3-related-linkage"
-        title: "Related Topics in Data Linkage"
+        title: "Workshop 3: Relating Topics in Data Linkage"
         date: "Q3 2026"
         status: "upcoming"
         use_provisional_date: true
