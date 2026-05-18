@@ -1,0 +1,59 @@
+{% assign material = site.data.materials_metadata.materials
+  | where: "id", include.id
+  | first %}
+
+{% if material %}
+
+<div class="material-embed material-embed--{{ material.type }}">
+
+  <div class="material-embed__header">
+    <h4>{{ material.title }}</h4>
+
+    {% if material.authors %}
+      <p class="material-embed__authors">
+        {{ material.authors | join: ", " }}
+      </p>
+    {% endif %}
+  </div>
+
+  {% if include.show_caption != false %}
+    <p class="material-embed__caption">
+      {{ material.caption }}
+    </p>
+  {% endif %}
+
+  {% if material.type == "video" %}
+
+    <video controls width="100%">
+      <source src="{{ material.src }}" type="video/mp4">
+      Your browser does not support video playback.
+    </video>
+
+  {% elsif material.type == "slides" %}
+
+    <a href="{{ material.src }}"
+       class="material-button"
+       target="_blank">
+
+      Open Slides →
+    </a>
+
+  {% endif %}
+
+  {% if include.show_tags %}
+    <div class="material-tags">
+      {% for tag in material.tags %}
+        <span class="material-tag">
+          {{ tag }}
+        </span>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+</div>
+
+{% else %}
+
+<p>Material not found: {{ include.id }}</p>
+
+{% endif %}

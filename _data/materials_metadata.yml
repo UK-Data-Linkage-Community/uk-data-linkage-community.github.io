@@ -1,0 +1,26 @@
+materials:
+  - id: "ukdlc-w1s1-mike-slides"
+    title: "SeRP's current practices"
+    event_id: "ukdlc-workshop-1-data-linkers"
+    type: "slides"
+    authors:
+      - "Mike Edwards"
+    tags:
+      - entity-resolution
+      - probabilistic-matching
+    src: "/assets/materials/slides/UKDLC_W1S1_SeRP.pdf"
+    caption: >
+      Mike's slides on the current practices within SERP on data linkage.
+
+  - id: "ukdlc-w1s1-mike-video"
+    title: "SeRP's current practices"
+    event_id: "ukdlc-workshop-1-data-linkers"
+    type: "video"
+    authors:
+      - "Mike Edwards"
+    tags:
+      - entity-resolution
+      - probabilistic-matching
+    src: "/assets/materials/videos/mike_W1S1_web.mp4"
+    caption: >
+      Mike presents the current practices within SERP on data linkage.

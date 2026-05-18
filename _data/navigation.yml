@@ -30,6 +30,8 @@ main:
         url: /related-groups/
       - title: "Glossary"
         url: /resources/glossary/
+      - title: "Site Materials"
+        url: /resources/materials/
 #      - title: "Bibliography"
 #        url: /resources/bibliography/
 #      - title: "Datasets"
