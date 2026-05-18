@@ -10,9 +10,20 @@
 .site-header .wrapper {
   max-width: 2400px !important;
   margin: 0 auto !important;
-  padding: 15px 80px !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+
+  padding: 15px 80px; // move it here
+}
+
+.site-header .reading-progress {
+  position: sticky;
+  left: 0;
+  bottom: 0;
+  width: 0%;
+  height: 3px;
+  background: var(--color-teal);
+  z-index: 1001;
 }
