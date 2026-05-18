@@ -1,0 +1,21 @@
+<div class="video">
+  <video
+    class="video__file"
+    controls
+    preload="metadata"
+    playsinline
+  >
+    <source
+      src="{{ include.src | relative_url }}"
+      type="video/mp4"
+    >
+
+    Your browser does not support HTML5 video.
+  </video>
+
+  {% if include.caption %}
+    <p class="video__caption">
+      {{ include.caption }}
+    </p>
+  {% endif %}
+</div>
