@@ -10,7 +10,7 @@ materials:
       - probabilistic-matching
     src: "/assets/materials/slides/UKDLC_W1S1_SeRP.pdf"
     caption: >
-      Mike's slides on the current practices within SERP on data linkage.
+      Mike Edwards's slides on the current practices within SERP on data linkage.
 
   - id: "ukdlc-w1s1-mike-video"
     title: "SeRP's current practices"
@@ -23,4 +23,57 @@ materials:
       - probabilistic-matching
     src: "/assets/materials/videos/mike_W1S1_web.mp4"
     caption: >
-      Mike presents the current practices within SERP on data linkage.
+      Mike Edwards presents the current practices within SERP on data linkage.
+      
+
+  - id: "ukdlc-w1s1-josie-slides"
+    title: "Data Linkage at the ONS"
+    event_id: "ukdlc-workshop-1-data-linkers"
+    type: "slides"
+    authors:
+      - "Josie"
+    tags:
+      - entity-resolution
+      - probabilistic-matching
+    src: "/assets/materials/slides/UKDLC_W1S1_ONS.pdf"
+    caption: >
+      Josie's slides on data linkage practices at the ONS.
+
+  - id: "ukdlc-w1s1-josie-video"
+    title: "Data Linkage at the ONS"
+    event_id: "ukdlc-workshop-1-data-linkers"
+    type: "video"
+    authors:
+      - "Josie"
+    tags:
+      - entity-resolution
+      - probabilistic-matching
+    src: "/assets/materials/videos/josie_W1S1_web.mp4"
+    caption: >
+      Josie presents on data linkage practices at the ONS.
+
+  - id: "ukdlc-w1s1-andy-slides"
+    title: "Data Linkage at the MoJ"
+    event_id: "ukdlc-workshop-1-data-linkers"
+    type: "slides"
+    authors:
+      - "Andy"
+    tags:
+      - entity-resolution
+      - probabilistic-matching
+    src: "/assets/materials/slides/UKDLC_W1S1_MoJ.pdf"
+    caption: >
+      Andy's slides on data linkage practices at the MoJ.
+
+  - id: "ukdlc-w1s1-andy-video"
+    title: "Data Linkage at the MoJ"
+    event_id: "ukdlc-workshop-1-data-linkers"
+    type: "video"
+    authors:
+      - "Andy"
+    tags:
+      - entity-resolution
+      - probabilistic-matching
+    src: "/assets/materials/videos/andy_W1S1_web.mp4"
+    caption: >
+      Andy presents on data linkage practices at the MoJ.
