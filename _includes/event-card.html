@@ -1,0 +1,70 @@
+<div class="event-card">
+
+  <div class="event-card__header">
+
+    <h3 class="event-card__title">
+      {{ include.event.title }}
+
+      {% case include.event.status %}
+
+        {% when "upcoming" %}
+          <span class="event-tag event-tag--upcoming">
+            Upcoming
+          </span>
+
+        {% when "complete" %}
+          <span class="event-tag event-tag--complete">
+            Complete
+          </span>
+
+        {% when "materials" %}
+          <a href="/materials/?event={{ include.event.id }}"
+             class="event-tag event-tag--materials">
+            Materials Available →
+          </a>
+
+      {% endcase %}
+    </h3>
+
+  </div>
+
+  <div class="event-description">
+    {{ include.event.description }}
+  </div>
+
+  <div class="event-meta-box">
+
+    {% if include.event.use_provisional_date %}
+      <p>
+        <strong>Provisional Date:</strong>
+        {{ include.event.date }}
+      </p>
+    {% else %}
+      <p>
+        <strong>Date:</strong>
+        {{ include.event.date }}
+      </p>
+    {% endif %}
+
+    <p>
+      <strong>Venue:</strong>
+      {{ include.event.venue }}
+    </p>
+
+    {% if include.event.status == "upcoming" %}
+      <p>
+        <strong>Registration:</strong>
+
+        {% if include.event.registration_link %}
+          <a href="{{ include.event.registration_link }}">
+            Click here
+          </a>
+        {% else %}
+          To be confirmed
+        {% endif %}
+      </p>
+    {% endif %}
+
+  </div>
+
+</div>

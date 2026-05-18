@@ -15,39 +15,84 @@ To help plan activities as a community, above is a publicly viewable calendar hi
 
 If you have an event you would like to be added, please make a request [through github]({{ site.ukdlc_github_discussions }}) or via [email](mailto:{{ site.contact_email }}?subject=UK DLC: Suggestions for events).
 
-<hr style="border-top: 1px solid {{ site.ukdlc_color_grey }};"> 
+<hr style="border-top: 1px solid {{ site.ukdlc_color_grey }};">
 
-{% assign events_data = site.data.events %}
+{% assign workshops = site.data.events.categories
+  | where: "event_type", "workshops"
+  | first %}
+
+{% assign sorted_workshops = workshops.events
+  | sort: "event_num" %}
 
 ## Workshops
 
-{% assign workshops = events_data.categories | where: "event_type", "workshops" | first %}
-{% assign sorted_workshops = workshops.events | sort: "event_num" %}
-
 <div class="events-section workshops-section">
+
 {% for event in sorted_workshops %}
   <div class="event-card">
-    <h3>{{ event.title }}</h3>
-    
+    <div class="event-card__header">
+      <h3 class="event-card__title">
+        {{ event.title }}
+        {% case event.status %}
+          {% when "upcoming" %}
+            <span class="event-badge event-badge--upcoming">
+              Upcoming
+            </span>
+          {% when "complete" %}
+            <span class="event-badge event-badge--complete">
+              Complete
+            </span>
+          {% when "materials" %}
+            <a href="/materials/?event={{ event.id }}"
+               class="event-badge event-badge--materials">
+              Materials Available →
+            </a>
+        {% endcase %}
+      </h3>
+    </div>
     <div class="event-description">
       {{ event.description }}
     </div>
-    
     <div class="event-meta-box">
       {% if event.use_provisional_date %}
-        <p><strong>Provisional Date:</strong> {{ event.date }}</p>
+        <p>
+          <strong>Provisional Date:</strong>
+          {{ event.date }}
+        </p>
       {% else %}
-        <p><strong>Date:</strong> {{ event.date | date: "%B %d, %Y" }}</p>
+        <p>
+          <strong>Date:</strong>
+          {{ event.date }}
+        </p>
       {% endif %}
 
-      <p><strong>Venue:</strong> {{ event.venue }}</p>
-      {% if event.registration_link %}
-        <p><strong>Registration:</strong> <a href="{{ event.registration_link }}">Click here</a></p>
-      {% else %}
-        <p><strong>Registration:</strong> To be confirmed </p>
+      <p>
+        <strong>Venue:</strong>
+        {{ event.venue }}
+      </p>
+
+      {% if event.status == "upcoming" %}
+
+        <p>
+          <strong>Registration:</strong>
+
+          {% if event.registration_link %}
+            <a href="{{ event.registration_link }}">
+              Click here
+            </a>
+          {% else %}
+            To be confirmed
+          {% endif %}
+        </p>
+
       {% endif %}
+
     </div>
-      <hr style="border-top: 1px solid {{ site.ukdlc_color_grey }};"> 
+
+    <hr style="border-top: 1px solid {{ site.ukdlc_color_grey }};">
+
   </div>
+
 {% endfor %}
+
 </div>

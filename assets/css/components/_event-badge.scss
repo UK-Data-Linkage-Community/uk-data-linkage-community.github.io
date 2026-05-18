@@ -1,0 +1,32 @@
+.event-badge {
+  display: inline-block;
+
+  margin-left: 0.75rem;
+  padding: 0.25rem 0.7rem;
+
+  border-radius: 999px;
+
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  text-decoration: none;
+}
+
+.event-badge--upcoming {
+  background: #e8f4ff;
+  color: #005ea5;
+}
+
+.event-badge--complete {
+  background: #ececec;
+  color: #444;
+}
+
+.event-badge--materials {
+  background: #e6f7ea;
+  color: #0a6b2d;
+}
+
+.event-badge--materials:hover {
+  background: #d8f0df;
+}

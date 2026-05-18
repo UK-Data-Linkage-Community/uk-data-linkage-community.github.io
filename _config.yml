@@ -49,6 +49,7 @@ header_pages:
   - materials.md
   - people.md
   - related_groups.md
+  - glossary.md
 
 # Build settings
 markdown: kramdown
@@ -63,7 +64,7 @@ plugins:
 collections_dir: collections
 
 include: ["_pages"]
-exlude: ["contributing_guidelines"]
+exclude: ["contributing_guidelines"]
 sass:
   sass_dir: assets/css
 
