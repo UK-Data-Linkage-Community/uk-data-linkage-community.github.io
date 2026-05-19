@@ -5,7 +5,7 @@ date:   2026-03-02 12:00:00 +0000
 event_id: "ukdlc-workshop-1-data-linkers"
 ---
 
-
+> This post is part of the outputs for the UK DLC Workshop 1.
 
 The first session of the day was focused on highlighting the current landscape of data linkage in the UK, starting with three short talks from key contributors to the community, namely the Secure eResearch Platform (SeRP), the Office of National Statistics (ONS), and the Ministry of Justice (MoJ).
 
