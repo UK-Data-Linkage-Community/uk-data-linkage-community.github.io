@@ -4,7 +4,7 @@ items:
     event_id: "ukdlc-workshop-1-data-linkers"
     type: "slides"
     authors:
-      - "Mike Edwards"
+      - mike-edwards
     tags:
       - entity-resolution
       - probabilistic-matching
@@ -17,21 +17,21 @@ items:
     event_id: "ukdlc-workshop-1-data-linkers"
     type: "video"
     authors:
-      - "Mike Edwards"
+      - mike-edwards
     tags:
       - entity-resolution
       - probabilistic-matching
     src: "/assets/materials/videos/mike_w1s1.webm"
     caption: >
       Mike Edwards presents the current practices within SERP on data linkage.
-      
+            
 
   - id: "ukdlc-w1s1-josie-slides"
     title: "Data Linkage at the ONS"
     event_id: "ukdlc-workshop-1-data-linkers"
     type: "slides"
     authors:
-      - "Josie"
+      - josie-plachta
     tags:
       - entity-resolution
       - probabilistic-matching
@@ -44,7 +44,7 @@ items:
     event_id: "ukdlc-workshop-1-data-linkers"
     type: "video"
     authors:
-      - "Josie"
+      - josie-plachta
     tags:
       - entity-resolution
       - probabilistic-matching
@@ -57,7 +57,7 @@ items:
     event_id: "ukdlc-workshop-1-data-linkers"
     type: "slides"
     authors:
-      - "Andy"
+      - andy
     tags:
       - entity-resolution
       - probabilistic-matching
@@ -70,7 +70,7 @@ items:
     event_id: "ukdlc-workshop-1-data-linkers"
     type: "video"
     authors:
-      - "Andy"
+      - andy
     tags:
       - entity-resolution
       - probabilistic-matching
