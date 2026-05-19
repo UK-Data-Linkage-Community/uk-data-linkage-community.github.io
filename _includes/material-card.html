@@ -1,4 +1,4 @@
-{% assign material = site.data.materials_metadata.materials
+{% assign material = site.data.materials.items
   | where: "id", include.id
   | first %}
 

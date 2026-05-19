@@ -4,7 +4,7 @@ title: Materials
 permalink: /resources/materials/
 ---
 
-{% assign materials = site.data.materials_metadata.materials %}
+{% assign materials = site.data.materials.items %}
 {% assign events = site.data.events.categories %}
 
 <div class="materials-page">
