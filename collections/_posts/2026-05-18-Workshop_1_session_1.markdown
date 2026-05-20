@@ -19,6 +19,7 @@ The first session of the day was focused on highlighting the current landscape o
 {% include material-ref.html id="ukdlc-w1s1-andy-video" show="src, author" %}
 
 
+
 All slides are availabe {here}
 
 The talks followed an open discussion where the greater room was able to ask questions and share their own methodologies and thoughts on linkage. Below are the takeaways from the session.
@@ -33,8 +34,17 @@ A common frustration among the attending data linkers was that many clients/user
 
 > "People would much rather the devil they know..."
 
-This of course is only half of the story, but it is inevitable that organisations, especially public ones, will be risk-averse and prefer to stick to what they know works, even if 'better' results could be achieved with probabilistic options. The second workshop in this series will be focused on the perspective of data linkage users, with an aim to ascertain the needs and current understand of data linkage among users, and by extension, to identify the barriers to adopting the 'best' linkage model.
+This of course is only half of the story, but it is inevitable that organisations, especially public ones, will be risk-averse and prefer to stick to what they know works, even if 'better' results could be achieved with probabilistic options. The second workshop in this series will be focused on the perspective of data linkage users, aiming to ascertain the needs and understand among users of data linkage, and by extension, to identify the barriers to adopting the 'best' linkage model.
 
 ### Linkage quality is contextual
 
-This naturally leads on to what is meant by the 'best' linkage model. It was generally agreed that linkage needs to be adapted to each use case.
+This naturally leads on to what is meant by the 'best' linkage model. It was generally agreed that linkage needs to be adapted to each use case, there is no 'one-size-fits-all'. 
+
+
+using card
+{% include card.html
+   type="material"
+   id="ukdlc-w1s1-andy-video"
+   render="box"
+   show="title, author"
+%}

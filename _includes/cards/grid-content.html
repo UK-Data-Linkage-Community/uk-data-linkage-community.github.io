@@ -1,0 +1,108 @@
+{% assign _card = include.card %}
+{% assign _type = include.type %}
+{% assign _show = include.show %}
+
+{% if _type == "material" %}
+
+  {% if _card.thumbnail %}
+    <div class="card__grid-image">
+      <img src="{{ _card.thumbnail }}"
+           alt="{{ _card.title }}"
+           loading="lazy">
+    </div>
+  {% endif %}
+
+  <div class="card__grid-content">
+
+    {% if _card.type %}
+      <span class="card__type-badge card__type-badge--{{ _card.type }}">
+        {{ _card.type }}
+      </span>
+    {% endif %}
+
+    <h3 class="card__grid-title">
+      {{ _card.title }}
+    </h3>
+
+    {% if _card.authors %}
+      <div class="card__grid-meta">
+        {% for _aid in _card.authors %}
+          {% assign _ap = site.data.people | where: "id", _aid | first %}
+          {% if _ap %}
+            {{ _ap.name }}
+          {% else %}
+            {{ _aid }}
+          {% endif %}
+          {% unless forloop.last %}, {% endunless %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if _card.caption %}
+      <p class="card__grid-caption">
+        {{ _card.caption | truncate: 120 }}
+      </p>
+    {% endif %}
+
+    {% if _card.tags %}
+      <div class="card__tags">
+        {% for _tag in _card.tags %}
+          <span class="card__tag">
+            {{ _tag }}
+          </span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+  </div>
+
+{% elsif _type == "person" %}
+
+  <div class="card__grid-content">
+
+    {% if _card.image %}
+      <img class="card__grid-avatar"
+           src="{{ _card.image }}"
+           alt="{{ _card.name }}"
+           loading="lazy">
+    {% endif %}
+
+    <h3 class="card__grid-title">
+      {{ _card.name }}
+    </h3>
+
+    {% if _card.affiliation %}
+      <div class="card__grid-meta">
+        {{ _card.affiliation }}
+      </div>
+    {% endif %}
+
+  </div>
+
+{% elsif _type == "event" %}
+
+  <div class="card__grid-content">
+
+    <span class="card__type-badge card__type-badge--event">
+      event
+    </span>
+
+    <h3 class="card__grid-title">
+      {{ _card.title }}
+    </h3>
+
+    {% if _card.date %}
+      <div class="card__grid-meta">
+        {{ _card.date | date: "%d %b %Y" }}
+      </div>
+    {% endif %}
+
+    {% if _card.description %}
+      <p class="card__grid-caption">
+        {{ _card.description | truncate: 120 }}
+      </p>
+    {% endif %}
+
+  </div>
+
+{% endif %}

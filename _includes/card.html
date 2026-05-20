@@ -1,0 +1,442 @@
+{% assign _card = nil %}
+
+{% if include.type == "material" %}
+  {% assign _card = site.data.materials.items | where: "id", include.id | first %}
+
+{% elsif include.type == "person" %}
+  {% assign _card = site.data.people | where: "id", include.id | first %}
+
+{% elsif include.type == "event" %}
+  {% for _cat in site.data.events.categories %}
+    {% for _ev in _cat.events %}
+      {% if _ev.id == include.id %}
+        {% assign _card = _ev %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+{% endif %}
+
+{% assign _render = include.render | default: "box" %}
+
+{% unless _card %}
+
+<span class="card-error">
+  Missing card:
+  {{ include.type }}/{{ include.id }}
+</span>
+
+{% else %}
+
+{% comment %}
+===============================================================================
+INLINE
+===============================================================================
+{% endcomment %}
+
+{% if _render == "inline" %}
+
+  {% if include.type == "material" %}
+    {{ _card.title }}
+
+  {% elsif include.type == "person" %}
+    {{ _card.name }}
+
+  {% elsif include.type == "event" %}
+    {{ _card.title }}
+
+  {% endif %}
+
+{% comment %}
+===============================================================================
+REFERENCE
+===============================================================================
+{% endcomment %}
+
+{% elsif _render == "reference" %}
+
+<button
+  class="card-ref card-ref--{{ include.type }}"
+  type="button"
+  onclick="CardSystem.openModal('card-modal-{{ include.type }}-{{ _card.id }}')"
+>
+
+  {% if include.type == "material" %}
+
+    {% if _card.type == "video" %}
+      ▶
+    {% elsif _card.type == "slides" %}
+      📊
+    {% elsif _card.type == "paper" %}
+      📄
+    {% else %}
+      📎
+    {% endif %}
+
+    {{ _card.title }}
+
+  {% elsif include.type == "person" %}
+
+    👤 {{ _card.name }}
+
+  {% elsif include.type == "event" %}
+
+    📅 {{ _card.title }}
+
+  {% endif %}
+
+</button>
+
+<div
+  id="card-modal-{{ include.type }}-{{ _card.id }}"
+  class="card-modal"
+  hidden
+>
+
+  <div
+    class="card-modal__backdrop"
+    onclick="CardSystem.closeModal('card-modal-{{ include.type }}-{{ _card.id }}')"
+  ></div>
+
+  <div class="card-modal__panel">
+
+    <button
+      class="card-modal__close"
+      type="button"
+      onclick="CardSystem.closeModal('card-modal-{{ include.type }}-{{ _card.id }}')"
+    >
+      ✕
+    </button>
+
+    {% include card.html
+       type=include.type
+       id=include.id
+       render="box"
+    %}
+
+  </div>
+
+</div>
+
+{% comment %}
+===============================================================================
+GRID
+===============================================================================
+{% endcomment %}
+
+{% elsif _render == "grid" %}
+
+<div
+  class="card card--grid"
+  onclick="CardSystem.openModal('card-modal-{{ include.type }}-{{ _card.id }}')"
+>
+
+  <div class="card__grid-content">
+
+    {% if include.type == "material" %}
+
+      <div class="card__grid-title">
+        {{ _card.title }}
+      </div>
+
+      {% if _card.authors %}
+        <div class="card__grid-meta">
+
+          {% for _aid in _card.authors %}
+
+            {% assign _author =
+              site.data.people
+              | where: "id", _aid
+              | first %}
+
+            {% if _author %}
+              {{ _author.name }}
+            {% else %}
+              {{ _aid }}
+            {% endif %}
+
+            {% unless forloop.last %}, {% endunless %}
+
+          {% endfor %}
+
+        </div>
+      {% endif %}
+
+    {% elsif include.type == "person" %}
+
+      <div class="card__grid-title">
+        {{ _card.name }}
+      </div>
+
+    {% elsif include.type == "event" %}
+
+      <div class="card__grid-title">
+        {{ _card.title }}
+      </div>
+
+    {% endif %}
+
+  </div>
+
+</div>
+
+<div
+  id="card-modal-{{ include.type }}-{{ _card.id }}"
+  class="card-modal"
+  hidden
+>
+
+  <div
+    class="card-modal__backdrop"
+    onclick="CardSystem.closeModal('card-modal-{{ include.type }}-{{ _card.id }}')"
+  ></div>
+
+  <div class="card-modal__panel">
+
+    <button
+      class="card-modal__close"
+      type="button"
+      onclick="CardSystem.closeModal('card-modal-{{ include.type }}-{{ _card.id }}')"
+    >
+      ✕
+    </button>
+
+    {% include card.html
+       type=include.type
+       id=include.id
+       render="box"
+    %}
+
+  </div>
+
+</div>
+
+{% comment %}
+===============================================================================
+BOX
+===============================================================================
+{% endcomment %}
+
+{% elsif _render == "box" %}
+
+<div class="card card--box">
+
+  {% if include.type == "material" %}
+
+    <div class="card__header">
+
+      <h3 class="card__title">
+
+        {% if _card.src %}
+          <a
+            href="{{ _card.src }}"
+            target="_blank"
+            rel="noopener"
+          >
+            {{ _card.title }}
+          </a>
+        {% else %}
+          {{ _card.title }}
+        {% endif %}
+
+      </h3>
+
+    </div>
+
+    <div class="card__body">
+
+      {% if _card.authors %}
+
+        <div class="card__field">
+
+          <span class="card__label">
+            Authors:
+          </span>
+
+          {% for _aid in _card.authors %}
+
+            {% assign _author =
+              site.data.people
+              | where: "id", _aid
+              | first %}
+
+            {% if _author %}
+
+              <button
+                class="card-ref"
+                type="button"
+                onclick="CardSystem.openModal('card-modal-person-{{ _aid }}')"
+              >
+                {{ _author.name }}
+              </button>
+
+            {% else %}
+
+              {{ _aid }}
+
+            {% endif %}
+
+            {% unless forloop.last %}, {% endunless %}
+
+          {% endfor %}
+
+        </div>
+
+      {% endif %}
+
+      {% if _card.caption %}
+        <p class="card__caption">
+          {{ _card.caption }}
+        </p>
+      {% endif %}
+
+      {% if _card.tags %}
+        <div class="card__tags">
+
+          {% for _tag in _card.tags %}
+            <span class="card__tag">
+              {{ _tag }}
+            </span>
+          {% endfor %}
+
+        </div>
+      {% endif %}
+
+      {% if _card.src %}
+        <div class="card__actions">
+
+          <a
+            href="{{ _card.src }}"
+            class="card__btn"
+            target="_blank"
+            rel="noopener"
+          >
+            Open Resource ↗
+          </a>
+
+        </div>
+      {% endif %}
+
+    </div>
+
+  {% elsif include.type == "person" %}
+
+    <div class="card__header">
+
+      <h3 class="card__title">
+        {{ _card.name }}
+      </h3>
+
+    </div>
+
+    <div class="card__body">
+
+      {% if _card.affiliation %}
+        <div class="card__field">
+          {{ _card.affiliation }}
+        </div>
+      {% endif %}
+
+      {% if _card.content %}
+        <div class="card__caption">
+          {{ _card.content }}
+        </div>
+      {% endif %}
+
+      {% assign _materials =
+        site.data.materials.items
+        | where_exp: "item",
+          "item.authors contains _card.id"
+      %}
+
+      {% if _materials.size > 0 %}
+
+        <div class="card__related">
+
+          <h4>
+            Materials
+          </h4>
+
+          <div class="card-grid">
+
+            {% for _mat in _materials %}
+
+              {% include card.html
+                 type="material"
+                 id=_mat.id
+                 render="grid"
+              %}
+
+            {% endfor %}
+
+          </div>
+
+        </div>
+
+      {% endif %}
+
+    </div>
+
+  {% elsif include.type == "event" %}
+
+    <div class="card__header">
+
+      <h3 class="card__title">
+        {{ _card.title }}
+      </h3>
+
+    </div>
+
+    <div class="card__body">
+
+      {% if _card.date %}
+        <div class="card__field">
+          {{ _card.date | date: "%d %B %Y" }}
+        </div>
+      {% endif %}
+
+      {% if _card.description %}
+        <div class="card__caption">
+          {{ _card.description }}
+        </div>
+      {% endif %}
+
+      {% assign _materials =
+        site.data.materials.items
+        | where: "event_id", _card.id
+      %}
+
+      {% if _materials.size > 0 %}
+
+        <div class="card__related">
+
+          <h4>
+            Related Materials
+          </h4>
+
+          <div class="card-grid">
+
+            {% for _mat in _materials %}
+
+              {% include card.html
+                 type="material"
+                 id=_mat.id
+                 render="grid"
+              %}
+
+            {% endfor %}
+
+          </div>
+
+        </div>
+
+      {% endif %}
+
+    </div>
+
+  {% endif %}
+
+</div>
+
+{% endif %}
+
+{% endunless %}
