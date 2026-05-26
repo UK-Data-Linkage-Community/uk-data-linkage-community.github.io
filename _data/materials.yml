@@ -4,7 +4,7 @@ items:
     event_id: "ukdlc-workshop-1-data-linkers"
     type: "slides"
     authors:
-      - mike-edwards
+      - "mike-edwards"
     tags:
       - entity-resolution
       - probabilistic-matching
@@ -17,7 +17,7 @@ items:
     event_id: "ukdlc-workshop-1-data-linkers"
     type: "video"
     authors:
-      - mike-edwards
+      - "mike-edwards"
     tags:
       - entity-resolution
       - probabilistic-matching
@@ -31,7 +31,7 @@ items:
     event_id: "ukdlc-workshop-1-data-linkers"
     type: "slides"
     authors:
-      - josie-plachta
+      - "josie-plachta"
     tags:
       - entity-resolution
       - probabilistic-matching
@@ -44,7 +44,7 @@ items:
     event_id: "ukdlc-workshop-1-data-linkers"
     type: "video"
     authors:
-      - josie-plachta
+      - "josie-plachta"
     tags:
       - entity-resolution
       - probabilistic-matching
@@ -57,7 +57,7 @@ items:
     event_id: "ukdlc-workshop-1-data-linkers"
     type: "slides"
     authors:
-      - andy
+      - "andy"
     tags:
       - entity-resolution
       - probabilistic-matching
@@ -70,7 +70,7 @@ items:
     event_id: "ukdlc-workshop-1-data-linkers"
     type: "video"
     authors:
-      - andy
+      - "andy"
     tags:
       - entity-resolution
       - probabilistic-matching

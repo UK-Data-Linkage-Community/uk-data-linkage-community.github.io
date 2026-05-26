@@ -1,0 +1,242 @@
+{% comment %}
+  MATERIAL CARD INCLUDE
+  =====================
+  Usage: {% include cards/material-card.html item=material display="card" %}
+
+  Parameters:
+    item    : a materials.yml item object (required)
+    display : "card" | "small" | "embedded" | "button"  (default: "card")
+
+  Display modes:
+    card     — Clickable card that opens a full modal with all metadata
+    small    — Compact card: thumbnail (if available) + key metadata
+    embedded — Renders the src as an iframe embed, with metadata below
+    button   — Minimal pill/button showing type icon + title
+{% endcomment %}
+
+{% assign item   = include.item %}
+{% assign display = include.display | default: "card" %}
+
+{% comment %} Resolve authors from people.yml {% endcomment %}
+{% assign resolved_authors = "" | split: "" %}
+{% if item.authors %}
+  {% for author_id in item.authors %}
+    {% assign person = site.data.people | where: "id", author_id | first %}
+    {% if person %}
+      {% assign resolved_authors = resolved_authors | push: person %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+{% comment %} Resolve event from events.yml {% endcomment %}
+{% assign resolved_event = nil %}
+{% if item.event_id %}
+  {% for cat in site.data.events.categories %}
+    {% for ev in cat.events %}
+      {% if ev.id == item.event_id %}
+        {% assign resolved_event = ev %}
+        {% assign resolved_event_type = cat.label %}
+      {% endif %}
+    {% endfor %}
+  {% endfor %}
+{% endif %}
+
+{% comment %} Type icon map {% endcomment %}
+{% case item.type %}
+  {% when "slides"   %}{% assign type_icon = "▤" %}{% assign type_label = "Slides" %}
+  {% when "video"    %}{% assign type_icon = "▶" %}{% assign type_label = "Video" %}
+  {% when "document" %}{% assign type_icon = "◻" %}{% assign type_label = "Document" %}
+  {% when "notebook" %}{% assign type_icon = "◈" %}{% assign type_label = "Notebook" %}
+  {% when "code"     %}{% assign type_icon = "⌥" %}{% assign type_label = "Code" %}
+  {% else            %}{% assign type_icon = "◆" %}{% assign type_label = item.type %}
+{% endcase %}
+
+{% comment %} Build data attributes for JS {% endcomment %}
+{% capture author_ids %}{% for a in item.authors %}{{ a }}{% unless forloop.last %},{% endunless %}{% endfor %}{% endcapture %}
+{% capture tag_list %}{% for t in item.tags %}{{ t }}{% unless forloop.last %},{% endunless %}{% endfor %}{% endcapture %}
+
+{% comment %}====== BUTTON MODE ======{% endcomment %}
+{% if display == "button" %}
+
+<span class="jk-card jk-card--button jk-card--type-{{ item.type }}"
+      data-card-trigger="material"
+      data-material-id="{{ item.id }}"
+      tabindex="0"
+      role="button"
+      aria-label="Open {{ item.title }}">
+  <span class="jk-card__type-icon" aria-hidden="true">{{ type_icon }}</span>
+  <span class="jk-card__title">{{ item.title }}</span>
+</span>
+
+{% comment %}====== SMALL MODE ======{% endcomment %}
+{% elsif display == "small" %}
+
+<div class="jk-card jk-card--small jk-card--type-{{ item.type }}"
+     data-card-trigger="material"
+     data-material-id="{{ item.id }}"
+     data-tags="{{ tag_list }}"
+     data-authors="{{ author_ids }}"
+     data-event="{{ item.event_id }}"
+     data-type="{{ item.type }}"
+     tabindex="0"
+     role="button"
+     aria-label="Open {{ item.title }}">
+  {% if item.thumbnail != "" and item.thumbnail %}
+    <div class="jk-card__thumb">
+      <img src="{{ item.thumbnail }}" alt="{{ item.title }} thumbnail" loading="lazy">
+      <span class="jk-card__type-badge jk-card--type-{{ item.type }}">{{ type_label }}</span>
+    </div>
+  {% else %}
+    <div class="jk-card__thumb jk-card__thumb--placeholder jk-card--type-{{ item.type }}">
+      <span class="jk-card__type-icon-lg" aria-hidden="true">{{ type_icon }}</span>
+      <span class="jk-card__type-badge jk-card--type-{{ item.type }}">{{ type_label }}</span>
+    </div>
+  {% endif %}
+  <div class="jk-card__body">
+    <h3 class="jk-card__title">{{ item.title }}</h3>
+    {% if resolved_authors.size > 0 %}
+    <div class="jk-card__meta-row">
+      {% for person in resolved_authors %}
+        <span class="jk-tag jk-tag--person"
+              data-tag-type="person"
+              data-person-id="{{ person.id }}"
+              tabindex="0"
+              role="button">{{ person.name }}</span>{% unless forloop.last %} {% endunless %}
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if item.tags %}
+    <div class="jk-card__meta-row">
+      {% for tag in item.tags %}
+        <span class="jk-tag jk-tag--topic"
+              data-tag-type="topic"
+              data-tag-value="{{ tag }}"
+              tabindex="0"
+              role="button">{{ tag }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% comment %}====== EMBEDDED MODE ======{% endcomment %}
+{% elsif display == "embedded" %}
+
+<div class="jk-card jk-card--embedded jk-card--type-{{ item.type }}">
+  <div class="jk-card__embed-wrapper">
+    {% if item.type == "video" or item.type == "slides" %}
+      <iframe src="{{ item.src }}"
+              class="jk-card__embed-frame"
+              frameborder="0"
+              allowfullscreen
+              title="{{ item.title }}"></iframe>
+    {% elsif item.type == "notebook" %}
+      <iframe src="{{ item.src }}"
+              class="jk-card__embed-frame"
+              frameborder="0"
+              title="{{ item.title }}"></iframe>
+    {% else %}
+      <div class="jk-card__embed-fallback">
+        <span class="jk-card__type-icon-lg" aria-hidden="true">{{ type_icon }}</span>
+        <p>Embed not available for this type.</p>
+        <a class="jk-btn" href="{{ item.src }}" target="_blank" rel="noopener">Open {{ type_label }} ↗</a>
+      </div>
+    {% endif %}
+  </div>
+  <div class="jk-card__embed-meta">
+    <div class="jk-card__embed-header">
+      <span class="jk-card__type-badge jk-card--type-{{ item.type }}">{{ type_icon }} {{ type_label }}</span>
+      <h3 class="jk-card__title">{{ item.title }}</h3>
+    </div>
+    {% if resolved_authors.size > 0 %}
+    <div class="jk-card__meta-row">
+      <span class="jk-card__meta-label">Authors</span>
+      {% for person in resolved_authors %}
+        <span class="jk-tag jk-tag--person"
+              data-tag-type="person"
+              data-person-id="{{ person.id }}"
+              tabindex="0"
+              role="button">{{ person.name }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if resolved_event %}
+    <div class="jk-card__meta-row">
+      <span class="jk-card__meta-label">Event</span>
+      <span class="jk-tag jk-tag--event"
+            data-tag-type="event"
+            data-event-id="{{ resolved_event.id }}"
+            tabindex="0"
+            role="button">{{ resolved_event.title }}</span>
+    </div>
+    {% endif %}
+    {% if item.tags %}
+    <div class="jk-card__meta-row">
+      <span class="jk-card__meta-label">Tags</span>
+      {% for tag in item.tags %}
+        <span class="jk-tag jk-tag--topic"
+              data-tag-type="topic"
+              data-tag-value="{{ tag }}"
+              tabindex="0"
+              role="button">{{ tag }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% comment %}====== CARD MODE (default) ======{% endcomment %}
+{% else %}
+
+<div class="jk-card jk-card--full jk-card--type-{{ item.type }}"
+     data-card-trigger="material"
+     data-material-id="{{ item.id }}"
+     data-tags="{{ tag_list }}"
+     data-authors="{{ author_ids }}"
+     data-event="{{ item.event_id }}"
+     data-type="{{ item.type }}"
+     tabindex="0"
+     role="button"
+     aria-label="Open {{ item.title }}">
+  {% if item.thumbnail != "" and item.thumbnail %}
+    <div class="jk-card__hero">
+      <img src="{{ item.thumbnail }}" alt="" loading="lazy">
+      <span class="jk-card__type-badge jk-card--type-{{ item.type }}">{{ type_icon }} {{ type_label }}</span>
+    </div>
+  {% else %}
+    <div class="jk-card__hero jk-card__hero--placeholder jk-card--type-{{ item.type }}">
+      <span class="jk-card__type-icon-lg" aria-hidden="true">{{ type_icon }}</span>
+      <span class="jk-card__type-badge jk-card--type-{{ item.type }}">{{ type_icon }} {{ type_label }}</span>
+    </div>
+  {% endif %}
+  <div class="jk-card__body">
+    <h3 class="jk-card__title">{{ item.title }}</h3>
+    {% if item.description %}
+    <p class="jk-card__desc">{{ item.description | truncate: 120 }}</p>
+    {% endif %}
+    {% if resolved_authors.size > 0 %}
+    <div class="jk-card__meta-row">
+      {% for person in resolved_authors %}
+        <span class="jk-tag jk-tag--person"
+              data-tag-type="person"
+              data-person-id="{{ person.id }}"
+              tabindex="0"
+              role="button">{{ person.name }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if item.tags %}
+    <div class="jk-card__tags-row">
+      {% for tag in item.tags %}
+        <span class="jk-tag jk-tag--topic"
+              data-tag-type="topic"
+              data-tag-value="{{ tag }}"
+              tabindex="0"
+              role="button">{{ tag }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endif %}

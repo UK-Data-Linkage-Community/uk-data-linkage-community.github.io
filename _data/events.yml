@@ -1,10 +1,11 @@
 categories:
   - event_type: "workshops"
+    label: "Workshops"
     events:
       - event_num: 1
         id: "ukdlc-workshop-1-data-linkers"
         title: "Workshop 1: Supporting Data Linkage Practitioners"
-        date: 2026-03-31
+        date: "2026-03-31"
         status: "materials"
         use_provisional_date: false
         registration_link: "https://uk-dlc-data-linkers-workshop.eventbrite.co.uk"

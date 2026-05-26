@@ -1,8 +1,8 @@
-- id: "mike-edwards"
-  name: "Mike Edwards"
-  affiliation: "SeRP UK, Swansea University"
+- id: mike-edwards
+  name: Mike Edwards
+  affiliation: SeRP UK, Swansea University
   content: "Principal Data Linkage Architect for SeRP’s Linkage branch, designing and developing linkage solutions for datasets covering applications including healthcare, justice, and education. His team has experience supporting the scoping of linkage projects, producing custom linkage models, creating operationalised workflows for linkage projects, and supporting end-users of linked cohorts."
-  image: "/assets/images/people/michael_edwards.jpg"
+  image: /assets/images/people/michael_edwards.jpg
 
 - id: "josie-plachta"
   name: "Josie Plachta"
