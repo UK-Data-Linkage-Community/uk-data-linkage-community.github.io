@@ -318,7 +318,7 @@
 .jk-card__embed-wrapper {
   flex: 1 1 auto;
   position: relative;
-  min-height: 350px;
+  min-height: 375px;
   background: #000;
 }
 
@@ -787,10 +787,10 @@
   white-space: nowrap;
 }
 .jk-btn--primary {
-  background: var(--jk-accent);
+  background: var(--jk-surface);
   color: #fff;
 }
-.jk-btn--primary:hover { background: var(--jk-accent-hover); }
+.jk-btn--primary:hover { background: var(--color-teal); }
 
 .jk-btn--secondary {
   background: var(--jk-surface);
