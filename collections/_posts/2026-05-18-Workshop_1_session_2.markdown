@@ -25,6 +25,14 @@ In an open discussion, the group identified a number of tricky cases that they s
 
 Multiple people, especially the ONS, emphasized that postcodes were far from stable. Besides being semantically overloaded, they can represent a variety of states, including real addresses, placeholder values (e.g. "ZZ" codes), and missingness, mistakenly being encoded as defaults. The latter of these was considered as a critical issue within the ONS.
 
-$$
-\text{Null postcodes} \neq \text{default "unknown" postcodes}
-$$
+> $\text{Null postcodes} \neq \text{default "unknown" postcodes}$
+
+This becomes a source of false clustering, misleading deduplication, and inflated clusters (especially for homelessness and communal living).
+
+#### Clustering Failure Modes
+
+On the topic of clustering, members point out the structual challenges of over-clustering when large groups are formed incorrectly (e.g. students, homeless populations), and under-clustering when a single person is split across multiple identities due to variation (e.g. "John" vs "Johnathan"). An important point, and a fundamental constraint of all linkage systems was said to be the asymmetry between splitting and merging clusters.
+
+> Merging clusters is easy, splitting them later is extremely hard and costly
+
+

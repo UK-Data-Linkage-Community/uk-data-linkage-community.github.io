@@ -1,28 +1,25 @@
 ---
 layout: post
-title:  "UK DLC Workshop 1 Session 1 - Data Linkage in the UK: Current approaches and future directions"
+title:  "UK DLC Workshop 1 Session 1 - Sharing Current Practices"
 date:   2026-03-02 12:00:00 +0000
 event_id: "ukdlc-workshop-1-data-linkers"
 ---
 
-> This post is part of the outputs for the UK DLC Workshop 1. {linked here}
+> This post is part of the outputs for the [UK DLC Workshop 1](/resources/materials/?event=ukdlc-workshop-1-data-linkers).
 
-The first session of the day was focused on highlighting the current landscape of data linkage in the UK, starting with three short talks from key contributors to the community, namely {Dr Mike Edwards} from the Secure eResearch Platform (SeRP), who was a main organiser and chair for the workshop, this was followed by {Josie Plachta} from the Office of National Statistics (ONS), and finally {Andy} from the Ministry of Justice (MoJ).
+The first session of the day was focused on establishing the current practices and challenges amongst the attendees, starting with three short talks from key contributors to the community, namely Dr Mike Edwards from the Secure eResearch Platform (SeRP), who was a main organiser and chair for the workshop, this was followed by Josie Plachta from the Office of National Statistics (ONS), and finally {Andy} from the Ministry of Justice (MoJ).
 
-## {% include material-ref.html id="ukdlc-w1s1-mike-video" show="title" inline=true %}
-{% include material-ref.html id="ukdlc-w1s1-mike-video" show="src, author" %}
+{% assign event_videos = site.data.materials.items 
+  | where: "event_id", "ukdlc-workshop-1-data-linkers"
+  | where: "type", "video" %}
+{% for item in event_videos %}
+  {% include cards/material-card.html item=item display="embedded" %}
+<br />
+{% endfor %}
 
-## {% include material-ref.html id="ukdlc-w1s1-josie-video" show="title" inline=true %}
-{% include material-ref.html id="ukdlc-w1s1-josie-video" show="src, author" %}
+All slides are available [here](/resources/materials/?type=slides&event=ukdlc-workshop-1-data-linkers).
 
-## {% include material-ref.html id="ukdlc-w1s1-andy-video" show="title" inline=true %}
-{% include material-ref.html id="ukdlc-w1s1-andy-video" show="src, author" %}
-
-
-
-All slides are availabe {here}
-
-The talks followed an open discussion where the greater room was able to ask questions and share their own methodologies and thoughts on linkage. Below are the takeaways from the session.
+The talks were followed by an open discussion where the greater room was able to ask questions and share their own methodologies and thoughts on linkage. Below are the takeaways from the session.
 
 ### Interpretability matters more than algorithmic novelty
 
@@ -38,13 +35,5 @@ This of course is only half of the story, but it is inevitable that organisation
 
 ### Linkage quality is contextual
 
-This naturally leads on to what is meant by the 'best' linkage model. It was generally agreed that linkage needs to be adapted to each use case, there is no 'one-size-fits-all'. 
+This naturally leads on to what is meant by the 'best' linkage model. It was generally agreed that linkage needs to be adapted to each use case, there is no 'one-size-fits-all'. Whilst many would see this question as being precision vs recall, it was argued that this is not the only element to consider in model choice. Other factors like considerations behind explainability, stability, temporal consistency, and operational latency vary between users and need to be well communicated in the consultation stage. 
 
-
-using card
-{% include card.html
-   type="material"
-   id="ukdlc-w1s1-andy-video"
-   render="box"
-   show="title, author"
-%}
