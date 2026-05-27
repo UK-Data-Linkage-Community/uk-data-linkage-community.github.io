@@ -5,9 +5,8 @@ date:   2026-03-02 12:00:00 +0000
 event_id: "ukdlc-workshop-1-data-linkers"
 ---
 
-> This post is part of the outputs for the [UK DLC Workshop 1](/resources/materials/?event=ukdlc-workshop-1-data-linkers).
-
 After establishing the current practices of the attendees in the [first session](/blog/2026/03/02/Workshop_1_session_1/), the second session of our first workshop was aimed at looking at the challenges practitioners face, what tricky or edge cases come up, and how the group approach them. Edge cases are not rare, but rather structurally embedded in real datasets, and lead to ambiguity, inconsistency, and fundamentally mistrust in linkage. 
+<!--more-->
 
 In an open discussion, the group identified a number of tricky cases that they see come up not infrequently in their work. Included in these were:
 
@@ -56,3 +55,5 @@ A participant raised the point that reputational risks can sit on the analysts, 
 ### Human-in-the-Loop Issues
 
 Despite being one of the most important steps to dealing with edge cases, clerical review still has multiple limitations. Attendees expressed concerns that clerical review lacks a formalised "gold standard truth" and that by its nature, can never escape subjectivity, fatigue, and inconsistency when humans are involved. Reviewers may rush decisions or drift in judgement slightly, which can accumulate over time into significant noise and errors that reduce the final linkage quality. Attendees reiterated that LLMs are far from a complete solution to this, as they are subject to hallucinations and can be even harder to audit. There may be a place in the future for AI to be used for explainabilty, for surface level metadata interpretation, or for assisting clerical reviews, but no one believes AI could, or should replace humans in this area.
+
+> This post is part of the outputs for the [UK DLC Workshop 1](/resources/materials/?event=ukdlc-workshop-1-data-linkers).
