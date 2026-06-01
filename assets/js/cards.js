@@ -165,7 +165,7 @@ function applyURLParams(params) {
   // ── Modal HTML: event ─────────────────────────────────────────────────────
   function eventModalHTML(event) {
     if (!event) return "<p>Not found.</p>";
-    const statusLabels = { completed:"✓ Completed", upcoming:"◷ Upcoming", ongoing:"● Ongoing", materials:"◻ Materials available" };
+    const statusLabels = { completed:"✓ Completed", upcoming:"◷ Upcoming", ongoing:"● Ongoing", materials:"● Materials available" };
     const relMats = SITE.materials.filter(m => m.event_id === event.id);
 
     return `<div class="jk-modal__hero jk-modal__hero--placeholder" style="height:80px;background:var(--jk-surface)">
@@ -314,6 +314,40 @@ function applyURLParams(params) {
 
       return;
     }
+
+    // --------------------------------------------------
+    // OPEN PERSON MODAL FROM NORMAL LINKS
+    // --------------------------------------------------
+
+    const personLink = e.target.closest("[data-open-person]");
+
+    if (personLink) {
+      e.preventDefault();
+      const id = personLink.dataset.openPerson;
+      const person = personById(id);
+      if (person) {
+        openModal(personModalHTML(person));
+      } else {
+        console.warn("personById returned nothing for id:", id);
+      }
+      return;
+    }
+
+    // --------------------------------------------------
+    // OPEN EVENT MODAL FROM NORMAL LINKS
+    // --------------------------------------------------
+
+    const eventLink = e.target.closest("[data-open-event]");
+    if (eventLink) {
+      e.preventDefault();
+      const event = eventById(eventLink.dataset.openEvent);
+      if (event) {
+        openModal(eventModalHTML(event));
+      }
+      return;
+    }
+
+    // --------------------------------------------------
 
     // Close tooltip on outside click
     if (tooltip && !tooltip.hidden) hideTooltip(0);

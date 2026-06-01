@@ -36,4 +36,6 @@ This of course is only half of the story, but it is inevitable that organisation
 
 This naturally leads on to what is meant by the 'best' linkage model. It was generally agreed that linkage needs to be adapted to each use case, there is no 'one-size-fits-all'. Whilst many would see this question as being precision vs recall, it was argued that this is not the only element to consider in model choice. Other factors like considerations behind explainability, stability, temporal consistency, and operational latency vary between users and need to be well communicated in the consultation stage. 
 
-> This post is part of the outputs for the [UK DLC Workshop 1](/resources/materials/?event=ukdlc-workshop-1-data-linkers).
+> This post is part of the outputs for the <a href="#"
+   data-open-event="ukdlc-workshop-1-data-linkers">
+   UK DLC Workshop 1</a>.

@@ -53,4 +53,6 @@ One of the final points raised was the more philosophical question of ownership;
 
 This is tied to legal ambiguity, and reveals operational accountability gaps in areas that may link to highly sensitive data. This point was not answered in the discussion, but it remains as one of the clear indicators that entity resolution is a challenging area for even practitioners to navigate, let alone the end users.
 
-> This post is part of the outputs for the [UK DLC Workshop 1](/resources/materials/?event=ukdlc-workshop-1-data-linkers).
+> This post is part of the outputs for the <a href="#"
+   data-open-event="ukdlc-workshop-1-data-linkers">
+   UK DLC Workshop 1</a>.

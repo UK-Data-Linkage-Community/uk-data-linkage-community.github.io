@@ -56,4 +56,6 @@ A participant raised the point that reputational risks can sit on the analysts, 
 
 Despite being one of the most important steps to dealing with edge cases, clerical review still has multiple limitations. Attendees expressed concerns that clerical review lacks a formalised "gold standard truth" and that by its nature, can never escape subjectivity, fatigue, and inconsistency when humans are involved. Reviewers may rush decisions or drift in judgement slightly, which can accumulate over time into significant noise and errors that reduce the final linkage quality. Attendees reiterated that LLMs are far from a complete solution to this, as they are subject to hallucinations and can be even harder to audit. There may be a place in the future for AI to be used for explainabilty, for surface level metadata interpretation, or for assisting clerical reviews, but no one believes AI could, or should replace humans in this area.
 
-> This post is part of the outputs for the [UK DLC Workshop 1](/resources/materials/?event=ukdlc-workshop-1-data-linkers).
+> This post is part of the outputs for the <a href="#"
+   data-open-event="ukdlc-workshop-1-data-linkers">
+   UK DLC Workshop 1</a>.
