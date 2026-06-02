@@ -32,7 +32,17 @@ permalink: /resources/materials/
  
     <!-- ═══ FILTER PANEL ═══════════════════════════════════════════════ -->
     <aside class="jk-filter-panel" aria-label="Filter materials">
-      <p class="jk-filter-panel__title">Filter</p>
+      <div class="jk-filter-panel__header">
+        <p class="jk-filter-panel__title">Filter</p>
+    
+        <p class="jk-results-count" id="jk-results-count" aria-live="polite">
+          {{ site.data.materials.items | size }} results
+        </p>
+      </div>
+
+      <!-- Active filter chips -->
+      <div class="jk-active-filters" id="jk-active-filters" aria-label="Active filters" aria-live="polite"></div>
+ 
  
       <div class="jk-filter-group">
         <div class="jk-filter-group__label">Search</div>
@@ -89,15 +99,8 @@ permalink: /resources/materials/
     <!-- ═══ RESULTS ════════════════════════════════════════════════════ -->
     <div class="jk-materials-results">
  
-      <!-- Active filter chips -->
-      <div class="jk-active-filters" id="jk-active-filters" aria-label="Active filters" aria-live="polite"></div>
- 
-      <!-- Result count + layout toggle -->
-      <div class="jk-materials-header" style="margin-top:12px">
-        <p class="jk-results-count" id="jk-results-count" aria-live="polite">
-          {{ site.data.materials.items | size }} results
-        </p>
-      </div>
+      
+      
  
       <!-- Card grid -->
       <div class="jk-card-grid" id="jk-card-grid">

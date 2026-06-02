@@ -42,6 +42,7 @@
 
   /* Spacing & shape */
   --jk-radius-sm:     6px;
+  --jk-radius-filter: 20px;
   --jk-radius:        10px;
   --jk-radius-lg:     16px;
   --jk-shadow-sm:     0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
@@ -913,7 +914,7 @@
   top: 16px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 12px;
 }
 .jk-filter-panel__title {
   font-size: 0.72rem;
@@ -998,6 +999,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  border-radius: var(--jk-radius-filter);
   min-height: 28px;
 }
 .jk-active-filters:empty::after {
@@ -1012,7 +1014,7 @@
   padding: 3px 10px;
   background: var(--jk-accent-light);
   border: 1px solid #bfdbfe;
-  border-radius: 999px;
+  border-radius: var(--jk-radius-filter);
   font-size: 0.75rem;
   font-weight: 500;
   color: var(--jk-accent-hover);
@@ -1154,4 +1156,26 @@
 
 .jk-card__info-btn:hover {
   transform: scale(1.05);
+}
+
+.jk-filter-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0;
+}
+
+.jk-filter-panel__header p {
+  margin: 0;
+}
+.jk-materials-header {
+  margin: 0;
+}
+
+.jk-filter-panel {
+  gap: 10px;
+}
+
+.jk-filter-group {
+  gap: 4px;
 }
