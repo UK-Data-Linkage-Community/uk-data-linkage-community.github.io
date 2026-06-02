@@ -123,66 +123,67 @@
 {% elsif display == "embedded" %}
 
 <div class="jk-card jk-card--embedded jk-card--type-{{ item.type }}">
+
   <div class="jk-card__embed-wrapper">
-    {% if item.type == "video" or item.type == "slides" %}
-      <iframe src="{{ item.src }}"
-              class="jk-card__embed-frame"
-              frameborder="0"
-              allowfullscreen
-              title="{{ item.title }}"></iframe>
-    {% elsif item.type == "notebook" %}
-      <iframe src="{{ item.src }}"
-              class="jk-card__embed-frame"
-              frameborder="0"
-              title="{{ item.title }}"></iframe>
-    {% else %}
-      <div class="jk-card__embed-fallback">
-        <span class="jk-card__type-icon-lg" aria-hidden="true">{{ type_icon }}</span>
-        <p>Embed not available for this type.</p>
-        <a class="jk-btn" href="{{ item.src }}" target="_blank" rel="noopener">Open {{ type_label }} ↗</a>
-      </div>
+
+    {% if item.type == "video" %}
+
+      {% if item.src contains "youtube.com" or item.src contains "youtu.be" %}
+        <iframe
+          src="{{ item.src | replace: 'autoplay=1', 'autoplay=0' }}"
+          class="jk-card__embed-frame"
+          frameborder="0"
+          allowfullscreen
+          title="{{ item.title }}">
+        </iframe>
+
+      {% else %}
+        <video
+          class="jk-card__embed-video"
+          controls
+          preload="metadata"
+          playsinline>
+          <source src="{{ item.src }}">
+        </video>
+
+      {% endif %}
+
+    {% elsif item.type == "slides" %}
+
+      <iframe
+        src="{{ item.src }}"
+        class="jk-card__embed-frame"
+        frameborder="0"
+        allowfullscreen
+        title="{{ item.title }}">
+      </iframe>
+
     {% endif %}
+
   </div>
-  <div class="jk-card__embed-meta">
-    <div class="jk-card__embed-header">
-      <span class="jk-card__type-badge jk-card--type-{{ item.type }}">{{ type_icon }} {{ type_label }}</span>
-      <h3 class="jk-card__title">{{ item.title }}</h3>
-    </div>
-    {% if resolved_authors.size > 0 %}
-    <div class="jk-card__meta-row">
-      <span class="jk-card__meta-label">Authors</span>
-      {% for person in resolved_authors %}
-        <span class="jk-tag jk-tag--person"
-              data-tag-type="person"
-              data-person-id="{{ person.id }}"
-              tabindex="0"
-              role="button">{{ person.name }}</span>
-      {% endfor %}
-    </div>
-    {% endif %}
-    {% if resolved_event %}
-    <div class="jk-card__meta-row">
-      <span class="jk-card__meta-label">Event</span>
-      <span class="jk-tag jk-tag--event"
-            data-tag-type="event"
-            data-event-id="{{ resolved_event.id }}"
-            tabindex="0"
-            role="button">{{ resolved_event.title }}</span>
-    </div>
-    {% endif %}
-    {% if item.tags %}
-    <div class="jk-card__meta-row">
-      <span class="jk-card__meta-label">Tags</span>
-      {% for tag in item.tags %}
-        <span class="jk-tag jk-tag--topic"
-              data-tag-type="topic"
-              data-tag-value="{{ tag }}"
-              tabindex="0"
-              role="button">{{ tag }}</span>
-      {% endfor %}
-    </div>
-    {% endif %}
+
+  <div class="jk-card__embed-caption">
+
+    <button
+      class="jk-card__info-btn"
+      data-card-trigger="material"
+      data-material-id="{{ item.id }}"
+      aria-label="More information about {{ item.title }}">
+
+      <svg width="16" height="16" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/>
+        <line x1="12" y1="10" x2="12" y2="16" stroke="currentColor" stroke-width="2"/>
+        <circle cx="12" cy="7" r="1.2" fill="currentColor"/>
+      </svg>
+
+    </button>
+
+    <span class="jk-card__embed-title">
+      {{ item.title }}
+    </span>
+
   </div>
+
 </div>
 
 {% comment %}====== CARD MODE (default) ======{% endcomment %}

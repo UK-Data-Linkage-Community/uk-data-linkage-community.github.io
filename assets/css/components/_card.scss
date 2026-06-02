@@ -512,7 +512,7 @@
    AVATAR
    -------------------------------------------------------------------------- */
 .jk-avatar {
-  border-radius: 50%;
+  border-radius: 10%;
   overflow: hidden;
   background: var(--jk-surface);
   display: flex;
@@ -1094,4 +1094,64 @@
   background: var(--jk-surface);
   color: var(--jk-text-muted);
   border: 1px solid var(--jk-border);
+}
+
+
+
+
+
+
+//overrides
+.jk-card--embedded {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: transparent;
+  border: 0;
+}
+
+.jk-card__embed-wrapper {
+  width: 100%;
+}
+
+.jk-card__embed-frame,
+.jk-card__embed-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  border: 0;
+  border-radius: 10px;
+}
+
+.jk-card__embed-caption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.jk-card__embed-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.jk-card__info-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  border: none;
+  border-radius: 50%;
+  background: var(--jk-surface);
+  cursor: pointer;
+}
+
+.jk-card__info-btn:hover {
+  transform: scale(1.05);
 }

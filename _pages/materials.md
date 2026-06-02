@@ -42,34 +42,46 @@ permalink: /resources/materials/
                placeholder="Title, description…"
                aria-label="Search materials">
       </div>
- 
-      <div class="jk-filter-group">
-        <div class="jk-filter-group__label">Type</div>
+
+      <details class="jk-filter-group jk-filter-group--dropdown">
+        <summary class="jk-filter-group__label">
+          Material Type
+        </summary>
+    
         <div class="jk-filter-options" id="jk-filter-types" role="group" aria-label="Filter by type">
           <!-- populated by JS -->
         </div>
-      </div>
- 
-      <div class="jk-filter-group">
-        <div class="jk-filter-group__label">Author</div>
+      </details>
+
+      <details class="jk-filter-group jk-filter-group--dropdown">
+        <summary class="jk-filter-group__label">
+          Authors
+        </summary>
+        
         <div class="jk-filter-options" id="jk-filter-authors" role="group" aria-label="Filter by author">
           <!-- populated by JS -->
         </div>
-      </div>
- 
-      <div class="jk-filter-group">
-        <div class="jk-filter-group__label">Event</div>
+      </details>
+
+      <details class="jk-filter-group jk-filter-group--dropdown">
+        <summary class="jk-filter-group__label">
+          Events
+        </summary>
+    
         <div class="jk-filter-options" id="jk-filter-events" role="group" aria-label="Filter by event">
           <!-- populated by JS -->
         </div>
-      </div>
+      </details>
  
-      <div class="jk-filter-group">
-        <div class="jk-filter-group__label">Tags</div>
-        <div class="jk-filter-options" id="jk-filter-tags" role="group" aria-label="Filter by tag">
-          <!-- populated by JS -->
-        </div>
-      </div>
+      <details class="jk-filter-group jk-filter-group--dropdown">
+          <summary class="jk-filter-group__label">
+            Tags
+          </summary>
+        
+          <div class="jk-filter-options" id="jk-filter-tags" role="group" aria-label="Filter by tag">
+            <!-- populated by JS -->
+          </div>
+        </details>
  
       <button class="jk-filter-reset" id="jk-filter-reset">Clear all filters</button>
     </aside>
