@@ -1,4 +1,4 @@
-FROM ruby:3.3
+FROM ruby:3.3-slim
 
 # Install minimal dependencies for native gems
 RUN apt-get update -qq && apt-get install -y \
@@ -20,6 +20,14 @@ RUN gem install bundler && bundle install
 
 # Copy the rest of the project
 COPY . .
+
+COPY _* .
+COPY assets .
+COPY collections .
+COPY _config.yml .
+COPY index.md .
+COPY favicon.ico .
+COPY 404.html .
 
 EXPOSE 4000
 
