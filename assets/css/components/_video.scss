@@ -1,0 +1,23 @@
+.video {
+  margin: 2rem 0;
+
+  &__file {
+    width: 100%;
+    height: auto;
+    display: block;
+    background: #000;
+    border-radius: 12px;
+  }
+
+  &__caption {
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    opacity: 0.8;
+  }
+}
+
+@media (min-width: $bp-tablet) {
+  .video {
+    margin: 3rem 0;
+  }
+}
