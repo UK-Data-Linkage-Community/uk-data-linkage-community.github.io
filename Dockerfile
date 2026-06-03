@@ -2,12 +2,8 @@ FROM ruby:3.3-slim
 
 # Install minimal dependencies for native gems
 RUN apt-get update -qq && apt-get install -y \
-  build-essential \
-  libffi-dev \
   libxml2-dev \
-  libxslt1-dev \
-  zlib1g-dev \
-  git \
+  build-essential \
   && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /site
@@ -16,18 +12,7 @@ WORKDIR /site
 COPY Gemfile Gemfile.lock ./
 
 # Install bundler + gems
-RUN gem install bundler && bundle install
-
-# Copy the rest of the project
-COPY . .
-
-COPY _* .
-COPY assets .
-COPY collections .
-COPY _config.yml .
-COPY index.md .
-COPY favicon.ico .
-COPY 404.html .
+RUN gem install bundler -v 2.7.2 && bundle install
 
 EXPOSE 4000
 
