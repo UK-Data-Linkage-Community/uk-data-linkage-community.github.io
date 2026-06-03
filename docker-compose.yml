@@ -1,8 +1,7 @@
-version: "3.8"
-
 services:
   jekyll:
     build: .
+    image: uk-dlc-website
     ports:
       - "4000:4000"
     volumes:
