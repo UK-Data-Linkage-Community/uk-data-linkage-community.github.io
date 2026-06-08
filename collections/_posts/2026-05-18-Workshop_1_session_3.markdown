@@ -16,13 +16,13 @@ Attendees highlighted that linkage teams generally work and understand outputs i
 
 ### Forms vs Conversations
 
-The question of information or cognitive overload continued into discussions about the format of scoping and reporting. Attendees expressed that in their experiences, scoping forms can often be too long and technical for stakeholders, and that sometimes the forms may be left filled default answers or other inaccuracies. It was suggested that the forms do not actually capture what really matters for the linkage practitioners, namely feasibility, data quality constraints, and linkage complexity.
+The question of information or cognitive overload continued into discussions about the format of scoping and reporting. Attendees expressed that in their experiences, scoping forms can often be too long and technical for stakeholders, and that sometimes the forms may be left filled with default answers or inaccuracies. It was suggested that the forms do not actually capture what really matters for the linkage practitioners, namely feasibility, data quality constraints, and linkage complexity.
 
 Attendees instead suggested that early dialogue and feasibility meetings supported by iterative clarification would greatly address these issues. Another suggestion was producing a data requirement spec after a discussion rather than before, to ensure that stakeholders are better equipped to provide meaningful details to a linkage team.
 
 ### Addressing the Disconnect
 
-An unfortunate issue with expanding the scoping stage is of course, scalability, as these additional steps require more time and resources from both parties. The attending practitioners accepted that whilst clients frequently do not understand linkage constraints fully, linkage teams rarely understand the full research intent, use cases, and real-world factors behind a linkage request. By extension, analysts in the middle may not fully understand either the nature of the data, or the nature of the linkage.
+An unfortunate issue with scalability for the scoping stage is of course, costs, as these additional steps require more time and resources from both parties. The attending practitioners accepted that whilst clients frequently do not fully understand linkage constraints, the reverse can also be true. Linkage teams rarely understand the full research intent, use cases, and real-world factors behind a linkage request. Additionally, analysts in the middle may not fully understand either the nature of the data, or the nature of the linkage, adding more complexity to the issue.
 
 > No single group fully understands the full pipeline from data acquisition, all the way to linkage, analysis, and policy output.
 
