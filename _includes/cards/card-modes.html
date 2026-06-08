@@ -1,0 +1,20 @@
+<script type="application/json" id="jk-site-data">
+{
+  "people": [{% for p in site.data.people %}{"id":{{ p.id | jsonify }},"name":{{ p.name | jsonify }},"affiliation":{{ p.affiliation | default:"" | jsonify }},"role":{{ p.role | default:"" | jsonify }},"content":{{ p.content | default:"" | jsonify }},"image":{{ p.image | default:"" | jsonify }},"links":{"website":{{ p.links.website | default:"" | jsonify }},"email":{{ p.links.email | default:"" | jsonify }},"github":{{ p.links.github | default:"" | jsonify }}}}{% unless forloop.last %},{% endunless %}{% endfor %}],
+  "events": [{% assign efirst = true %}{% for cat in site.data.events.categories %}{% for ev in cat.events %}{% unless efirst %},{% endunless %}{% assign efirst = false %}{"id":{{ ev.id | jsonify }},"title":{{ ev.title | jsonify }},"date":{{ ev.date | date:"%Y-%m-%d" | jsonify }},"status":{{ ev.status | default:"" | jsonify }},"description":{{ ev.description | default:"" | strip_newlines | jsonify }},"venue":{{ ev.venue | default:"" | jsonify }},"registration_link":{{ ev.registration_link | default:"" | jsonify }},"event_type":{{ cat.event_type | jsonify }},"event_type_label":{{ cat.label | default:cat.event_type | jsonify }}}{% endfor %}{% endfor %}],
+  "materials": [{% for m in site.data.materials.items %}{"id":{{ m.id | jsonify }},"title":{{ m.title | jsonify }},"event_id":{{ m.event_id | default:"" | jsonify }},"type":{{ m.type | jsonify }},"authors":{{ m.authors | jsonify }},"tags":{{ m.tags | jsonify }},"src":{{ m.src | default:"" | jsonify }},"thumbnail":{{ m.thumbnail | default:"" | jsonify }},"description":{{ m.description | default:"" | strip_newlines | jsonify }},"caption":{{ m.caption | default:"" | strip_newlines | jsonify }},"date":{{ m.date | date:"%Y-%m-%d" | jsonify }}}{% unless forloop.last %},{% endunless %}{% endfor %}]
+}
+</script>
+
+<div class="jk-modal-overlay" id="jk-modal" role="dialog" aria-modal="true" hidden>
+  <div class="jk-modal">
+    <button class="jk-modal__close" id="jk-modal-close" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M14 4L4 14M4 4l10 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    <div class="jk-modal__content" id="jk-modal-content"></div>
+  </div>
+</div>
+
+<div class="jk-tag-tooltip" id="jk-tag-tooltip" hidden>
+  <div id="jk-tag-tooltip-inner"></div>
+</div>
