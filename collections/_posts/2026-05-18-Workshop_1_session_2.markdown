@@ -5,10 +5,10 @@ date:   2026-03-02 12:00:00 +0000
 event_id: "ukdlc-workshop-1-data-linkers"
 ---
 
-After establishing the current practices of the attendees in the [first session](/blog/2026/03/02/Workshop_1_session_1/), the second session of our first workshop was aimed at looking at the challenges practitioners face, what tricky or edge cases come up, and how the group approach them. Edge cases are not rare, but rather structurally embedded in real datasets, and lead to ambiguity, inconsistency, and fundamentally mistrust in linkage. 
+After establishing the current practices of the attendees in the [first session](/blog/2026/03/02/Workshop_1_session_1/), the second session of our first workshop was aimed at looking at the challenges practitioners face, what tricky or edge cases can come up, and what approaches the group have for them. In practice, edge cases are far from rare, but rather structurally embedded in real datasets, and lead to ambiguity, inconsistency, and fundamentally mistrust in linkage. 
 <!--more-->
 
-In an open discussion, the group identified a number of tricky cases that they see come up not infrequently in their work. Included in these were:
+In an open discussion, the group identified some of the notable tricky cases that they see in their work. Included in these were:
 
 - twins / multi-birth families
 - shared households with identical names
@@ -36,7 +36,7 @@ On the topic of clustering, members point out the structural challenges of over-
 
 ### Methodological Discussions
 
-Being that [Splink](https://moj-analytical-services.github.io/splink/index.html) was developed by the MoJ, who had attendees at this workshop, and which is a tool used by others attending, Splink's use as a tool for dealing with edge cases was highlighted. Splink was used by practitioners for probabilistic matching, clustering, threshold tuning, and linkage scoring, all in aid of dealing with edge cases. The [Unlinkables Chart](https://moj-analytical-services.github.io/splink/charts/unlinkables_chart.html) was also mentioned as a key tool for some for diagnosing matchability limits.
+Being that [Splink](https://moj-analytical-services.github.io/splink/index.html) was a tool developed by the MoJ, who had attendees at this workshop, and used by others attending, Splink's suitability as a tool for dealing with edge cases was highlighted by the group. Already being used by practitioners for probabilistic matching, clustering, threshold tuning, and linkage scoring, it was seen as being ideal for dealing with edge cases. The [Unlinkables Chart](https://moj-analytical-services.github.io/splink/charts/unlinkables_chart.html) was also mentioned as a key tool for some for diagnosing matchability limits.
 
 Participants discussed **running multiple thresholds** and comparing the downstream impacts. The idea being that linkage doesn't have to be a single model output, but rather it can be expressed as a spectrum of possible datasets.
 
