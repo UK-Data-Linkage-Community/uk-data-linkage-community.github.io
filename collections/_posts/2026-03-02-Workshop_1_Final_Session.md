@@ -26,3 +26,22 @@ There was particular interest in:
 - consolidated best-practice guidance,
 - reusable educational content,
 - and lessons learned from more mature linkage teams.
+
+### Support for Non-Technical Stakeholders
+
+Another major point was that linkage work often involves intermediaries, such as research coordinators, project managers, governance staff, etc. These individuals may not be linkage specialists but are responsible for translating research questions, scoping, and communicating with technical teams. Participants suggested that guidance should therefore target multiple audiences such as:
+
+- technical linkers,
+- analysts,
+- researchers,
+- governance teams,
+- public contributors,
+- and operational coordinators.
+
+There was support amongst attendees for process guidance, decision trees, and structered conversations rather than only formal documentation.
+
+> "Questions you should ask before requesting linkage"  
+
+> "Do you actually need a custom linkage?"  
+
+> "What identifiers are required for your use case?"
