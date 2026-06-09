@@ -35,4 +35,38 @@ Clustering and graph-based methods were seen as being modern and increasingly es
 - **Cluster diversity/stability** - how clusters change under threshold adjustments
 - **Bridge clusters** - records acting as connectors between clusters
 - **“Funky clusters”** - internally inconsistent clusters, e.g. conflicting sex, impossible ages, multiple DOBs
-- **Cluster error counts** - though participants noted definitions remain unresolved
+
+The group, however, agreed that cluster evaluation methodology is still an evolving field, and as a consequence, there are a lack of, or somewhat open-ended definitions around the matter.
+
+### Data Quality Before Linkage
+
+In this session the group reaffirmed the impact of poor source data quality on the quality of the linkage, emphasising the value of profiling datasets _before_ linkage. Attendees highlighted missingness, uniqueness, duplicate records, and invalid or illogical values being common possible pre-linkage checks. One group focused heavily on metadata governance and interoperability, arguing that:  
+
+> Without standardised metadata and semantic consistency, downstream linkage quality becomes unreliable.
+
+Some of the mentioned standardisation ideas mentioned were the following:
+
+- [FAIR principles](https://www.go-fair.org/fair-principles/)
+- controlled vocabularies
+- [SKOS vocabularies](https://csiro-enviro-informatics.github.io/info-engineering/skos-bp.html)
+- semantic layers
+- ontologies
+- persistent identifiers (PIDs)
+- lineage tracking
+
+### Bias and Representativeness
+
+One key discussion during this session was the difficulties in assessing bias in the context of linkage quality. For instance, among unlinked records there may be true negatives or there may be false negatives caused by linkage failure, as a result, simple "unlinked distribution" analysis can be misleading. Comparing linked distributions against known population distributions, stratified clerical reviews (by age, demographic, etc.), and sensitivity analysis were seen as appropriate directions to combating these issues. Participants did note however, that demographic stratification scales poorly due to the already high expense of clerical review.
+
+### Visualisation and Reporting Interfaces
+
+There was particular interest in ensuring linkage quality is made more understandable to non-specialists and how to best achieve this. Visualisations were seen as an important way to do this, and candidate visualisations included:
+
+- Waterfall charts
+- Match-weight distributions
+- Threshold histograms
+- Cluster graphs
+- Blocking diagnostics
+- Flowcharts of linkage logic
+- Error matrices
+
