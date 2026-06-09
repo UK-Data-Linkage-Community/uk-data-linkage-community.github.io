@@ -60,7 +60,7 @@ One key discussion during this session was the difficulties in assessing bias in
 
 ### Visualisation and Reporting Interfaces
 
-There was particular interest in ensuring linkage quality is made more understandable to non-specialists and how to best achieve this. Visualisations were seen as an important way to do this, and candidate visualisations included:
+There was particular interest in ensuring linkage quality is made more understandable to non-specialists and in how to best achieve this. Visualisations were seen as a key method, and ideal visualisations were said to include:
 
 - Waterfall charts
 - Match-weight distributions
@@ -70,3 +70,64 @@ There was particular interest in ensuring linkage quality is made more understan
 - Flowcharts of linkage logic
 - Error matrices
 
+There was much debate about whether outputs should be static, dashboards, portals, or interactive "talk-to-data" interfaces. One attendee saw an ideal architecture consisting of semantic-layer-driven dashboards, natural language querying, and dynamic visualisation generation.
+
+### Reporting Constraints and Realities
+
+Several practical tensions emerged from discussions. Participants noted that the reality is that users can frequently ignore linkage documentation, assume linkage is perfect, or only revisit quality issues after publication. 
+
+> People tend not to read the fine print, and standard reporting needs to address that reality. 
+
+Funding was another important issue behind what a standard report might include. Not all organisations can perform clerical reviews, estimate recall robustly, or produce extensive diagnostics. The suggested solution to this was a tiered reporting framework, which would address distinct data quality tiers.
+
+### Takeaway - Linkage Quality Reporting Standards
+> #### A. Technical Performance Metrics
+>
+> Measure core system performance using standard evaluation metrics:
+>
+> - **Precision** — Accuracy of identified matches
+> - **Recall** — Completeness of identified matches
+> - **Match Rates** — Proportion of records successfully matched
+> - **Error Matrices** — Analysis of false positives and false negatives
+>
+> ---
+>
+> #### B. Data Quality Assessment
+>
+> Evaluate the integrity and fitness of source data:
+>
+> - **Missingness** — Extent and patterns of missing data
+> - **Duplicate Detection** — Identification of duplicate records
+> - **Validation Checks** — Conformance to business and data rules
+> - **Coverage & Timeliness** — Completeness and currency of available data
+>
+> ---
+>
+> #### C. Cluster & Graph Diagnostics
+>
+> Assess the behavior and stability of entity relationships:
+>
+> - **Cluster Consistency** — Internal coherence of clustered entities
+> - **Threshold Sensitivity** — Impact of matching threshold changes
+> - **Bridge Effects** — Detection of unintended links connecting clusters
+>
+> ---
+>
+> #### D. Bias & Fairness Assessment
+>
+> Where feasible, evaluate potential sources of bias:
+>
+> - **Stratified Analyses** — Performance across relevant subgroups
+> - **Population Comparisons** — Comparison against expected population distributions
+> - **Sensitivity Analyses** — Robustness of findings under alternative assumptions
+>
+> ---
+>
+> #### E. Limitations & Transparency
+>
+> Clearly communicate constraints and appropriate interpretation:
+>
+> - **Uncertainty** — Known sources of ambiguity or error
+> - **Assumptions** — Key assumptions underlying methods and results
+> - **Intended Use** — Appropriate use cases and decision contexts
+> - **Validation Boundaries** — What cannot be verified or validated with available evidence
