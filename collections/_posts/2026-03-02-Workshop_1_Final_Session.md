@@ -71,3 +71,7 @@ Regarding the concerns within the workshop for how best to communicate limitatio
 ### Collaborative and Community-Driven Infrastructure
 
 The room broadly favoured a collaborative model rather than one with a centralised control for the community. One member stressed that when it comes to contributions, the intentions were not to mandate standards, but rather provide recommendations, guidance, and support through github-backed documentation, collaborative updating, peer suggestions, and shared methodological discussions.
+
+> This post is part of the outputs for the <a href="#"
+   data-open-event="ukdlc-workshop-1-data-linkers">
+   UK DLC Workshop 1</a>.
