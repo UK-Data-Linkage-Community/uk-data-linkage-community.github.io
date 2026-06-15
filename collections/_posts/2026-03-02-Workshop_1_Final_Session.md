@@ -41,6 +41,7 @@ Another major point was that linkage work often involves intermediaries, such as
 There was support amongst attendees for process guidance, decision trees, and structered conversations rather than only formal documentation. Some suggested questions to consider during discussions included:
 
 > - "Do you actually need a custom linkage?"  
+> - "Do links already exist that are satisfactory for your project"
 > - "What identifiers are required for your use case?"
 
 ### Educational Materials and Modular Explainers
@@ -55,17 +56,18 @@ It was widely agreed that a strong focus of the UK DLC would be to produce mater
 - Linkage governance
 - Linkage limitations
 
-Attendees emphasized the need for materials to exist at **multiple levels of technical depth**, with a focus on plain-language communication, terminology explainers, and resources understandable by researchers and the public, not only linkage specialists.
+Attendees emphasized the need for materials to exist at **multiple levels of technical depth**, with a focus on plain-language communication, terminology explainers, and resources understandable by researchers and the public, not only linkage specialists. This included using appropriate operational language to better communicate to coordinators the downstream impact of guidance policies. 
 
 ### Synthetic Data and Sandbox Environments
 
-There was a call to have suitable and accessible training environments and datasets available within the UK DLC as real world linkage datasets were seen as being often too sensitive, large, and inaccessible for training purposes. Specifically, the group proposed that the community provide synthetic linkage datasets and sandbox exercises that include realistic linkage problems with approriately 'messy' data, with both multi-dataset challenges, and interactive experimentation environments. Through this environment, people of different skill levels can practice cleaning, blocking, clustering, and debugging linkage problems safely.
+There was a call to have suitable and accessible training environments and datasets available within the UK DLC as real world linkage datasets were seen as being often too sensitive, large, and inaccessible for training purposes. Specifically, the group proposed that the community provide synthetic linkage datasets and sandbox exercises that include realistic linkage problems with appropriately 'messy' data, with both multi-dataset challenges, and interactive experimentation environments. Through this environment, people of different skill levels can practice cleaning, blocking, clustering, and debugging linkage problems safely.
 
 > The group agreed that open-source tooling should be prioritised wherever possible.
 
 ### Communication of Caveats and Uncertainty
 
-Regarding the concerns within the workshop for how best to communicate limitations and user interpretation, attendees discussed the need for consistent, or better still, standardised caveat and uncertainty wording. Additionally, guidance for presenting linkage quality to researchers and public audiences should also be an output of the coimmunity.
+Regarding the concerns within the workshop for how best to communicate limitations and user interpretation, attendees discussed the need for consistent, or better still, standardised caveat and uncertainty wording. Additionally, guidance for presenting linkage quality to researchers and public audiences should also be an output of the community.
 
 ### Collaborative and Community-Driven Infrastructure
 
+The room broadly favoured a collaborative model rather than one with a centralised control for the community. One member stressed that when it comes to contributions, the intentions were not to mandate standards, but rather provide recommendations, guidance, and support through github-backed documentation, collaborative updating, peer suggestions, and shared methodological discussions.
