@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "UK DLC Workshop 1 Final Session - Future Directions and Action Planning"
-date:   2026-03-02 12:00:00 +0000
+date:   2026-03-20 12:00:00 +0000
 event_id: "ukdlc-workshop-1-data-linkers"
 ---
 
@@ -40,8 +40,8 @@ Another major point was that linkage work often involves intermediaries, such as
 
 There was support amongst attendees for process guidance, decision trees, and structered conversations rather than only formal documentation. Some suggested questions to consider during discussions included:
 
-> - "Do you actually need a custom linkage?"  
-> - "What identifiers are required for your use case?"
+- "Do you actually need a custom linkage?"  
+- "What identifiers are required for your use case?"
 
 ### Educational Materials and Modular Explainers
 
