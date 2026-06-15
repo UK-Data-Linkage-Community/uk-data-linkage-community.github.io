@@ -46,7 +46,7 @@ There was support amongst attendees for process guidance, decision trees, and st
 
 ### Educational Materials and Modular Explainers
 
-It was widely agreed that a strong focus of the UK DLC would be to produce materials similar to the presentations in [Session 1](), but on a wider community level. These resources may be to explain full pipelines or specific modules such as:  
+It was widely agreed that a strong focus of the UK DLC would be to produce materials similar to the presentations in [Session 1](/blog/2026/03/02/Workshop_1_session_1/), but on a wider community level. These resources may be to explain full pipelines or specific modules such as:  
 
 - Precision and recall
 - Linkage uncertainty
