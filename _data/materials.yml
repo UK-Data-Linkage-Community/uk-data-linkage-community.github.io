@@ -21,7 +21,7 @@ items:
     tags:
       - entity-resolution
       - probabilistic-matching
-    src: "/assets/materials/videos/mike_w1s1.webm"
+    src: "/assets/materials/videos/mike_W1S1.mp4"
     caption: >
       Mike Edwards presents the current practices within SERP on data linkage.
             
@@ -48,7 +48,7 @@ items:
     tags:
       - entity-resolution
       - probabilistic-matching
-    src: "/assets/materials/videos/josie_w1s1.webm"
+    src: "/assets/materials/videos/josie_W1S1.mp4"
     caption: >
       Josie presents on data linkage practices at the ONS.
 
@@ -74,6 +74,6 @@ items:
     tags:
       - entity-resolution
       - probabilistic-matching
-    src: "/assets/materials/videos/andy_w1s1.webm"
+    src: "/assets/materials/videos/andy_W1S1.mp4"
     caption: >
       Andy presents on data linkage practices at the MoJ.
