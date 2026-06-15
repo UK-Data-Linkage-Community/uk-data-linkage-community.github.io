@@ -77,3 +77,15 @@ items:
     src: "/assets/materials/videos/andy_W1S1.mp4"
     caption: >
       Andy presents on data linkage practices at the MoJ.
+
+  - id: "ukdlc-w1s1-test-youtube"
+    title: "My Test Video"
+    event_id: "ukdlc-workshop-1-data-linkers"
+    type: "video"
+    authors:
+      - "mike-edwards"
+    tags:
+      - entity-resolution
+    src: "https://www.youtube.com/embed/7-u8s49Lv28?si=lqChaR4svz2Tnp_B"
+    caption: >
+      A short description of the video.
