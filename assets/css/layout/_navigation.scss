@@ -1,0 +1,137 @@
+%nav-link-base {
+  color: var(--color-grey);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 8px 0;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+}
+
+.site-nav {
+  position: relative;
+
+  .nav-links {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    align-items: center;
+  }
+
+  .page-link {
+    @extend %nav-link-base;
+
+    &:hover {
+      color: #111;
+      text-decoration: none;
+    }
+  }
+}
+
+
+
+/* Mobile menu */
+@media (max-width: $bp-nav) {
+  .site-header .wrapper {
+    padding: 15px 20px !important;
+  }
+
+  .menu-icon {
+    display: block;
+  }
+
+  .site-nav .nav-links {
+    display: none;
+    position: fixed;
+    top: $header-height;
+    right: 0;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+    padding: 20px 0;
+    z-index: 1003;
+    max-height: calc(100vh - #{$header-height});
+    overflow-y: auto;
+  }
+
+  .nav-trigger:checked ~ .nav-links {
+    display: flex;
+  }
+
+  // Animate hamburger to X
+  .nav-trigger:checked ~ .menu-icon span:nth-child(1) {
+    transform: rotate(-45deg) translate(-6px, 6px);
+  }
+
+  .nav-trigger:checked ~ .menu-icon span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .nav-trigger:checked ~ .menu-icon span:nth-child(3) {
+    transform: rotate(45deg) translate(-6px, -6px);
+  }
+
+  // Flatten dropdowns into a list on mobile
+  .nav-dropdown {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dropdown-toggle {
+    padding: 12px 20px;
+    width: 100%;
+    justify-content: flex-start;
+    font-weight: 600;
+    color: #111;
+    background: #f5f5f5;
+    border-bottom: 1px solid #e0e0e0;
+    pointer-events: none;
+  }
+
+  .dropdown-arrow {
+    display: none;
+  }
+
+  .dropdown-content {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    background: #fff;
+    margin-top: 0;
+    display: flex !important;
+    padding-left: 15px;
+
+    a {
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 0.95rem;
+      padding: 12px 20px;
+
+      &:hover {
+        background: #f5f5f5;
+      }
+    }
+  }
+
+  .site-nav .page-link {
+    padding: 12px 20px;
+    display: block;
+    width: 100%;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .site-logo {
+    margin-right: 20px;
+    padding: 0 10px;
+  }
+
+  .logo-svg {
+    height: 60px !important;
+    min-height: 60px !important;
+    min-width: 60px !important;
+  }
+}
