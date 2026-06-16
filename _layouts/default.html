@@ -4,9 +4,11 @@
   <head>
     {% include head.html %}
     {% include head/custom.html %}
+    {% include cards/card-modes.html %}
   </head>
 
   <script src="{{ '/assets/js/progress.js' | relative_url }}"></script>
+  {% include cards/card-modes.html %}
   <script src="/assets/js/cards.js"></script>
   <script>
   window.MathJax = {
