@@ -5,7 +5,7 @@
 
   Parameters:
     item    : a materials.yml item object (required)
-    display : "card" | "small" | "embedded" | "button"  (default: "card")
+    display : "card" | "small" | "embedded" | "button" | "notebook" (default: "card")
 
   Display modes:
     card     — Clickable card that opens a full modal with all metadata
@@ -48,6 +48,8 @@
   {% when "document" %}{% assign type_icon = "◻" %}{% assign type_label = "Document" %}
   {% when "notebook" %}{% assign type_icon = "◈" %}{% assign type_label = "Notebook" %}
   {% when "code"     %}{% assign type_icon = "⌥" %}{% assign type_label = "Code" %}
+  {% when "demo"     %}{% assign type_icon = "⚗" %}{% assign type_label = "Demo" %}
+  {% when "visual"   %}{% assign type_icon = "◉" %}{% assign type_label = "Interactive" %}
   {% else            %}{% assign type_icon = "◆" %}{% assign type_label = item.type %}
 {% endcase %}
 
@@ -158,6 +160,16 @@
         title="{{ item.title }}">
       </iframe>
 
+    {% elsif item.type == "notebook" or item.type == "demo" %}
+
+      <iframe
+        src="{{ item.src }}"
+        class="jk-card__embed-frame"
+        frameborder="0"
+        allowfullscreen
+        title="{{ item.title }}">
+      </iframe>
+
     {% endif %}
 
   </div>
@@ -183,6 +195,60 @@
     </span>
 
   </div>
+
+</div>
+
+{% comment %}====== DEMO MODE ======{% endcomment %}
+{% elsif display == "demo" %}
+
+<div class="jk-card jk-card--demo jk-card--type-{{ item.type }}"
+     data-material-id="{{ item.id }}">
+
+  <div class="jk-card__demo-header">
+    <span class="jk-card__type-icon" aria-hidden="true">{{ type_icon }}</span>
+    <div class="jk-card__demo-meta">
+      <h3 class="jk-card__demo-title">{{ item.title }}</h3>
+      {% if item.description %}
+        <p class="jk-card__demo-desc">{{ item.description }}</p>
+      {% endif %}
+    </div>
+    {% if item.src %}
+      <a class="jk-btn jk-btn--ghost jk-card__demo-open"
+         href="{{ item.src }}"
+         target="_blank"
+         rel="noopener">Open ↗</a>
+    {% endif %}
+  </div>
+
+  {% if item.src %}
+    <div class="jk-card__demo-frame">
+      <iframe
+        src="{{ item.src }}"
+        frameborder="0"
+        allowfullscreen
+        title="{{ item.title }}">
+      </iframe>
+    </div>
+  {% endif %}
+
+  {% if resolved_authors.size > 0 or item.tags %}
+  <div class="jk-card__demo-footer">
+    {% for person in resolved_authors %}
+      <span class="jk-tag jk-tag--person"
+            data-tag-type="person"
+            data-person-id="{{ person.id }}"
+            tabindex="0"
+            role="button">{{ person.name }}</span>
+    {% endfor %}
+    {% for tag in item.tags %}
+      <span class="jk-tag jk-tag--topic"
+            data-tag-type="topic"
+            data-tag-value="{{ tag }}"
+            tabindex="0"
+            role="button">{{ tag }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
 
 </div>
 
@@ -226,17 +292,6 @@
       {% endfor %}
     </div>
     {% endif %}
-<!--    {% if item.tags %}-->
-<!--    <div class="jk-card__tags-row">-->
-<!--      {% for tag in item.tags %}-->
-<!--        <span class="jk-tag jk-tag&#45;&#45;topic"-->
-<!--              data-tag-type="topic"-->
-<!--              data-tag-value="{{ tag }}"-->
-<!--              tabindex="0"-->
-<!--              role="button">{{ tag }}</span>-->
-<!--      {% endfor %}-->
-<!--    </div>-->
-<!--    {% endif %}-->
   </div>
 </div>
 

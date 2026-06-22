@@ -577,8 +577,8 @@ function initMaterialsPage() {
     try { return new Date(s).toLocaleDateString("en-GB",{year:"numeric",month:"long",day:"numeric"}); }
     catch { return s; }
   }
-  function typeIcon(t) { return {slides:"▤",video:"▶",document:"◻",notebook:"◈",code:"⌥"}[t]||"◆"; }
-  function typeName(t) { return {slides:"Slides",video:"Video",document:"Document",notebook:"Notebook",code:"Code"}[t]||(t||"Material"); }
+  function typeIcon(t) { return {slides:"▤",video:"▶",document:"◻",notebook:"◈", demo:"⚗",code:"⌥"}[t]||"◆"; }
+  function typeName(t) { return {slides:"Slides",video:"Video",document:"Document",notebook:"Notebook", demo:"Demo", code:"Code"}[t]||(t||"Material"); }
   function personTag(p) {
     return `<span class="jk-tag jk-tag--person" data-tag-type="person" data-person-id="${esc(p.id)}" tabindex="0" role="button">${esc(p.name)}</span>`;
   }
