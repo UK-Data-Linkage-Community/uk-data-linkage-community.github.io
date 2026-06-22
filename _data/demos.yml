@@ -1,0 +1,5 @@
+items:
+  - id: example-demo
+    title: Example Scatter Plot with Interactivity
+    type: visual
+    src: '/assets/materials/visuals/example_plot.html'
