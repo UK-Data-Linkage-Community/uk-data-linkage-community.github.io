@@ -1,0 +1,53 @@
+/* ==========================================================================
+   Related Groups Layout
+   ========================================================================== */
+
+.community-groups {
+  display: grid;
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.group-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background: #fafafa;
+
+  h2 {
+    margin-top: 0;
+    color: #2c3e50;
+
+    a {
+      text-decoration: none;
+      color: #2c3e50;
+
+      &:hover {
+        color: var(--color-teal);
+      }
+    }
+  }
+
+  .group-description {
+    color: var(--color-grey);
+    line-height: 1.6;
+  }
+
+  .group-link a {
+    color: var(--color-teal);
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.get-involved {
+  text-align: center;
+  margin-top: 3rem;
+  padding: 1.5rem;
+  background: #f0f8ff;
+  border-radius: 8px;
+}
