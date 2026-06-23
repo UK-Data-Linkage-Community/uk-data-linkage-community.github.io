@@ -1,0 +1,788 @@
+$bp-mobile: 600px;
+
+.glossary-page {
+  --color-teal:       #2a9d8f;
+  --color-teal-light: #eef8f7;
+  --color-teal-dark:  #21756b;
+}
+
+
+// =============================================================================
+// PAGE SHELL
+// =============================================================================
+.glossary-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+
+// =============================================================================
+// TOP SECTION
+// =============================================================================
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.top-left { flex: 2; }
+.top-right { flex: 1; }
+
+
+// =============================================================================
+// SEARCH
+// =============================================================================
+.search-box {
+  position: relative;
+}
+
+.search-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+#search {
+  width: 100%;
+  padding: 0.6rem;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+#search-btn {
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  background: var(--color-teal);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: background 0.15s ease;
+}
+
+#search-btn:hover {
+  background: var(--color-teal-dark);
+}
+
+#search-message {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 0.25rem;
+}
+
+#suggestions {
+  position: absolute;
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-top: none;
+  display: none;
+  z-index: 100;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+}
+
+.suggestion {
+  padding: 0.45rem 0.65rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.suggestion:hover {
+  background: #f5f5f5;
+}
+
+
+// =============================================================================
+// PIPELINE  –  bordered steps with right-pointing arrow between each
+// =============================================================================
+.pipeline-wrapper {
+  margin-top: 1rem;
+}
+
+.pipeline {
+  display: flex;
+  position: relative;
+}
+
+// ── Shared sizing variables ───────────────────────────────────────────────────
+$step-h:   72px;
+$half-h:   36px;
+$arrow-w:  12px;
+$bdr-w:    0.0px;
+$bdr-c:    #c4cad8;
+$step-bg:  #eef1f5;
+$hover-bg: #dde3ec;
+
+.pipeline-step {
+  flex: 1;
+  height: $step-h;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 ($arrow-w + 8px) 0 0.9rem;
+  font-size: 0.85rem;
+  text-align: center;
+  background: $step-bg;
+  color: #555;
+  border: $bdr-w none $bdr-c;
+  border-right: none;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -$bdr-w;
+    right: -($arrow-w + $bdr-w);
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: ($half-h + $bdr-w) 0 ($half-h + $bdr-w) ($arrow-w + $bdr-w);
+    border-color: transparent transparent transparent $bdr-c;
+    z-index: 1;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -$arrow-w;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: $half-h 0 $half-h $arrow-w;
+    border-color: transparent transparent transparent $step-bg;
+    z-index: 2;
+  }
+
+  &:first-child {
+    border-radius: 1px 0 0 1px;
+  }
+
+  &:last-child {
+    border-right: $bdr-w solid $bdr-c;
+    border-radius: 0 1px 1px 0;
+    padding-right: 0.9rem;
+    &::before,
+    &::after { display: none; }
+  }
+
+  &:hover {
+    background: $hover-bg;
+    color: #333;
+    &::after { border-left-color: $hover-bg; }
+  }
+}
+
+@for $i from 1 through 20 {
+  .pipeline-step:nth-child(#{$i}) { z-index: #{21 - $i}; }
+}
+
+.pipeline-step.active {
+  background: var(--color-teal);
+  color: #fff;
+  border-color: var(--color-teal-dark);
+}
+.pipeline-step.active::before { border-left-color: var(--color-teal-dark); }
+.pipeline-step.active::after  { border-left-color: var(--color-teal); }
+
+#connector {
+  height: 4px;
+  width: 0;
+  background: var(--color-teal);
+  transition: width 0.25s ease, transform 0.25s ease;
+}
+
+
+// =============================================================================
+// DETAIL PANEL
+// =============================================================================
+#detail-panel {
+  display: none;
+  border: 1px solid #ddd;
+  border-top: none;
+  padding: 1rem;
+  background: #fafafa;
+}
+
+#detail-panel.open {
+  display: block;
+}
+
+#detail-panel .section-summary {
+  color: #555;
+  margin-bottom: 0.75rem;
+}
+
+#detail-panel h3 {
+  font-size: 0.95rem;
+  margin: 0.9rem 0 0.4rem;
+  color: #333;
+}
+
+.panel-concept {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem 0.5rem;
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.concept-link {
+  cursor: pointer;
+  color: var(--color-teal);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.concept-link:hover {
+  text-decoration-style: solid;
+}
+
+.panel-tags {
+  display: flex;
+  gap: 0.2rem;
+}
+
+.panel-def {
+  flex: 1 0 100%;
+  color: #555;
+}
+
+
+// =============================================================================
+// TAG CHIPS  (shared across pipeline panel and glossary list)
+// =============================================================================
+.tag-chip {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tag-chip:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+// In the glossary term list, chips become small colour dots
+.glossary-term .tag-chip {
+  padding: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  font-size: 0;
+  line-height: 0;
+  opacity: 0.55;
+  transition: opacity 0.1s ease;
+}
+
+.glossary-term:hover .tag-chip {
+  opacity: 1;
+}
+
+// ── Chip colour palette ───────────────────────────────────────────────────────
+.tag-chip--datatype      { color: #dc2626; }
+.tag-chip--evaluation    { color: #ea580c; }
+.tag-chip--python        { color: #ca8a04; }
+.tag-chip--deterministic { color: #65a30d; }
+.tag-chip--tool          { color: #16a34a; }
+.tag-chip--visualisation { color: #0d9488; }
+.tag-chip--metric        { color: #06b6d4; }
+.tag-chip--core          { color: #0369a1; }
+.tag-chip--method        { color: #2563eb; }
+.tag-chip--probabilistic { color: #7c3aed; }
+.tag-chip--model         { color: #a21caf; }
+.tag-chip--comparison    { color: #db2777; }
+
+// Dot variants in the glossary list use background, not text colour
+.glossary-term .tag-chip--datatype      { background: #dc2626; border-color: #dc2626; }
+.glossary-term .tag-chip--evaluation    { background: #ea580c; border-color: #ea580c; }
+.glossary-term .tag-chip--python        { background: #ca8a04; border-color: #ca8a04; }
+.glossary-term .tag-chip--deterministic { background: #65a30d; border-color: #65a30d; }
+.glossary-term .tag-chip--tool          { background: #16a34a; border-color: #16a34a; }
+.glossary-term .tag-chip--visualisation { background: #0d9488; border-color: #0d9488; }
+.glossary-term .tag-chip--metric        { background: #06b6d4; border-color: #06b6d4; }
+.glossary-term .tag-chip--core          { background: #0369a1; border-color: #0369a1; }
+.glossary-term .tag-chip--method        { background: #2563eb; border-color: #2563eb; }
+.glossary-term .tag-chip--probabilistic { background: #7c3aed; border-color: #7c3aed; }
+.glossary-term .tag-chip--model         { background: #a21caf; border-color: #a21caf; }
+.glossary-term .tag-chip--comparison    { background: #db2777; border-color: #db2777; }
+
+
+// =============================================================================
+// TAG FILTERS (category key + filter controls)
+// =============================================================================
+.tag-filters-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.tag-filters-label {
+  font-size: 0.72rem;
+  color: #999;
+  white-space: nowrap;
+  font-style: italic;
+}
+
+.tag-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tag-filter {
+  padding: 0.2rem 0.65rem;
+  font-size: 0.75rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(0,0,0,0.12);
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(0,0,0,0.04);
+  }
+
+  &.active {
+    background: rgba(0,0,0,0.05);
+    font-weight: 500;
+  }
+}
+
+// Per-category filter colours
+.tag-filter--method        { color: #2563eb; border-color: rgba(37,  99,  235, 0.3); }
+.tag-filter--model         { color: #a21caf; border-color: rgba(162, 28,  175, 0.3); }
+.tag-filter--evaluation    { color: #ea580c; border-color: rgba(234, 88,  12,  0.3); }
+.tag-filter--metric        { color: #06b6d4; border-color: rgba(6,   182, 212, 0.3); }
+.tag-filter--tool          { color: #16a34a; border-color: rgba(22,  163, 74,  0.3); }
+.tag-filter--datatype      { color: #ef4444; border-color: rgba(239, 68,  68,  0.3); }
+.tag-filter--comparison    { color: #ec4899; border-color: rgba(236, 72,  153, 0.3); }
+.tag-filter--probabilistic { color: #7c3aed; border-color: rgba(124, 58,  237, 0.3); }
+.tag-filter--deterministic { color: #d97706; border-color: rgba(217, 119, 6,   0.3); }
+.tag-filter--visualisation { color: #059669; border-color: rgba(5,   150, 105, 0.3); }
+.tag-filter--python        { color: #ca8a04; border-color: rgba(202, 138, 4,   0.3); }
+.tag-filter--core          { color: #0284c7; border-color: rgba(2,   132, 199, 0.3); }
+
+// Active state gains a teal border for all categories
+.tag-filter--method.active,
+.tag-filter--model.active,
+.tag-filter--evaluation.active,
+.tag-filter--metric.active,
+.tag-filter--tool.active,
+.tag-filter--datatype.active,
+.tag-filter--comparison.active,
+.tag-filter--probabilistic.active,
+.tag-filter--deterministic.active,
+.tag-filter--visualisation.active,
+.tag-filter--python.active,
+.tag-filter--core.active {
+  border-color: var(--color-teal);
+  border-width: 3px;
+}
+
+
+.glossary-body {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  min-height: 460px;
+}
+
+
+// =============================================================================
+// LEFT: alphabetical term list
+// =============================================================================
+.glossary-list-panel {
+  flex: 0 0 290px;
+  max-height: 560px;
+  overflow-y: auto;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  scroll-behavior: smooth;
+}
+
+.glossary-list-panel::-webkit-scrollbar {
+  width: 5px;
+}
+
+.glossary-list-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.glossary-list-panel::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 99px;
+}
+
+.alpha-group:not(:last-child) {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.alpha-label {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #bbb;
+  background: #fafafa;
+  border-bottom: 1px solid #f3f3f3;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.glossary-term {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.42rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.88rem;
+  border-left: 3px solid transparent;
+  transition: background 0.1s ease;
+}
+
+.glossary-term:hover {
+  background: #f7f7f7;
+}
+
+.glossary-term.active {
+  background: var(--color-teal-light);
+  border-left-color: var(--color-teal);
+  font-weight: 500;
+}
+
+.term-label {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.term-tags-inline {
+  flex-shrink: 0;
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+}
+
+
+// =============================================================================
+// RIGHT: graph + detail panel
+// =============================================================================
+.glossary-detail-panel {
+  flex: 1;
+  position: sticky;
+  top: 1rem;
+  align-self: flex-start;
+}
+
+// Empty state (shown before JS initialises the graph)
+.graph-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 420px;
+  border: 1px dashed #ddd;
+  border-radius: 6px;
+  background: #fafafa;
+  color: #bbb;
+}
+
+.empty-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.empty-inner p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.empty-inner svg {
+  opacity: 0.4;
+}
+
+// =============================================================================
+// CONCEPT GRAPH
+// =============================================================================
+
+// Container holds both the SVG canvas and the floating zoom controls
+#concept-graph-container {
+  position: relative;
+}
+
+#concept-graph {
+  width: 100%;
+  height: 420px;           // taller than before to give the graph room to breathe
+  display: block;
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+
+  // Globe parallax — JS applies a CSS 3D perspective tilt on mousemove.
+  // The transition gives it a smooth, fluid feel.
+  transition: transform 0.1s ease-out;
+  // Prevent layout shifts when the 3D transform is applied
+  will-change: transform;
+}
+
+// Smooth circle transitions (kept from original)
+.graph-node circle {
+  transition: fill-opacity 0.15s ease;
+}
+
+.def-link {
+  color: var(--color-teal);
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 500;
+
+  &:hover {
+    color: #1f5fcc;
+  }
+}
+
+// ── Floating zoom controls ────────────────────────────────────────────────────
+.graph-controls {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  z-index: 10;
+  // Prevent the 3D SVG tilt from misaligning the buttons
+  pointer-events: auto;
+}
+
+.graph-ctrl-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  color: #555;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+
+  &:hover {
+    background: #fff;
+    border-color: rgba(0, 0, 0, 0.22);
+    color: #222;
+  }
+
+  &:active {
+    background: #f0f0f0;
+  }
+}
+
+// ── Graph legend ──────────────────────────────────────────────────────────────
+.graph-legend {
+  display: flex;
+  gap: 1.25rem;
+  margin: 0.5rem 0 0.75rem;
+  font-size: 0.78rem;
+  color: #666;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.legend-item::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.legend-center::before   { background: #2a9d8f; }
+.legend-broader::before  { background: #e07b39; }
+.legend-narrower::before { background: #4a7fc1; }
+.legend-related::before  { background: #9b8ea8; }
+
+
+// =============================================================================
+// CONCEPT DETAIL CARD
+// =============================================================================
+.concept-detail-inner {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 1rem 1.1rem;
+  background: #fff;
+}
+
+.concept-detail-header h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.alt-label {
+  font-size: 0.72rem;
+  background: #f0f0f0;
+  color: #666;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  font-weight: 400;
+}
+
+.concept-def {
+  font-size: 0.9rem;
+  color: #444;
+  line-height: 1.55;
+  margin: 0 0 0.75rem;
+}
+
+.concept-relations {
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.relation-row {
+  font-size: 0.83rem;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.35rem;
+}
+
+.rel-label {
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.1rem 0.45rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.rel-label.broader-label  { background: #fde8d8; color: #b45309; }
+.rel-label.narrower-label { background: #dbeafe; color: #1d4ed8; }
+.rel-label.related-label  { background: #f3e8ff; color: #7c3aed; }
+
+.rel-link {
+  color: var(--color-teal);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.rel-link:hover {
+  text-decoration-style: solid;
+}
+
+.concept-tag-chips {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+
+// =============================================================================
+// MOBILE
+// =============================================================================
+@media (max-width: $bp-mobile) {
+
+  .top-section {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pipeline {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .pipeline-step,
+  .pipeline-step:first-child,
+  .pipeline-step:last-child {
+    clip-path: none;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    margin-right: 0;
+    padding: 0.6rem 1rem;
+    background: #f5f7fa;
+  }
+
+  .pipeline-step.active {
+    background: var(--color-teal);
+    border-color: var(--color-teal);
+    color: #fff;
+  }
+
+  .tag-filters-wrapper {
+    align-items: flex-start;
+  }
+
+  .tag-filters {
+    justify-content: flex-start;
+  }
+
+  .glossary-controls {
+    flex-direction: column;
+  }
+
+  .glossary-body {
+    flex-direction: column;
+  }
+
+  .glossary-list-panel {
+    flex: none;
+    width: 100%;
+    max-height: 300px;
+  }
+
+  .glossary-detail-panel {
+    position: static;
+    width: 100%;
+  }
+
+  // Shorter graph on mobile, globe tilt disabled
+  .graph-empty-state {
+    height: 260px;
+  }
+
+  #concept-graph {
+    height: 300px;
+    // Disable 3D globe effect on touch devices to avoid interaction conflicts
+    touch-action: pan-x pan-y;
+    &:hover { transform: none !important; }
+  }
+}
