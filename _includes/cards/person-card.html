@@ -1,0 +1,102 @@
+{% comment %}
+  PERSON CARD INCLUDE
+  ===================
+  Usage: {% include cards/person-card.html person=person display="card" %}
+
+  Parameters:
+    person  : a people.yml person object (required)
+    display : "card" | "small" | "button"  (default: "card")
+
+  Display modes:
+    card   — Clickable card that opens a full profile modal
+    small  — Compact card: photo + name + affiliation + role
+    button — Minimal pill with avatar initial + name
+{% endcomment %}
+
+{% assign person  = include.person %}
+{% assign display = include.display | default: "card" %}
+
+{% comment %} Initials for avatar fallback {% endcomment %}
+{% assign name_parts = person.name | split: " " %}
+{% assign first_name = name_parts.first %}
+{% assign last_name  = name_parts.last %}
+
+{% capture initials %}
+  {{ first_name | slice: 0 }}
+  {{ last_name  | slice: 0 }}
+{% endcapture %}
+
+{% assign initials = initials | strip %}
+
+{% comment %}====== BUTTON MODE ======{% endcomment %}
+{% if display == "button" %}
+
+<button
+  type="button"
+  class="jk-card jk-card--button jk-card--person"
+  data-card-trigger="person"
+  data-person-id="{{ person.id }}"
+  aria-label="View {{ person.name }}'s profile">
+
+  <span class="jk-avatar jk-avatar--xs">
+    {% if person.image %}
+      <img src="{{ person.image }}" alt="{{ person.name }}">
+    {% else %}
+      <span class="jk-avatar__initials">{{ initials }}</span>
+    {% endif %}
+  </span>
+
+  <span class="jk-card__title">{{ person.name }}</span>
+
+</button>
+
+{% comment %}====== SMALL MODE ======{% endcomment %}
+{% elsif display == "small" %}
+
+<div class="jk-card jk-card--small jk-card--person"
+     data-card-trigger="person"
+     data-person-id="{{ person.id }}"
+     tabindex="0"
+     role="button"
+     aria-label="View {{ person.name }}'s profile">
+  <div class="jk-avatar jk-avatar--md">
+    {% if person.image %}
+      <img src="{{ person.image }}" alt="{{ person.name }}">
+    {% else %}
+      <span class="jk-avatar__initials">{{ initials }}</span>
+    {% endif %}
+  </div>
+  <div class="jk-card__body">
+    <h3 class="jk-card__title">{{ person.name }}</h3>
+    {% if person.role %}<p class="jk-card__role">{{ person.role }}</p>{% endif %}
+    {% if person.affiliation %}<p class="jk-card__affiliation">{{ person.affiliation }}</p>{% endif %}
+  </div>
+</div>
+
+{% comment %}====== CARD MODE (default) ======{% endcomment %}
+{% else %}
+
+<div class="jk-card jk-card--full jk-card--person"
+     data-card-trigger="person"
+     data-person-id="{{ person.id }}"
+     tabindex="0"
+     role="button"
+     aria-label="View {{ person.name }}'s profile">
+  <div class="jk-card__hero jk-card__hero--person">
+    <div class="jk-avatar jk-avatar--lg">
+      {% if person.image %}
+        <img src="{{ person.image }}" alt="{{ person.name }}">
+      {% else %}
+        <span class="jk-avatar__initials">{{ initials }}</span>
+      {% endif %}
+    </div>
+  </div>
+  <div class="jk-card__body">
+    <h3 class="jk-card__title">{{ person.name }}</h3>
+    {% if person.role %}<p class="jk-card__role">{{ person.role }}</p>{% endif %}
+    {% if person.affiliation %}<p class="jk-card__affiliation">{{ person.affiliation }}</p>{% endif %}
+    {% if person.content %}<p class="jk-card__desc">{{ person.content | truncate: 120 }}</p>{% endif %}
+  </div>
+</div>
+
+{% endif %}
