@@ -12,6 +12,11 @@ categories:
         description: "Comprehensive book covering privacy-preserving record linkage"
         icons: "fa-solid fa-book"
 
+      - title: "Introductory Workshop"
+        url: "https://github.com/cleanzr/record-linkage-tutorial"
+        description: "A collection of slides and talks about introductory subjects within entity resolution"
+        icons: "fab fa-github"
+
 
   - name: "Software and tools"
     description: "Software development tools and libraries for data linkage"
@@ -60,3 +65,12 @@ categories:
         description: "Github repository"
         icons:
           - "fab fa-github"
+
+  - name: "Important papers and surveys"
+    description:
+    links:
+      - title: "(Almost) All of Entity Resolution"
+        url: "https://arxiv.org/abs/2008.04443"
+        description: "A 2020 survey paper on the current trends and methods within the entity resolution field"
+        icons:
+          - "fa-solid fa-book"
