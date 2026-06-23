@@ -23,7 +23,7 @@ permalink: /resources/materials/
 </style>
  
 <div class="jk-materials-page-wrap">
-  <h1 class="jk-materials-page-title">Site Materials</h1>
+  <h1 class="jk-materials-page-title">Site Materials (coming soon)</h1>
   <p class="jk-materials-page-subtitle">
     Slides, recordings, notebooks, and documents from all our events.
   </p>

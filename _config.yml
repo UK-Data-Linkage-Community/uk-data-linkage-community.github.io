@@ -71,7 +71,7 @@ collections:
     sort_by: date
 
 include: ["_pages"]
-exclude: ["contributing_guidelines"]
+exclude: ["contributing_guidelines", "_pages/materials.md"]
 sass:
   sass_dir: assets/css
 
