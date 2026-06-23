@@ -52,3 +52,11 @@ categories:
         icons:
           - "fab fa-python"
 
+  - name: "Datasets to explore"
+    description:
+    links:
+      - title: "Awesome Entity Resolution"
+        url: "https://github.com/OlivierBinette/Awesome-Entity-Resolution"
+        description: "Github repository"
+        icons:
+          - "fab fa-github"
