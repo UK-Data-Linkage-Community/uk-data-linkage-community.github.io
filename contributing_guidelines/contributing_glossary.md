@@ -67,3 +67,18 @@ The next step is to define substeps or `methods` within the pipeline step, again
 
 ## Tags:
 
+Tags are used throughout the glossary and materials to signify relationships, help navigation, and generally simplify how users interact and understand with the website. 
+We provide the following tags with short descriptions of there use:
+- `probabilistic` - Probabilistic approaches to linkage, such as the Fellegi-Sunter model.
+- `deterministic` - Deterministic approaches to linkage, for example, blocking rules.
+- `method` - A methodology or approach to linkage.
+- `tool` - A specific program, library, or assistant tool in performing linkage.
+- `python` - A concept that is specific to the Python programming language.
+- `datatype` - A term that directly refers to a datatype, structure, or format, both broadly such as 'graph' or more granularly, such as 'boolean' or 'edge'.
+- `model` - Similar to `method`, but more focused on established set-ups, functions, and models.
+- `comparison` - Relating to the comparison two or more entities, this can include similarity functions, 
+- `evaluation` - Relating to the outputs of linkage, such as assessing or communicating quality or performance of a model.
+- `visualisation` - Specifically terms connected to communicating information, possibly to end users.
+- `privacy` - Methods and terms that contribute to privacy protection during linkage.
+
+Using too many distinct tags mitigates their role in simplifying the glossary and helping navigation, and therefor we recommend that all tags should be broad in nature, and that adding new tags should be avoided when possible.
