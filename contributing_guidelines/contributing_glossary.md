@@ -3,7 +3,7 @@
 --- 
 # Contributing Glossary Terms
 
-The UK DLC site has an interactive glossary page for term discovery and disambiguation. There are three main components, the glossary list with attached search and filter abilities, a concept graph showing relations, and an interactive pipeline. Similar to other components of the website, data is stored in a yaml file located in  `_data/glossary.yml`.
+The UK DLC site has an interactive glossary page for term discovery and disambiguation. There are three main components, the glossary term list with attached search and filter components, a concept graph showing relationships between terms, and an interactive pipeline. Similar to other components of the website, data is stored in a yaml file located in  `_data/glossary.yml`.
 
 ## Terminology
 
@@ -38,7 +38,7 @@ The `conflicts` at this time are in the form of a description of how a term may 
 
 ### Concept graph:
 
-The final two elements are `narrower` and `related`. Both of these are coded using term `id`, multiple may be place in square brackets. The latter of these elements, `realted`, is a space to state what ideas are similar in meaning, use case, field, etc. We would advise that contributors be selective with these, aiming to not exceed five related terms to prevent poor concept map generation. The former, `narrower`, is a space to describe hierarchy within terms. It works on a parent/child basis, and each term may have multiple of each. By stating a child term, the parent is automatically encoded. For instance, _'probabilistic linkage'_ can have the _'Fellegi-Sunter Model'_ as a child/narrower term as the Fellegi-Sunter model is an example of a probabilistic linkage model. Similarly, _'Entity Resolution'_ may have _'probabilistic linkage'_ as a narrower term, as probabilistic linkage is one broard/major approach to entity resolution. This automatically creates a path within the concept graph:
+The final two elements are `narrower` and `related`. Both of these are coded using term `id`, multiple may be place in square brackets and separated with commas. The latter of these elements, `realted`, is a space to state what ideas are similar in meaning, use case, field, etc. We would advise that contributors be selective with these, aiming to not exceed five related terms to prevent poor concept map generation. The former, `narrower`, is a space to describe hierarchy within terms. It works on a parent/child basis, and each term may have multiple of each. By stating a child term, the parent is automatically encoded. For instance, _'probabilistic linkage'_ can have the _'Fellegi-Sunter Model'_ as a child/narrower term as the Fellegi-Sunter model is an example of a probabilistic linkage model. Similarly, _'Entity Resolution'_ may have _'probabilistic linkage'_ as a narrower term, as probabilistic linkage is one broard/major approach to entity resolution. This automatically creates a path within the concept graph:
 
 ```
 Entity Resolution -> Probabilistic Linkage -> Fellugi-Sunter Model
@@ -48,7 +48,9 @@ Entity Resolution -> Probabilistic Linkage -> Fellugi-Sunter Model
 
 ## Pipeline
 
-The interactive pipeline is meant as a tool to familiarise linkage users with specific linkage processes. Similarly to other yamls
+The interactive pipeline is meant as a tool to familiarise linkage users with specific linkage processes. Similarly to other yamls, `id` should be a single unique word or phrase, using underscores to separate words. Both `title` and `summary` here are available to be made accessible for non-technical people, enabling them to understand the role of a particular step in the pipeline before looking more granularly.
+
+The next step is to define substeps or `methods` within the pipeline step, again names should be made to be approachable whilst still being accurate. Each `method` can be given `tags` to help indicate greater detail and help with filtering. Finally, the `concepts` field is where we place glossary term `id`'s , separated by commas within square brackets. If the term does not exist yet in the term list then add it before you put it within the pipeline. The full term and description, with tags, will be inserted in the order that they are placed in the square brackets.
 
 ``` yml
 - id: classification
@@ -62,3 +64,6 @@ The interactive pipeline is meant as a tool to familiarise linkage users with sp
       tags: ["model"]
       concepts: [probabilistic_linkage, fellegi_sunter, weight, agreement_pattern]
 ```
+
+## Tags:
+
