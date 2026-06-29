@@ -5,42 +5,60 @@
 
 The UK DLC site has an interactive glossary page for term discovery and disambiguation. There are three main components, the glossary list with attached search and filter abilities, a concept graph showing relations, and an interactive pipeline. Similar to other components of the website, data is stored in a yaml file located in  `_data/glossary.yml`.
 
-## Pipeline
+## Terminology
+
+### Term list:
+
+Located under `skos: concepts:`, terms are given an id, a preferred label, definition, and metadata. In the current build, terms are placed in loose tag-adjacent categories (commented), such as `# datatype`, based on the most relevant tag/category for the term. Although relevancy is subjective, we ask that contributors use their best judgement to stick to this organisation, as one objective of this system is to help in preventing duplication through easier searching.
+
+Below is an example entry for the definition of graphs. The `id` should be a short unique reference to the term, multiple words are separated by underscores, but no other special characters should be used. The `prefLabel` is the preferred term being referenced in the entry, it should not be unnecessarily long or expansive, should only address one term or concept, and only in the singular if possible. With this glossary we are aiming to standardise terminology within the community, so divisive choices will be handled through respectful discussions. The definition should balance being accessible and being comprehensive. Within the definition you may use double braces (`{{id}}`) to link directly to any other term in the glossary. The `preLabel` will be inputted by the command, and as such will ideally be in the singular form, meaning you may need to put an _'s'_ outside the braces if the plural is needed. See below for an example.
+
 
 ``` yml
-- id: classification
-    title: "Classification"
-    summary: "Decide match, non-match, or possible-match status for each pair."
-    methods:
-      - name: "Rule-based"
-        tags: ["model"]
-        concepts: [deterministic_linkage, match_key]
-        terms:
-          - term: "Threshold"
-            definition: "Cutoff for classification."
-            tags: ["core"]
-      - name: "Probabilistic"
-        tags: ["model"]
-        concepts: [probabilistic_linkage, fellegi_sunter, weight, agreement_pattern]
-        terms:
-          - term: "Fellegi-Sunter Model"
-            definition: "Probabilistic linkage framework."
-            tags: ["probabilistic", "model"]
+- id: graph
+  prefLabel: Graph
+  definition: A data structure or visual model representing relationships between entities ({{nodes}}) connected by {{edge}}s.
+  tags: [datatype, visualisation]
+  narrower: [node, edge]
+  related: [chart, cluster, entity]
+  conflicts: Graphs can be used to represent many concepts within data science, but they also see increasing use specifically within deep learning. As such, graphs may also refer to a deep, trainable network in some contexts.
+      
+- id: probabilistic_linkage
+  prefLabel: Probabilistic Linkage
+  altLabel: [Probabilistic Matching]
+  definition: An evidence based approach to matching records. Takes data from across the entire dataset to determine matches based on using a threshold value instead of using concrete rules. Generally good for lower quality datasets where thresholds can be adjusted to account for errors or studies that don’t need to follow specific linkage requirements.
+  tags: [method, probabilistic]
+  narrower: [fellegi_sunter]
+  related: [deterministic_linkage, comparisons, linkage_metrics, weight, splink]
+```
+
+`altLabel` is another category that can be used after `prefLabel`, contributors may place synonyms here. Generally these should be exact synonyms, being interchangable with the `prefLabel` to refer to the same concept.
+
+The `conflicts` at this time are in the form of a description of how a term may be confused with concepts with the same (or very similar) name. This is not necessary for all terms, and again leans into the standardisation of terminology. This is not a space to criticise uses of other terms, and should be done respectfully.
+
+### Concept graph:
+
+The final two elements are `narrower` and `related`. Both of these are coded using term `id`, multiple may be place in square brackets. The latter of these elements, `realted`, is a space to state what ideas are similar in meaning, use case, field, etc. We would advise that contributors be selective with these, aiming to not exceed five related terms to prevent poor concept map generation. The former, `narrower`, is a space to describe hierarchy within terms. It works on a parent/child basis, and each term may have multiple of each. By stating a child term, the parent is automatically encoded. For instance, _'probabilistic linkage'_ can have the _'Fellegi-Sunter Model'_ as a child/narrower term as the Fellegi-Sunter model is an example of a probabilistic linkage model. Similarly, _'Entity Resolution'_ may have _'probabilistic linkage'_ as a narrower term, as probabilistic linkage is one broard/major approach to entity resolution. This automatically creates a path within the concept graph:
+
+```
+Entity Resolution -> Probabilistic Linkage -> Fellugi-Sunter Model
 ```
 
 
-```yaml
-items:
-  - id: "ukdlc-w1s1-mike-slides"
-    title: "SeRP's current practices"
-    event_id: "ukdlc-workshop-1-data-linkers"
-    type: "slides"
-    authors:
-      - "mike-edwards"
-    tags:
-      - entity-resolution
-      - probabilistic-matching
-    src: "/assets/materials/slides/UKDLC_W1S1_SeRP.pdf"
-    caption: >
-      Mike Edwards's slides on the current practices within SERP on data linkage.
+
+## Pipeline
+
+The interactive pipeline is meant as a tool to familiarise linkage users with specific linkage processes. Similarly to other yamls
+
+``` yml
+- id: classification
+  title: "Classification"
+  summary: "Decide match, non-match, or possible-match status for each pair."
+  methods:
+    - name: "Rule-based"
+      tags: ["model"]
+      concepts: [deterministic_linkage, match_key]
+    - name: "Probabilistic"
+      tags: ["model"]
+      concepts: [probabilistic_linkage, fellegi_sunter, weight, agreement_pattern]
 ```
