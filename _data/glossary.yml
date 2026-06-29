@@ -10,13 +10,6 @@ sections:
       - name: "Problem Definition"
         tags: ["concept"]
         concepts: [entity_resolution, entity, record, data_linkage]
-        terms:
-          - term: "Entity Resolution"
-            definition: "Identifying records referring to the same entity."
-            tags: ["core"]
-          - term: "Use Case"
-            definition: "Specific linkage scenario."
-            tags: ["concept"]
 
   - id: data-prep
     title: "Data Preparation"
@@ -25,13 +18,6 @@ sections:
       - name: "Cleaning & Standardisation"
         tags: ["prep"]
         concepts: [data_cleaning, lexicon_mapping, address_matching]
-        terms:
-          - term: "Normalization"
-            definition: "Standardising formats."
-            tags: ["prep"]
-          - term: "Parsing"
-            definition: "Splitting fields into structured components."
-            tags: ["prep"]
 
   - id: indexing
     title: "Indexing / Blocking"
@@ -40,20 +26,9 @@ sections:
       - name: "Blocking"
         tags: ["performance"]
         concepts: [blocking, blocking_rules, blocking_key, candidate_pairs]
-        terms:
-          - term: "Blocking Key"
-            definition: "Field used to partition data."
-            tags: ["core"]
-          - term: "Sorted Neighbourhood"
-            definition: "Sliding window over sorted data."
-            tags: ["method"]
       - name: "Indexing"
         tags: ["performance"]
         concepts: [candidate_pairs, blocking]
-        terms:
-          - term: "Canopy Clustering"
-            definition: "Approximate grouping using cheap distance."
-            tags: ["method"]
 
   - id: comparison
     title: "Comparison"
@@ -62,13 +37,6 @@ sections:
       - name: "String Comparison"
         tags: ["algorithm"]
         concepts: [comparisons, string_similarity, edit_distance, jaro_winkler, agreement_pattern]
-        terms:
-          - term: "Edit Distance"
-            definition: "Operations needed to transform strings."
-            tags: ["core"]
-          - term: "Jaro-Winkler"
-            definition: "String similarity measure."
-            tags: ["method"]
 
   - id: classification
     title: "Classification"
@@ -77,17 +45,9 @@ sections:
       - name: "Rule-based"
         tags: ["model"]
         concepts: [deterministic_linkage, match_key]
-        terms:
-          - term: "Threshold"
-            definition: "Cutoff for classification."
-            tags: ["core"]
       - name: "Probabilistic"
         tags: ["model"]
         concepts: [probabilistic_linkage, fellegi_sunter, weight, agreement_pattern]
-        terms:
-          - term: "Fellegi-Sunter Model"
-            definition: "Probabilistic linkage framework."
-            tags: ["core"]
 
   - id: evaluation
     title: "Evaluation"
@@ -96,13 +56,6 @@ sections:
       - name: "Metrics"
         tags: ["evaluation"]
         concepts: [linkage_metrics, precision, recall, f_measure]
-        terms:
-          - term: "Precision"
-            definition: "Proportion of correct matches."
-            tags: ["metric"]
-          - term: "Recall"
-            definition: "Proportion of true matches found."
-            tags: ["metric"]
 
   - id: clerical
     title: "Clerical Review"
@@ -111,10 +64,6 @@ sections:
       - name: "Manual Review"
         tags: ["human"]
         concepts: [clerical_review, cluster, gold_standard]
-        terms:
-          - term: "Gold Standard"
-            definition: "Trusted labelled dataset."
-            tags: ["evaluation"]
 
 
 skos:
