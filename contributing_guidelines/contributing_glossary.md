@@ -80,5 +80,6 @@ We provide the following tags with short descriptions of there use:
 - `evaluation` - Relating to the outputs of linkage, such as assessing or communicating quality or performance of a model.
 - `visualisation` - Specifically terms connected to communicating information, possibly to end users.
 - `privacy` - Methods and terms that contribute to privacy protection during linkage.
+- `processing` - Similar to `method`, but with a focus on technical treatments on data within the linkage pipeline.
 
 Using too many distinct tags mitigates their role in simplifying the glossary and helping navigation, and therefor we recommend that all tags should be broad in nature, and that adding new tags should be avoided when possible.
