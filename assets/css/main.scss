@@ -22,6 +22,7 @@
 @import "components/hero";
 @import "components/logo";
 @import "components/dropdown";
+@import "components/card";
 @import "components/video";
 @import "components/event-badge";
 @import "components/material-ref";
@@ -33,5 +34,6 @@
 @import "pages/related-groups";
 @import "pages/useful-links";
 @import "pages/post";
+@import "pages/glossary";
 
 body { overflow-x: hidden; }
