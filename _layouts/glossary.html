@@ -4,14 +4,21 @@ layout: default
 
 <div class="glossary-page">
 
-  <!-- ═══ TOP ═══════════════════════════════════════════════════════ -->
-  <div class="top-section">
-    <div class="top-left">
-      <h1>{{ site.data.glossary.pipeline.title }}</h1>
-      <p>{{ site.data.glossary.pipeline.description }}</p>
-    </div>
+  <!-- ═══ SIDE DRAWER (search + explanation-style toggle) ═══════════ -->
+  <button id="drawer-tab" class="drawer-tab" aria-expanded="false" aria-controls="side-drawer">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+    <span class="drawer-tab-label">Search &amp; view</span>
+  </button>
 
-    <div class="top-right">
+  <div id="drawer-backdrop" class="drawer-backdrop"></div>
+
+  <aside id="side-drawer" class="side-drawer" aria-hidden="true">
+    <button id="drawer-close" class="drawer-close" aria-label="Close panel">&times;</button>
+
+    <div class="drawer-section">
+      <label class="drawer-label" for="search">Search terms</label>
       <div class="search-box">
         <div class="search-row">
           <input type="text" id="search" placeholder="Search terms…" autocomplete="off" />
@@ -21,68 +28,98 @@ layout: default
         <div id="search-message"></div>
       </div>
     </div>
+
+    <div class="drawer-section">
+      <label class="drawer-label">Explanation style</label>
+      <div class="mode-toggle" id="mode-toggle" role="group" aria-label="Definition style">
+        <button class="mode-btn active" data-mode="technical" type="button">Technical</button>
+        <button class="mode-btn" data-mode="plain" type="button">Plain language</button>
+      </div>
+      <p class="drawer-hint">Switches every definition on this page between technical and plain-language wording.</p>
+    </div>
+  </aside>
+
+  <!-- ═══ TOP ═══════════════════════════════════════════════════════ -->
+  <div class="top-section">
+    <h1>{{ site.data.glossary.pipeline.title }}</h1>
+    <p>{{ site.data.glossary.pipeline.description }}</p>
   </div>
 
-  <!-- ═══ PIPELINE ══════════════════════════════════════════════════ -->
-  <div class="pipeline-wrapper">
-    <div class="pipeline">
+  <!-- ═══ PIPELINE — vertical rail (left) + detail (right) ═════════ -->
+  <div class="pipeline-layout">
+
+    <div class="pipeline-rail" id="pipeline-rail">
       {% for section in site.data.glossary.sections %}
-      <div class="pipeline-step" data-section="{{ section.id }}">
-        {{ section.title }}
+      <div class="pipeline-node" data-section="{{ section.id }}">
+        <button class="pipeline-node-header" type="button">
+          <span class="node-dot"></span>
+          <span class="node-title">{{ section.title }}</span>
+          <svg class="node-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+        <div class="pipeline-node-body">
+          <p class="node-summary">{{ section.summary }}</p>
+        </div>
       </div>
       {% endfor %}
     </div>
 
-    <div id="connector"></div>
-
-    <div id="detail-panel">
-      <div id="detail-content"></div>
+    <div class="pipeline-detail" id="detail-panel">
+      <div id="detail-content">
+        <div class="detail-empty">
+          <p>Select a stage on the left to see its methods and definitions here.</p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ═══ GLOSSARY ══════════════════════════════════════════════════ -->
+  <!-- ═══ GLOSSARY — filters + term list (prominent, own section) ═══ -->
   <section class="glossary-section">
 
     <div class="glossary-controls">
-      <h3>Glossary Map</h3>
+      <h3>Glossary map</h3>
       <div id="tag-filters" class="tag-filters"></div>
     </div>
 
-    <div class="glossary-body">
+    <div id="glossary-list" class="glossary-list"></div>
+  </section>
 
-      <!-- Left: alphabetical term list -->
-      <div class="glossary-list-panel">
-        <div id="glossary-list"></div>
+  <!-- ═══ CONCEPT GRAPH — collapsible ═══════════════════════════════ -->
+  <section class="graph-section">
+    <button id="graph-toggle" class="graph-toggle" type="button" aria-expanded="false" aria-controls="graph-body">
+      <span>Concept relationship graph</span>
+      <svg class="graph-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
+
+    <div id="graph-body" class="graph-body" hidden>
+
+      <div id="graph-empty-state" class="graph-empty-state">
+        <div class="empty-inner">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="5"  cy="12" r="2"/><circle cx="19" cy="5"  r="2"/>
+            <circle cx="19" cy="19" r="2"/><line x1="7"  y1="11" x2="17" y2="6"/>
+            <line   x1="7"  y1="13" x2="17" y2="18"/>
+          </svg>
+          <p>Select a term to explore its relationships</p>
+        </div>
       </div>
 
-      <!-- Right: relation graph + detail -->
-      <div class="glossary-detail-panel">
+      <div id="concept-graph-container" style="display:none">
+        <svg id="concept-graph"></svg>
 
-        <div id="graph-empty-state" class="graph-empty-state">
-          <div class="empty-inner">
-            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <circle cx="5"  cy="12" r="2"/><circle cx="19" cy="5"  r="2"/>
-              <circle cx="19" cy="19" r="2"/><line x1="7"  y1="11" x2="17" y2="6"/>
-              <line   x1="7"  y1="13" x2="17" y2="18"/>
-            </svg>
-            <p>Select a term to explore its relationships</p>
-          </div>
+        <div class="graph-legend">
+          <span class="legend-item legend-center">Selected</span>
+          <span class="legend-item legend-broader">Broader</span>
+          <span class="legend-item legend-narrower">Narrower</span>
+          <span class="legend-item legend-related">Related</span>
         </div>
 
-        <div id="concept-graph-container" style="display:none">
-          <svg id="concept-graph"></svg>
-
-          <div class="graph-legend">
-            <span class="legend-item legend-center">Selected</span>
-            <span class="legend-item legend-broader">Broader</span>
-            <span class="legend-item legend-narrower">Narrower</span>
-            <span class="legend-item legend-related">Related</span>
-          </div>
-
-          <div id="concept-detail"></div>
-        </div>
-
+        <div id="concept-detail"></div>
       </div>
+
     </div>
   </section>
 

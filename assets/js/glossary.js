@@ -6,14 +6,73 @@ document.addEventListener("DOMContentLoaded", function () {
   // ═══════════════════════════════════════════════════════════════════
   // ELEMENTS
   // ═══════════════════════════════════════════════════════════════════
-  const steps       = document.querySelectorAll(".pipeline-step");
-  const panel       = document.getElementById("detail-panel");
-  const content     = document.getElementById("detail-content");
-  const connector   = document.getElementById("connector");
-  const searchInput = document.getElementById("search");
-  const searchBtn   = document.getElementById("search-btn");
-  const suggestions = document.getElementById("suggestions");
-  const message     = document.getElementById("search-message");
+  const nodes          = document.querySelectorAll(".pipeline-node");
+  const content        = document.getElementById("detail-content");
+  const searchInput    = document.getElementById("search");
+  const searchBtn      = document.getElementById("search-btn");
+  const suggestions    = document.getElementById("suggestions");
+  const message        = document.getElementById("search-message");
+
+  const drawerTab      = document.getElementById("drawer-tab");
+  const drawerClose    = document.getElementById("drawer-close");
+  const drawer         = document.getElementById("side-drawer");
+  const drawerBackdrop = document.getElementById("drawer-backdrop");
+  const modeToggle     = document.getElementById("mode-toggle");
+
+  const graphToggle    = document.getElementById("graph-toggle");
+  const graphBody      = document.getElementById("graph-body");
+
+  // ═══════════════════════════════════════════════════════════════════
+  // EXPLANATION MODE (technical / plain language)
+  // Falls back to the technical `definition` if a term has no
+  // `plainDefinition` yet, so content can be backfilled gradually.
+  // ═══════════════════════════════════════════════════════════════════
+  let defMode = "technical"; // "technical" | "plain"
+
+  function getDefinitionText(concept) {
+    if (defMode === "plain" && concept.plainDefinition) {
+      return concept.plainDefinition;
+    }
+    return concept.definition;
+  }
+
+  modeToggle.querySelectorAll(".mode-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.mode === defMode) return;
+      defMode = btn.dataset.mode;
+      modeToggle.querySelectorAll(".mode-btn").forEach(b =>
+        b.classList.toggle("active", b === btn)
+      );
+      // Re-render anything currently on screen so the switch is immediate
+      if (activeSection)   renderSection(activeSection);
+      if (activeConceptId) renderConceptDetail(activeConceptId);
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // SIDE DRAWER (search + explanation style)
+  // ═══════════════════════════════════════════════════════════════════
+  function openDrawer() {
+    drawer.classList.add("open");
+    drawerBackdrop.classList.add("visible");
+    drawerTab.setAttribute("aria-expanded", "true");
+    drawer.setAttribute("aria-hidden", "false");
+  }
+  function closeDrawer() {
+    drawer.classList.remove("open");
+    drawerBackdrop.classList.remove("visible");
+    drawerTab.setAttribute("aria-expanded", "false");
+    drawer.setAttribute("aria-hidden", "true");
+    suggestions.style.display = "none";
+  }
+  drawerTab.addEventListener("click", () =>
+    drawer.classList.contains("open") ? closeDrawer() : openDrawer()
+  );
+  drawerClose.addEventListener("click", closeDrawer);
+  drawerBackdrop.addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && drawer.classList.contains("open")) closeDrawer();
+  });
 
   // ═══════════════════════════════════════════════════════════════════
   // CONCEPT MAP
@@ -32,6 +91,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
       return `<span class="def-link" data-id="${concept.id}">${fullWord}</span>`;
     });
+  }
+
+  // Renders a definition line plus, if the concept has one, an
+  // expandable "analogy" pill that reveals a novice-friendly comparison.
+  function renderDefinitionBlock(c) {
+    const defHtml = linkifyDefinition(getDefinitionText(c));
+    const pillHtml = c.analogy
+      ? `<button class="analogy-pill" data-analogy-for="${c.id}" type="button" aria-expanded="false">
+           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+             <circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 0 1 5 0c0 1.5-2.5 2-2.5 3.5"/><circle cx="12" cy="17" r=".4" fill="currentColor"/>
+           </svg>
+           Analogy
+         </button>
+         <div class="analogy-text" id="analogy-${c.id}" hidden>${c.analogy}</div>`
+      : "";
+    return `<span class="panel-def">${defHtml}</span>${pillHtml}`;
   }
 
   // ═══════════════════════════════════════════════════════════════════
@@ -67,9 +142,12 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ═══════════════════════════════════════════════════════════════════
-  // RENDER PIPELINE DETAIL PANEL
+  // RENDER PIPELINE DETAIL PANEL (right-hand side)
   // ═══════════════════════════════════════════════════════════════════
+  let activeSection = null;
+
   function renderSection(section) {
+    activeSection = section;
     let html = `<p class="section-summary">${section.summary}</p>`;
 
     section.methods.forEach(m => {
@@ -86,7 +164,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <p class="panel-concept">
               <strong class="concept-link" data-id="${c.id}">${c.prefLabel}</strong>
               <span class="panel-tags">${tagHtml}</span>
-              <span class="panel-def">${linkifyDefinition(c.definition)}</span>
+              ${renderDefinitionBlock(c)}
             </p>`;
         });
       } else {
@@ -111,24 +189,27 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // PIPELINE STEP CLICK
+  // VERTICAL PIPELINE — each node is collapsible AND, on open,
+  // pushes its full detail into the right-hand panel.
   // ═══════════════════════════════════════════════════════════════════
-  steps.forEach(step => {
-    step.addEventListener("click", () => {
-      const id      = step.dataset.section;
+  nodes.forEach(node => {
+    const header = node.querySelector(".pipeline-node-header");
+    header.addEventListener("click", () => {
+      const id      = node.dataset.section;
       const section = data.sections.find(s => s.id === id);
       if (!section) return;
 
-      steps.forEach(s => s.classList.remove("active"));
-      step.classList.add("active");
+      const wasOpen = node.classList.contains("expanded");
 
-      renderSection(section);
-      panel.classList.add("open");
+      nodes.forEach(n => n.classList.remove("expanded", "active"));
 
-      const rect   = step.getBoundingClientRect();
-      const parent = step.parentElement.getBoundingClientRect();
-      connector.style.width     = rect.width + "px";
-      connector.style.transform = `translateX(${rect.left - parent.left}px)`;
+      if (!wasOpen) {
+        node.classList.add("expanded", "active");
+        renderSection(section);
+      } else {
+        activeSection = null;
+        content.innerHTML = `<div class="detail-empty"><p>Select a stage on the left to see its methods and definitions here.</p></div>`;
+      }
     });
   });
 
@@ -167,12 +248,15 @@ document.addEventListener("DOMContentLoaded", function () {
       allTerms.find(t => t.term.toLowerCase().includes(q));
 
     if (match) {
-      const btn = document.querySelector(
-        `.pipeline-step[data-section="${match.section}"]`
+      const header = document.querySelector(
+        `.pipeline-node[data-section="${match.section}"] .pipeline-node-header`
       );
-      if (btn) btn.click();
+      if (header && !header.parentElement.classList.contains("expanded")) {
+        header.click();
+      }
       message.textContent = "";
-      selectGlossaryConcept(match.id, false);
+      closeDrawer();
+      selectGlossaryConcept(match.id, true);
     } else {
       message.textContent = "No match found in glossary.";
     }
@@ -184,43 +268,29 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ═══════════════════════════════════════════════════════════════════
-  // GLOSSARY LIST
+  // GLOSSARY LIST + TAG FILTERS
   // ═══════════════════════════════════════════════════════════════════
   let activeFilter    = null;
   let activeConceptId = null;
 
-  function getAllTags() {
-    const tagSet = new Set();
+  function getTagCounts() {
+    const counts = new Map();
     data.skos.concepts.forEach(c =>
-      (c.tags || []).forEach(t => tagSet.add(t))
+      (c.tags || []).forEach(t => counts.set(t, (counts.get(t) || 0) + 1))
     );
-    return [...tagSet].sort();
+    return counts;
   }
 
   function renderTagFilters() {
-    const tags = getAllTags();
+    const counts = getTagCounts();
+    const tags   = [...counts.keys()].sort();
+    const total  = data.skos.concepts.length;
 
-    const filtersDiv = document.getElementById("tag-filters");
-    const parent     = filtersDiv.parentElement;
+    const container = document.getElementById("tag-filters");
 
-    if (!document.querySelector(".tag-filters-wrapper")) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "tag-filters-wrapper";
-
-      const label = document.createElement("span");
-      label.className   = "tag-filters-label";
-      label.textContent = "Category key / filter";
-
-      parent.insertBefore(wrapper, filtersDiv);
-      wrapper.appendChild(label);
-      wrapper.appendChild(filtersDiv);
-    }
-
-    const container = filtersDiv;
-
-    let html = `<button class="tag-filter active" data-tag="">All</button>`;
+    let html = `<button class="tag-filter active" data-tag="">All <span class="tag-count">${total}</span></button>`;
     tags.forEach(t => {
-      html += `<button class="tag-filter tag-filter--${t}" data-tag="${t}">${t}</button>`;
+      html += `<button class="tag-filter tag-filter--${t}" data-tag="${t}">${t} <span class="tag-count">${counts.get(t)}</span></button>`;
     });
     container.innerHTML = html;
 
@@ -266,7 +336,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     if (currentLetter) html += `</div>`;
 
-    container.innerHTML = html;
+    container.innerHTML = html || `<p class="glossary-list-empty">No terms match this filter.</p>`;
 
     container.querySelectorAll(".glossary-term").forEach(el => {
       el.addEventListener("click", () => {
@@ -276,6 +346,7 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         el.classList.add("active");
         renderConceptGraph(el.dataset.id);
+        expandGraphSection();
       });
     });
   }
@@ -285,6 +356,7 @@ document.addEventListener("DOMContentLoaded", function () {
     activeConceptId = id;
     renderGlossaryList();
     renderConceptGraph(id);
+    expandGraphSection();
     if (scrollIntoView) {
       document.querySelector(".glossary-section")
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -327,7 +399,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="concept-detail-header">
           <h3>${concept.prefLabel} ${altHtml}</h3>
         </div>
-        <p class="concept-def">${linkifyDefinition(concept.definition)}</p>
+        <p class="concept-def">${renderDefinitionBlock(concept)}</p>
         ${relationRows.length
           ? `<div class="concept-relations">
                ${relationRows.map(r => `<div class="relation-row">${r}</div>`).join("")}
@@ -353,6 +425,21 @@ document.addEventListener("DOMContentLoaded", function () {
     renderConceptDetail(conceptId);
     if (graphManager) graphManager.setFocus(conceptId);
   }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ANALOGY PILLS — global delegated toggle, works anywhere on the page
+  // ═══════════════════════════════════════════════════════════════════
+  document.addEventListener("click", e => {
+    const pill = e.target.closest(".analogy-pill");
+    if (!pill) return;
+    const id   = pill.dataset.analogyFor;
+    const text = document.getElementById(`analogy-${id}`);
+    if (!text) return;
+    const isOpen = !text.hidden;
+    text.hidden = isOpen;
+    pill.setAttribute("aria-expanded", String(!isOpen));
+    pill.classList.toggle("open", !isOpen);
+  });
 
   // ═══════════════════════════════════════════════════════════════════
   // CONCEPT GRAPH MANAGER
@@ -757,7 +844,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // GRAPH BOOTSTRAP — called once on page load
+  // GRAPH SECTION — collapsible, graph is lazily built the first time
+  // it's expanded so the page doesn't pay the simulation cost up front.
   // ═══════════════════════════════════════════════════════════════════
   let graphManager = null;
 
@@ -765,14 +853,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const svgEl = document.getElementById("concept-graph");
     if (!svgEl || graphManager) return;
 
-    // Show the graph container immediately (unfocused full view)
-    // The empty state placeholder is no longer needed.
     const emptyState = document.getElementById("graph-empty-state");
     const container  = document.getElementById("concept-graph-container");
     if (emptyState) emptyState.style.display = "none";
     if (container)  container.style.display  = "block";
 
-    // Wait one frame so the SVG has its final rendered width
     requestAnimationFrame(() => {
       graphManager = new ConceptGraphManager(
         svgEl,
@@ -780,10 +865,27 @@ document.addEventListener("DOMContentLoaded", function () {
         id => selectGlossaryConcept(id, false)
       );
 
-      // If a concept was already selected before the graph was ready, apply focus
       if (activeConceptId) graphManager.setFocus(activeConceptId);
     });
   }
+
+  function expandGraphSection() {
+    if (graphBody.hidden) toggleGraphSection(true);
+    const emptyState = document.getElementById("graph-empty-state");
+    const container  = document.getElementById("concept-graph-container");
+    if (emptyState) emptyState.style.display = "none";
+    if (container)  container.style.display  = "block";
+  }
+
+  function toggleGraphSection(forceOpen) {
+    const open = forceOpen !== undefined ? forceOpen : graphBody.hidden;
+    graphBody.hidden = !open;
+    graphToggle.setAttribute("aria-expanded", String(open));
+    graphToggle.classList.toggle("open", open);
+    if (open) initConceptGraph(); // no-op after the first call
+  }
+
+  graphToggle.addEventListener("click", () => toggleGraphSection());
 
   // ═══════════════════════════════════════════════════════════════════
   // GLOBAL TAG CLICK HANDLER (works everywhere)
@@ -810,7 +912,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function initGlossary() {
     renderTagFilters();
     renderGlossaryList();
-    initConceptGraph();
+    // Concept graph builds lazily on first expand — see toggleGraphSection.
   }
 
   requestAnimationFrame(initGlossary);
