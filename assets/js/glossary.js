@@ -13,14 +13,44 @@ document.addEventListener("DOMContentLoaded", function () {
   const suggestions    = document.getElementById("suggestions");
   const message        = document.getElementById("search-message");
 
-  const drawerTab      = document.getElementById("drawer-tab");
-  const drawerClose    = document.getElementById("drawer-close");
-  const drawer         = document.getElementById("side-drawer");
-  const drawerBackdrop = document.getElementById("drawer-backdrop");
   const modeToggle     = document.getElementById("mode-toggle");
+
+  const pipelineToggle = document.getElementById("pipeline-toggle");
+  const pipelineBody   = document.getElementById("pipeline-body");
+
+  const glossaryBody   = document.querySelector(".glossary-body");
+  const detailPanel    = document.getElementById("glossary-detail-panel");
+  const detailClose    = document.querySelector(".detail-close");
 
   const graphToggle    = document.getElementById("graph-toggle");
   const graphBody      = document.getElementById("graph-body");
+
+  // ═══════════════════════════════════════════════════════════════════
+  // PIPELINE SECTION — collapsible, expanded by default so it's the
+  // first thing encountered on the page.
+  // ═══════════════════════════════════════════════════════════════════
+  function togglePipelineSection(forceOpen) {
+    const open = forceOpen !== undefined ? forceOpen : pipelineBody.hidden;
+    pipelineBody.hidden = !open;
+    pipelineToggle.setAttribute("aria-expanded", String(open));
+    pipelineToggle.classList.toggle("open", open);
+  }
+  pipelineToggle.addEventListener("click", () => togglePipelineSection());
+
+  // ═══════════════════════════════════════════════════════════════════
+  // GLOSSARY DETAIL TAB — hidden until a term is picked from the list,
+  // the pipeline, or the graph. The list itself stays permanently
+  // visible at full width; the detail card opens alongside it.
+  // ═══════════════════════════════════════════════════════════════════
+  function openGlossaryDetail() {
+    glossaryBody?.classList.add("detail-open");
+    detailPanel?.classList.add("open");
+  }
+  function closeGlossaryDetail() {
+    glossaryBody?.classList.remove("detail-open");
+    detailPanel?.classList.remove("open");
+  }
+  detailClose?.addEventListener("click", closeGlossaryDetail);
 
   // ═══════════════════════════════════════════════════════════════════
   // EXPLANATION MODE (technical / plain language)
@@ -47,31 +77,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if (activeSection)   renderSection(activeSection);
       if (activeConceptId) renderConceptDetail(activeConceptId);
     });
-  });
-
-  // ═══════════════════════════════════════════════════════════════════
-  // SIDE DRAWER (search + explanation style)
-  // ═══════════════════════════════════════════════════════════════════
-  function openDrawer() {
-    drawer.classList.add("open");
-    drawerBackdrop.classList.add("visible");
-    drawerTab.setAttribute("aria-expanded", "true");
-    drawer.setAttribute("aria-hidden", "false");
-  }
-  function closeDrawer() {
-    drawer.classList.remove("open");
-    drawerBackdrop.classList.remove("visible");
-    drawerTab.setAttribute("aria-expanded", "false");
-    drawer.setAttribute("aria-hidden", "true");
-    suggestions.style.display = "none";
-  }
-  drawerTab.addEventListener("click", () =>
-    drawer.classList.contains("open") ? closeDrawer() : openDrawer()
-  );
-  drawerClose.addEventListener("click", closeDrawer);
-  drawerBackdrop.addEventListener("click", closeDrawer);
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape" && drawer.classList.contains("open")) closeDrawer();
   });
 
   // ═══════════════════════════════════════════════════════════════════
@@ -255,7 +260,7 @@ document.addEventListener("DOMContentLoaded", function () {
         header.click();
       }
       message.textContent = "";
-      closeDrawer();
+      suggestions.style.display = "none";
       selectGlossaryConcept(match.id, true);
     } else {
       message.textContent = "No match found in glossary.";
@@ -346,17 +351,17 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         el.classList.add("active");
         renderConceptGraph(el.dataset.id);
-        expandGraphSection();
       });
     });
   }
 
-  // Navigate to a concept: re-render list, update detail card + graph focus
+  // Navigate to a concept: re-render list + update the detail card.
+  // Lightweight and instant — the graph is a separate, opt-in step
+  // (see the "View relationships" button rendered inside the detail card).
   function selectGlossaryConcept(id, scrollIntoView) {
     activeConceptId = id;
     renderGlossaryList();
     renderConceptGraph(id);
-    expandGraphSection();
     if (scrollIntoView) {
       document.querySelector(".glossary-section")
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -406,7 +411,15 @@ document.addEventListener("DOMContentLoaded", function () {
              </div>`
           : ""}
         <div class="concept-tag-chips">${tagHtml}</div>
+        <button class="view-graph-btn" type="button" data-id="${concept.id}">
+          View in relationship graph
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+        </button>
       </div>`;
+
+    openGlossaryDetail();
 
     document.querySelectorAll(".rel-link").forEach(el => {
       el.addEventListener("click", () =>
@@ -417,6 +430,13 @@ document.addEventListener("DOMContentLoaded", function () {
       el.addEventListener("click", () =>
         selectGlossaryConcept(el.dataset.id, false)
       );
+    });
+    document.querySelector(".view-graph-btn")?.addEventListener("click", e => {
+      const id = e.currentTarget.dataset.id;
+      expandGraphSection();
+      if (graphManager) graphManager.setFocus(id);
+      document.querySelector(".graph-section")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
 

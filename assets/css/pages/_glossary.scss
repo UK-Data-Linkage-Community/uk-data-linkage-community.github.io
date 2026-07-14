@@ -25,7 +25,6 @@ $bp-mobile: 600px;
 // =============================================================================
 .top-section {
   margin-bottom: 1.25rem;
-  padding-right: 3rem; // keep clear of the fixed drawer tab
 
   h1 {
     margin: 0 0 0.35rem;
@@ -41,113 +40,23 @@ $bp-mobile: 600px;
 
 
 // =============================================================================
-// SIDE DRAWER  (search + explanation-style toggle live here)
+// EXPLANATION MODE TOGGLE (technical / plain language)
+// Sits in the glossary toolbar — kept compact, doesn't stretch full width.
 // =============================================================================
-.drawer-tab {
-  position: fixed;
-  top: 40%;
-  right: 0;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.65rem 0.85rem;
-  background: var(--color-teal);
-  color: #fff;
-  border: none;
-  border-radius: 6px 0 0 6px;
-  cursor: pointer;
-  font-size: 0.78rem;
-  box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.12);
-  transition: background 0.15s ease, transform 0.15s ease;
-
-  &:hover { background: var(--color-teal-dark); }
-  &[aria-expanded="true"] { transform: translateX(-2px); }
-}
-
-.drawer-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(20, 22, 28, 0.32);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-  z-index: 35;
-
-  &.visible {
-    opacity: 1;
-    pointer-events: auto;
-  }
-}
-
-.side-drawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: min(320px, 88vw);
-  background: #fff;
-  border-left: 1px solid #e0e0e0;
-  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.08);
-  transform: translateX(100%);
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 45;
-  padding: 2.75rem 1.25rem 1.5rem;
-  overflow-y: auto;
-
-  &.open { transform: translateX(0); }
-}
-
-.drawer-close {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.9rem;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  line-height: 1;
-  color: #999;
-  cursor: pointer;
-
-  &:hover { color: #333; }
-}
-
-.drawer-section {
-  margin-bottom: 1.75rem;
-
-  &:last-child { margin-bottom: 0; }
-}
-
-.drawer-label {
-  display: block;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #999;
-  margin-bottom: 0.5rem;
-}
-
-.drawer-hint {
-  font-size: 0.78rem;
-  color: var(--color-ink-soft);
-  margin: 0.6rem 0 0;
-  line-height: 1.4;
-}
-
 .mode-toggle {
   display: flex;
+  flex-shrink: 0;
   border: 1px solid #ddd;
   border-radius: 6px;
   overflow: hidden;
 
   .mode-btn {
-    flex: 1;
-    padding: 0.5rem 0.4rem;
+    padding: 0.5rem 0.7rem;
     border: none;
     background: #fff;
     color: var(--color-ink-soft);
     font-size: 0.8rem;
+    white-space: nowrap;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
 
@@ -157,12 +66,34 @@ $bp-mobile: 600px;
   }
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 
 // =============================================================================
-// SEARCH
+// GLOSSARY TOOLBAR — search + explanation-mode toggle, always visible
+// above the term list (previously hidden in a side drawer)
 // =============================================================================
+.glossary-toolbar {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
 .search-box {
   position: relative;
+  flex: 1;
+  max-width: 360px;
 }
 
 .search-row {
@@ -225,6 +156,55 @@ $bp-mobile: 600px;
 
 
 // =============================================================================
+// PIPELINE SECTION — collapsible wrapper (same pattern as the graph section)
+// =============================================================================
+.pipeline-section {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+  margin: 1rem 0 2rem;
+}
+
+.pipeline-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem 1.4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  transition: background 0.15s ease;
+
+  &:hover { background: var(--color-teal-light); }
+
+  .pipeline-chevron {
+    color: #999;
+    transition: transform 0.2s ease;
+  }
+
+  &.open .pipeline-chevron { transform: rotate(180deg); }
+}
+
+.pipeline-body {
+  padding: 0 1.4rem 1.4rem;
+  border-top: 1px solid #eee;
+
+  &[hidden] { display: none; }
+}
+
+.pipeline-description {
+  color: var(--color-ink-soft);
+  margin: 1rem 0 0;
+  max-width: 60ch;
+}
+
+
+// =============================================================================
 // PIPELINE  –  vertical rail on the left, collapsible nodes, detail on the right
 // =============================================================================
 .pipeline-layout {
@@ -232,7 +212,7 @@ $bp-mobile: 600px;
   grid-template-columns: minmax(220px, 300px) 1fr;
   gap: 1.25rem;
   align-items: start;
-  margin: 1rem 0 2rem;
+  margin-top: 1rem;
 
   @media (max-width: $bp-mobile) {
     grid-template-columns: 1fr;
@@ -242,21 +222,28 @@ $bp-mobile: 600px;
 .pipeline-rail {
   position: relative;
   padding-left: 1.1rem;
-
-  &::before {
-    content: "";
-    position: absolute;
-    left: 5px;
-    top: 0.5rem;
-    bottom: 0.5rem;
-    width: 2px;
-    background: #e4e4e4;
-  }
 }
 
 .pipeline-node {
   position: relative;
-  margin-bottom: 0.3rem;
+}
+
+// One arrowhead per gap between adjacent sections — not a tiled line.
+// Horizontally centred under the node-dot column (dot sits ~5px in from
+// the rail's edge; the 12px-wide chevron is nudged to match).
+.pipeline-connector {
+  display: flex;
+  align-items: center;
+  width: 12px;
+  height: 1.05rem;
+  margin-left: -1.1rem; // cancel the rail's padding-left so this lines
+                        // up with the node-dot column, not the row content
+  color: #bcc3cf;
+  pointer-events: none;
+
+  svg {
+    display: block;
+  }
 }
 
 .pipeline-node-header {
@@ -507,17 +494,18 @@ $bp-mobile: 600px;
 // TAG FILTERS (category key + filter controls, now with live counts)
 // =============================================================================
 .glossary-controls {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.9rem;
 
   h3 {
-    margin: 0;
+    margin: 0 0 0.25rem;
     font-size: 1.05rem;
   }
+}
+
+.glossary-hint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-ink-soft);
 }
 
 .tag-filters {
@@ -605,6 +593,28 @@ $bp-mobile: 600px;
   background: #fff;
 }
 
+// The list stays permanently visible at full width. The detail card is
+// a tab that opens alongside it once a term is selected — from the list
+// itself, a linked term in the pipeline, or a node in the graph.
+.glossary-body {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  align-items: start;
+
+  &.detail-open {
+    grid-template-columns: minmax(220px, 300px) 1fr;
+  }
+
+  @media (max-width: $bp-mobile) {
+    grid-template-columns: 1fr;
+
+    &.detail-open {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
 .glossary-list {
   max-height: 460px;
   overflow-y: auto;
@@ -612,6 +622,45 @@ $bp-mobile: 600px;
   &::-webkit-scrollbar { width: 5px; }
   &::-webkit-scrollbar-track { background: transparent; }
   &::-webkit-scrollbar-thumb { background: #ddd; border-radius: 99px; }
+}
+
+.glossary-detail {
+  display: none;
+  position: sticky;
+  top: 1rem;
+
+  &.open {
+    display: block;
+    animation: detail-tab-in 0.2s ease;
+  }
+
+  @media (max-width: $bp-mobile) {
+    position: static;
+
+    &.open {
+      margin-top: 1.1rem;
+    }
+  }
+}
+
+@keyframes detail-tab-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.detail-close {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.7rem;
+  z-index: 1;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: #999;
+  cursor: pointer;
+
+  &:hover { color: #333; }
 }
 
 .alpha-group:not(:last-child) {
@@ -852,7 +901,7 @@ $bp-mobile: 600px;
 .concept-detail-inner {
   border: 1px solid #e8e8e8;
   border-radius: 6px;
-  padding: 1rem 1.1rem;
+  padding: 1rem 2rem 1rem 1.1rem;
   background: #fff;
 }
 
@@ -929,18 +978,40 @@ $bp-mobile: 600px;
   flex-wrap: wrap;
 }
 
+.view-graph-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.9rem;
+  padding: 0.4rem 0.75rem;
+  background: none;
+  border: 1px solid var(--color-teal);
+  border-radius: 999px;
+  color: var(--color-teal);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: var(--color-teal);
+    color: #fff;
+  }
+}
+
 
 // =============================================================================
 // ACCESSIBILITY
 // =============================================================================
-.drawer-tab:focus-visible,
-.drawer-close:focus-visible,
 .mode-btn:focus-visible,
+.pipeline-toggle:focus-visible,
 .pipeline-node-header:focus-visible,
 .graph-toggle:focus-visible,
 .tag-filter:focus-visible,
 .glossary-term:focus-visible,
 .analogy-pill:focus-visible,
+.view-graph-btn:focus-visible,
+.detail-close:focus-visible,
 #search:focus-visible,
 #search-btn:focus-visible {
   outline: 2px solid var(--color-teal);
@@ -964,14 +1035,6 @@ $bp-mobile: 600px;
     padding: 0.75rem;
   }
 
-  .top-section {
-    padding-right: 0;
-  }
-
-  .side-drawer {
-    width: 100vw;
-  }
-
   .pipeline-layout {
     grid-template-columns: 1fr;
   }
@@ -981,9 +1044,25 @@ $bp-mobile: 600px;
     padding: 1rem;
   }
 
-  .glossary-controls {
+  .pipeline-toggle {
+    padding: 0.85rem 1rem;
+  }
+
+  .pipeline-body {
+    padding: 0 1rem 1rem;
+  }
+
+  .glossary-toolbar {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+  }
+
+  .search-box {
+    max-width: none;
+  }
+
+  .mode-toggle .mode-btn {
+    flex: 1;
   }
 
   .glossary-list {

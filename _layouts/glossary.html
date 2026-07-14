@@ -4,85 +4,94 @@ layout: default
 
 <div class="glossary-page">
 
-  <!-- ═══ SIDE DRAWER (search + explanation-style toggle) ═══════════ -->
-  <button id="drawer-tab" class="drawer-tab" aria-expanded="false" aria-controls="side-drawer">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-    </svg>
-    <span class="drawer-tab-label">Search &amp; view</span>
-  </button>
-
-  <div id="drawer-backdrop" class="drawer-backdrop"></div>
-
-  <aside id="side-drawer" class="side-drawer" aria-hidden="true">
-    <button id="drawer-close" class="drawer-close" aria-label="Close panel">&times;</button>
-
-    <div class="drawer-section">
-      <label class="drawer-label" for="search">Search terms</label>
-      <div class="search-box">
-        <div class="search-row">
-          <input type="text" id="search" placeholder="Search terms…" autocomplete="off" />
-          <button id="search-btn">Go</button>
-        </div>
-        <div id="suggestions"></div>
-        <div id="search-message"></div>
-      </div>
-    </div>
-
-    <div class="drawer-section">
-      <label class="drawer-label">Explanation style</label>
-      <div class="mode-toggle" id="mode-toggle" role="group" aria-label="Definition style">
-        <button class="mode-btn active" data-mode="technical" type="button">Technical</button>
-        <button class="mode-btn" data-mode="plain" type="button">Plain language</button>
-      </div>
-      <p class="drawer-hint">Switches every definition on this page between technical and plain-language wording.</p>
-    </div>
-  </aside>
-
   <!-- ═══ TOP ═══════════════════════════════════════════════════════ -->
   <div class="top-section">
     <h1>{{ site.data.glossary.pipeline.title }}</h1>
     <p>{{ site.data.glossary.pipeline.description }}</p>
   </div>
 
-  <!-- ═══ PIPELINE — vertical rail (left) + detail (right) ═════════ -->
-  <div class="pipeline-layout">
+  <!-- ═══ PIPELINE — collapsible; vertical rail (left) + detail (right) ═ -->
+  <section class="pipeline-section">
+    <button id="pipeline-toggle" class="pipeline-toggle open" type="button" aria-expanded="true" aria-controls="pipeline-body">
+      <span>Pipeline stages</span>
+      <svg class="pipeline-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
 
-    <div class="pipeline-rail" id="pipeline-rail">
-      {% for section in site.data.glossary.sections %}
-      <div class="pipeline-node" data-section="{{ section.id }}">
-        <button class="pipeline-node-header" type="button">
-          <span class="node-dot"></span>
-          <span class="node-title">{{ section.title }}</span>
-          <svg class="node-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </button>
-        <div class="pipeline-node-body">
-          <p class="node-summary">{{ section.summary }}</p>
+    <div id="pipeline-body" class="pipeline-body">
+      <div class="pipeline-layout">
+
+        <div class="pipeline-rail" id="pipeline-rail">
+          {% for section in site.data.glossary.sections %}
+          <div class="pipeline-node" data-section="{{ section.id }}">
+            <button class="pipeline-node-header" type="button">
+              <span class="node-dot"></span>
+              <span class="node-title">{{ section.title }}</span>
+              <svg class="node-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+            <div class="pipeline-node-body">
+              <p class="node-summary">{{ section.summary }}</p>
+            </div>
+          </div>
+          {% unless forloop.last %}
+          <div class="pipeline-connector" aria-hidden="true">
+            <svg width="12" height="14" viewBox="0 0 12 14" fill="none">
+              <path d="M2 1 L6 8 L10 1" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          {% endunless %}
+          {% endfor %}
+        </div>
+
+        <div class="pipeline-detail" id="detail-panel">
+          <div id="detail-content">
+            <div class="detail-empty">
+              <p>Select a stage on the left to see its methods and definitions here.</p>
+            </div>
+          </div>
         </div>
       </div>
-      {% endfor %}
     </div>
+  </section>
 
-    <div class="pipeline-detail" id="detail-panel">
-      <div id="detail-content">
-        <div class="detail-empty">
-          <p>Select a stage on the left to see its methods and definitions here.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ GLOSSARY — filters + term list (prominent, own section) ═══ -->
+  <!-- ═══ GLOSSARY — always-visible search, filters, list + detail ══ -->
   <section class="glossary-section">
 
     <div class="glossary-controls">
       <h3>Glossary map</h3>
-      <div id="tag-filters" class="tag-filters"></div>
+      <p class="glossary-hint">Click a term below — or a linked term anywhere on the page — to open its definition.</p>
     </div>
 
-    <div id="glossary-list" class="glossary-list"></div>
+    <div class="glossary-toolbar">
+      <div class="search-box">
+        <div class="search-row">
+          <label class="sr-only" for="search">Search terms</label>
+          <input type="text" id="search" placeholder="Search terms…" autocomplete="off" />
+          <button id="search-btn">Go</button>
+        </div>
+        <div id="suggestions"></div>
+        <div id="search-message"></div>
+      </div>
+
+      <div class="mode-toggle" id="mode-toggle" role="group" aria-label="Definition style">
+        <button class="mode-btn active" data-mode="technical" type="button">Technical</button>
+        <button class="mode-btn" data-mode="plain" type="button">Plain language</button>
+      </div>
+    </div>
+
+    <div id="tag-filters" class="tag-filters"></div>
+
+    <div class="glossary-body">
+      <div id="glossary-list" class="glossary-list"></div>
+
+      <div class="glossary-detail" id="glossary-detail-panel">
+        <button class="detail-close" type="button" aria-label="Close definition">&times;</button>
+        <div id="concept-detail"></div>
+      </div>
+    </div>
   </section>
 
   <!-- ═══ CONCEPT GRAPH — collapsible ═══════════════════════════════ -->
@@ -116,8 +125,6 @@ layout: default
           <span class="legend-item legend-narrower">Narrower</span>
           <span class="legend-item legend-related">Related</span>
         </div>
-
-        <div id="concept-detail"></div>
       </div>
 
     </div>
