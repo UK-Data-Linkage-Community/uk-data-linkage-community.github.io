@@ -1,11 +1,10 @@
 $bp-mobile: 600px;
+$bp-tablet: 880px;
 
 .glossary-page {
   --color-teal:       #2a9d8f;
   --color-teal-light: #eef8f7;
   --color-teal-dark:  #21756b;
-  --color-ink:        #333;
-  --color-ink-soft:   #666;
 }
 
 
@@ -14,96 +13,329 @@ $bp-mobile: 600px;
 // =============================================================================
 .glossary-page {
   position: relative;
-  max-width: 1100px;
+  max-width: 1240px;
   margin: 0 auto;
   padding: 1rem;
 }
 
 
 // =============================================================================
+// LAYOUT — persistent sidebar (left) + main column (right)
+// =============================================================================
+.glossary-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.glossary-main { min-width: 0; }
+
+
+// =============================================================================
 // TOP SECTION
 // =============================================================================
 .top-section {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
   margin-bottom: 1.25rem;
 
-  h1 {
-    margin: 0 0 0.35rem;
-    font-size: 1.6rem;
-  }
+  h1 { margin: 0 0 0.35rem; font-size: 1.6rem; }
+  p  { margin: 0; color: #666; max-width: 60ch; }
+}
 
-  p {
-    margin: 0;
-    color: var(--color-ink-soft);
-    max-width: 60ch;
-  }
+.top-section-text { min-width: 0; }
+
+
+// =============================================================================
+// "SEARCH & VIEW" — small trigger button + floating popover card
+// =============================================================================
+.view-settings-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  background: #fff;
+  color: #444;
+  border: 1px solid #ddd;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.view-settings-btn svg { color: #999; transition: color 0.15s ease; }
+
+.view-settings-btn:hover,
+.view-settings-btn.active {
+  border-color: var(--color-teal);
+  color: var(--color-teal-dark);
+}
+
+.view-settings-btn:hover svg,
+.view-settings-btn.active svg { color: var(--color-teal); }
+
+.view-settings-card {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  width: min(300px, 90vw);
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  padding: 1.25rem 1.25rem 1rem;
+  z-index: 50;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
+}
+
+.view-settings-card.popover-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.drawer-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.7rem;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: #999;
+  cursor: pointer;
+}
+
+.drawer-close:hover { color: #333; }
+
+.drawer-section {
+  margin-bottom: 1.25rem;
+}
+
+.drawer-section:last-child {
+  margin-bottom: 0;
+}
+
+.drawer-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #999;
+  margin-bottom: 0.5rem;
 }
 
 
 // =============================================================================
-// EXPLANATION MODE TOGGLE (technical / plain language)
-// Sits in the glossary toolbar — kept compact, doesn't stretch full width.
+// SIDEBAR — always-visible term browser
+// =============================================================================
+.glossary-sidebar {
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+}
+
+// Hidden entirely on desktop — the sidebar is always open there.
+.sidebar-toggle { display: none; }
+
+.sidebar-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 1rem 1rem 0.75rem;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+.sidebar-search { position: relative; }
+
+.sidebar-list-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 0.5rem;
+  margin: 0 -1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+
+// =============================================================================
+// FILTER DROPDOWN  (compact button + popover, replaces the pill wall)
+// =============================================================================
+.sidebar-filter { position: relative; }
+
+.filter-toggle-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: #f7f8fa;
+  border: 1px solid #e2e5ea;
+  border-radius: 6px;
+  color: #444;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.filter-toggle-btn:hover,
+.filter-toggle-btn.active {
+  border-color: var(--color-teal);
+  background: var(--color-teal-light);
+}
+
+.filter-toggle-chevron {
+  color: #999;
+  transition: transform 0.15s ease;
+  font-size: 0.75em;
+}
+
+.filter-toggle-btn.active .filter-toggle-chevron { transform: rotate(180deg); }
+
+.filter-popover {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+  padding: 0.75rem;
+  z-index: 50;
+  max-height: 260px;
+  overflow-y: auto;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
+}
+
+.filter-popover.popover-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+
+// =============================================================================
+// EXPLANATION-STYLE + MODE TOGGLE
 // =============================================================================
 .mode-toggle {
   display: flex;
-  flex-shrink: 0;
   border: 1px solid #ddd;
   border-radius: 6px;
   overflow: hidden;
+}
 
-  .mode-btn {
-    padding: 0.5rem 0.7rem;
-    border: none;
-    background: #fff;
-    color: var(--color-ink-soft);
-    font-size: 0.8rem;
-    white-space: nowrap;
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
+.mode-btn {
+  flex: 1;
+  padding: 0.5rem 0.4rem;
+  border: none;
+  background: #fff;
+  color: #666;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
 
-    & + .mode-btn { border-left: 1px solid #ddd; }
-    &:hover { background: var(--color-teal-light); }
-    &.active { background: var(--color-teal); color: #fff; }
+.mode-btn + .mode-btn { border-left: 1px solid #ddd; }
+.mode-btn:hover { background: var(--color-teal-light); }
+.mode-btn.active { background: var(--color-teal); color: #fff; }
+
+
+// =============================================================================
+// DISPLAY-OPTIONS TOGGLE SWITCHES
+// =============================================================================
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  font-size: 0.85rem;
+  color: #444;
+  cursor: pointer;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
   }
 }
 
-.sr-only {
+.toggle-slider {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  inset: 0;
+  background: #ccc;
+  border-radius: 999px;
+  transition: background 0.15s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.15s ease;
+  }
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: var(--color-teal);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(16px);
 }
 
 
 // =============================================================================
-// GLOSSARY TOOLBAR — search + explanation-mode toggle, always visible
-// above the term list (previously hidden in a side drawer)
+// SEARCH
 // =============================================================================
-.glossary-toolbar {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  margin-bottom: 0.9rem;
-}
-
-.search-box {
-  position: relative;
-  flex: 1;
-  max-width: 360px;
-}
-
 .search-row {
   display: flex;
   gap: 0.5rem;
+  align-items: stretch;
 }
 
 #search {
-  width: 100%;
-  padding: 0.6rem;
+  flex: 1;
+  min-width: 0;
+  height: 2.4rem;
+  padding: 0 0.7rem;
   box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -111,7 +343,9 @@ $bp-mobile: 600px;
 }
 
 #search-btn {
-  padding: 0.5rem 0.9rem;
+  height: 2.4rem;
+  padding: 0 0.9rem;
+  box-sizing: border-box;
   cursor: pointer;
   white-space: nowrap;
   background: var(--color-teal);
@@ -119,12 +353,11 @@ $bp-mobile: 600px;
   border: none;
   border-radius: 4px;
   font-size: 0.9rem;
+  line-height: 1;
   transition: background 0.15s ease;
 }
 
-#search-btn:hover {
-  background: var(--color-teal-dark);
-}
+#search-btn:hover { background: var(--color-teal-dark); }
 
 #search-message {
   font-size: 0.85rem;
@@ -150,209 +383,172 @@ $bp-mobile: 600px;
   font-size: 0.9rem;
 }
 
-.suggestion:hover {
-  background: #f5f5f5;
-}
+.suggestion:hover { background: #f5f5f5; }
 
 
 // =============================================================================
-// PIPELINE SECTION — collapsible wrapper (same pattern as the graph section)
+// PIPELINE  —  vertical steps with a connecting line, detail on the right
 // =============================================================================
-.pipeline-section {
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
-  background: #fff;
-  overflow: hidden;
-  margin: 1rem 0 2rem;
-}
-
-.pipeline-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 1rem 1.4rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-ink);
-  transition: background 0.15s ease;
-
-  &:hover { background: var(--color-teal-light); }
-
-  .pipeline-chevron {
-    color: #999;
-    transition: transform 0.2s ease;
-  }
-
-  &.open .pipeline-chevron { transform: rotate(180deg); }
-}
-
-.pipeline-body {
-  padding: 0 1.4rem 1.4rem;
-  border-top: 1px solid #eee;
-
-  &[hidden] { display: none; }
-}
-
-.pipeline-description {
-  color: var(--color-ink-soft);
-  margin: 1rem 0 0;
-  max-width: 60ch;
-}
-
-
-// =============================================================================
-// PIPELINE  –  vertical rail on the left, collapsible nodes, detail on the right
-// =============================================================================
-.pipeline-layout {
+.pipeline-wrapper {
   display: grid;
   grid-template-columns: minmax(220px, 300px) 1fr;
   gap: 1.25rem;
   align-items: start;
-  margin-top: 1rem;
-
-  @media (max-width: $bp-mobile) {
-    grid-template-columns: 1fr;
-  }
+  margin: 1rem 0 1.5rem;
 }
 
-.pipeline-rail {
-  position: relative;
-  padding-left: 1.1rem;
-}
-
-.pipeline-node {
+.pipeline-vertical {
   position: relative;
 }
 
-// One arrowhead per gap between adjacent sections — not a tiled line.
-// Horizontally centred under the node-dot column (dot sits ~5px in from
-// the rail's edge; the 12px-wide chevron is nudged to match).
-.pipeline-connector {
-  display: flex;
-  align-items: center;
-  width: 12px;
-  height: 1.05rem;
-  margin-left: -1.1rem; // cancel the rail's padding-left so this lines
-                        // up with the node-dot column, not the row content
-  color: #bcc3cf;
-  pointer-events: none;
-
-  svg {
-    display: block;
-  }
+// The connecting line running down through every step's dot marker
+.pipeline-vertical::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 1.15rem;
+  bottom: 1.15rem;
+  width: 2px;
+  background: #dde1e8;
 }
 
-.pipeline-node-header {
+.pipeline-step {
   position: relative;
   display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  width: 100%;
-  background: none;
-  border: none;
-  text-align: left;
-  padding: 0.55rem 0.65rem;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  color: var(--color-ink);
-  transition: background 0.15s ease;
-
-  &:hover { background: var(--color-teal-light); }
-
-  .node-dot {
-    position: absolute;
-    left: -1.1rem;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #fff;
-    border: 2px solid #c4cad8;
-    transition: background 0.15s ease, border-color 0.15s ease;
-  }
-
-  .node-title {
-    flex: 1;
-    font-weight: 600;
-  }
-
-  .node-chevron {
-    color: #999;
-    flex-shrink: 0;
-    transition: transform 0.2s ease;
-  }
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin-bottom: 0.5rem;
 }
 
-.pipeline-node.active .pipeline-node-header .node-dot {
+.step-marker {
+  flex: 0 0 20px;
+  display: flex;
+  justify-content: center;
+  padding-top: 0.85rem;
+  z-index: 1;
+}
+
+.step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #c4cad8;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pipeline-step.active .step-dot {
   background: var(--color-teal);
-  border-color: var(--color-teal);
+  border-color: var(--color-teal-dark);
   box-shadow: 0 0 0 4px var(--color-teal-light);
 }
 
-.pipeline-node.expanded .pipeline-node-header {
-  background: var(--color-teal-light);
-
-  .node-chevron { transform: rotate(180deg); }
-}
-
-.pipeline-node-body {
-  display: grid;
-  grid-template-rows: 0fr;
-  transition: grid-template-rows 0.25s ease;
-  padding-left: 0.65rem;
-
-  .node-summary {
-    overflow: hidden;
-    margin: 0;
-    font-size: 0.82rem;
-    color: var(--color-ink-soft);
-    line-height: 1.45;
-  }
-}
-
-.pipeline-node.expanded .pipeline-node-body {
-  grid-template-rows: 1fr;
-  padding: 0.15rem 0.65rem 0.6rem;
-}
-
-
-// =============================================================================
-// DETAIL PANEL  (right-hand side of the pipeline, always visible)
-// =============================================================================
-.pipeline-detail {
+.step-card {
+  flex: 1;
+  min-width: 0;
   border: 1px solid #ddd;
   border-radius: 6px;
-  padding: 1.1rem 1.3rem;
-  background: #fafafa;
-  min-height: 200px;
+  overflow: hidden;
+  background: #eef1f5;
+}
+
+.pipeline-step.active .step-card {
+  border-color: var(--color-teal-dark);
+}
+
+.pipeline-step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: #555;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.pipeline-step-header:hover {
+  background: #dde3ec;
+  color: #333;
+}
+
+.step-title { font-weight: 500; }
+
+.step-chevron {
+  color: #999;
+  transition: transform 0.2s ease;
+}
+
+.pipeline-step.active .pipeline-step-header {
+  background: var(--color-teal);
+  color: #fff;
+}
+
+.pipeline-step.active .step-chevron {
+  color: #fff;
+  transform: rotate(180deg);
+}
+
+.pipeline-step-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+.pipeline-step.active .pipeline-step-body {
+  max-height: 200px;
+}
+
+.step-summary {
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.8rem;
+  color: #666;
+  background: #fff;
+}
+
+
+// =============================================================================
+// CENTRAL DETAIL PANEL  (shared by pipeline sections AND single concepts)
+// =============================================================================
+#detail-panel {
+  border: 1px solid #e4e4e4;
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(20, 22, 28, 0.05);
+  min-height: 240px;
+  position: sticky;
+  top: 1rem;
+}
+
+@media (max-width: $bp-tablet) {
+  #detail-panel { position: static; }
 }
 
 .detail-empty {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 160px;
-  text-align: center;
   color: #aaa;
   font-size: 0.88rem;
+  text-align: center;
+  margin: 3rem 0;
 }
 
-.pipeline-detail .section-summary {
+#detail-panel .section-summary {
   color: #555;
   margin-bottom: 0.75rem;
 }
 
-.pipeline-detail h3 {
+#detail-panel h3 {
   font-size: 0.95rem;
   margin: 0.9rem 0 0.4rem;
   color: #333;
-
-  &:first-child { margin-top: 0; }
 }
+
+#detail-panel h3:first-child { margin-top: 0; }
 
 .panel-concept {
   display: flex;
@@ -370,28 +566,18 @@ $bp-mobile: 600px;
   text-decoration-style: dotted;
 }
 
-.concept-link:hover {
-  text-decoration-style: solid;
-}
+.concept-link:hover { text-decoration-style: solid; }
 
-.panel-tags {
-  display: flex;
-  gap: 0.2rem;
-}
+.panel-tags { display: flex; gap: 0.2rem; }
 
-.panel-def {
-  flex: 1 0 100%;
-  color: #555;
-}
+.panel-def { flex: 1 0 100%; color: #555; }
 
 
 // =============================================================================
-// ANALOGY PILL  (expandable novice-friendly comparison)
+// ANALOGY  (expandable pill, or always-inline per display preference)
 // =============================================================================
 .analogy-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
+  display: inline-block;
   margin: 0.3rem 0.4rem 0 0;
   padding: 0.18rem 0.55rem;
   border-radius: 999px;
@@ -402,12 +588,12 @@ $bp-mobile: 600px;
   font-weight: 500;
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
+}
 
-  &:hover,
-  &.open {
-    background: #e07b39;
-    color: #fff;
-  }
+.analogy-pill:hover,
+.analogy-pill.open {
+  background: #e07b39;
+  color: #fff;
 }
 
 .analogy-text {
@@ -424,9 +610,15 @@ $bp-mobile: 600px;
   max-width: 60ch;
 }
 
+// When shown inline (display preference), no click needed, so drop the
+// pointer/hover cues that imply interactivity
+.analogy-text--inline {
+  margin-top: 0.4rem;
+}
+
 
 // =============================================================================
-// TAG CHIPS  (shared across pipeline panel and glossary list)
+// TAG CHIPS  (shared across central panel and term list)
 // =============================================================================
 .tag-chip {
   display: inline-block;
@@ -445,7 +637,6 @@ $bp-mobile: 600px;
   transform: translateY(-1px);
 }
 
-// In the glossary term list, chips become small colour dots
 .glossary-term .tag-chip {
   padding: 0;
   width: 8px;
@@ -457,11 +648,8 @@ $bp-mobile: 600px;
   transition: opacity 0.1s ease;
 }
 
-.glossary-term:hover .tag-chip {
-  opacity: 1;
-}
+.glossary-term:hover .tag-chip { opacity: 1; }
 
-// ── Chip colour palette ───────────────────────────────────────────────────────
 .tag-chip--datatype      { color: #dc2626; }
 .tag-chip--evaluation    { color: #ea580c; }
 .tag-chip--python        { color: #ca8a04; }
@@ -475,7 +663,6 @@ $bp-mobile: 600px;
 .tag-chip--model         { color: #a21caf; }
 .tag-chip--comparison    { color: #db2777; }
 
-// Dot variants in the glossary list use background, not text colour
 .glossary-term .tag-chip--datatype      { background: #dc2626; border-color: #dc2626; }
 .glossary-term .tag-chip--evaluation    { background: #ea580c; border-color: #ea580c; }
 .glossary-term .tag-chip--python        { background: #ca8a04; border-color: #ca8a04; }
@@ -491,23 +678,8 @@ $bp-mobile: 600px;
 
 
 // =============================================================================
-// TAG FILTERS (category key + filter controls, now with live counts)
+// TAG FILTERS  (now live in the left "browse" drawer)
 // =============================================================================
-.glossary-controls {
-  margin-bottom: 0.9rem;
-
-  h3 {
-    margin: 0 0 0.25rem;
-    font-size: 1.05rem;
-  }
-}
-
-.glossary-hint {
-  margin: 0;
-  font-size: 0.82rem;
-  color: var(--color-ink-soft);
-}
-
 .tag-filters {
   display: flex;
   flex-wrap: wrap;
@@ -515,9 +687,6 @@ $bp-mobile: 600px;
 }
 
 .tag-filter {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
   padding: 0.2rem 0.65rem;
   font-size: 0.75rem;
   border-radius: 999px;
@@ -526,15 +695,13 @@ $bp-mobile: 600px;
   color: #666;
   cursor: pointer;
   transition: all 0.15s ease;
+}
 
-  &:hover {
-    background: rgba(0, 0, 0, 0.04);
-  }
+.tag-filter:hover { background: rgba(0, 0, 0, 0.04); }
 
-  &.active {
-    background: rgba(0, 0, 0, 0.05);
-    font-weight: 500;
-  }
+.tag-filter.active {
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 500;
 }
 
 .tag-count {
@@ -543,28 +710,21 @@ $bp-mobile: 600px;
   border-radius: 999px;
   padding: 0 0.4rem;
   font-size: 0.68rem;
-  line-height: 1.4;
 }
 
-.tag-filter.active .tag-count {
-  background: rgba(0, 0, 0, 0.1);
-}
+.tag-filter--method        { color: #2563eb; border-color: rgba(37, 99, 235, 0.3); }
+.tag-filter--model         { color: #a21caf; border-color: rgba(162, 28, 175, 0.3); }
+.tag-filter--evaluation    { color: #ea580c; border-color: rgba(234, 88, 12, 0.3); }
+.tag-filter--metric        { color: #06b6d4; border-color: rgba(6, 182, 212, 0.3); }
+.tag-filter--tool          { color: #16a34a; border-color: rgba(22, 163, 74, 0.3); }
+.tag-filter--datatype      { color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+.tag-filter--comparison    { color: #ec4899; border-color: rgba(236, 72, 153, 0.3); }
+.tag-filter--probabilistic { color: #7c3aed; border-color: rgba(124, 58, 237, 0.3); }
+.tag-filter--deterministic { color: #d97706; border-color: rgba(217, 119, 6, 0.3); }
+.tag-filter--visualisation { color: #059669; border-color: rgba(5, 150, 105, 0.3); }
+.tag-filter--python        { color: #ca8a04; border-color: rgba(202, 138, 4, 0.3); }
+.tag-filter--core          { color: #0284c7; border-color: rgba(2, 132, 199, 0.3); }
 
-// Per-category filter colours
-.tag-filter--method        { color: #2563eb; border-color: rgba(37,  99,  235, 0.3); }
-.tag-filter--model         { color: #a21caf; border-color: rgba(162, 28,  175, 0.3); }
-.tag-filter--evaluation    { color: #ea580c; border-color: rgba(234, 88,  12,  0.3); }
-.tag-filter--metric        { color: #06b6d4; border-color: rgba(6,   182, 212, 0.3); }
-.tag-filter--tool          { color: #16a34a; border-color: rgba(22,  163, 74,  0.3); }
-.tag-filter--datatype      { color: #ef4444; border-color: rgba(239, 68,  68,  0.3); }
-.tag-filter--comparison    { color: #ec4899; border-color: rgba(236, 72,  153, 0.3); }
-.tag-filter--probabilistic { color: #7c3aed; border-color: rgba(124, 58,  237, 0.3); }
-.tag-filter--deterministic { color: #d97706; border-color: rgba(217, 119, 6,   0.3); }
-.tag-filter--visualisation { color: #059669; border-color: rgba(5,   150, 105, 0.3); }
-.tag-filter--python        { color: #ca8a04; border-color: rgba(202, 138, 4,   0.3); }
-.tag-filter--core          { color: #0284c7; border-color: rgba(2,   132, 199, 0.3); }
-
-// Active state gains a teal border for all categories
 .tag-filter--method.active,
 .tag-filter--model.active,
 .tag-filter--evaluation.active,
@@ -583,89 +743,9 @@ $bp-mobile: 600px;
 
 
 // =============================================================================
-// GLOSSARY SECTION — filters + prominent full-width term list
+// TERM LIST  (now lives in the left "browse" drawer)
 // =============================================================================
-.glossary-section {
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
-  padding: 1.4rem 1.5rem 1.6rem;
-  margin-bottom: 1.75rem;
-  background: #fff;
-}
-
-// The list stays permanently visible at full width. The detail card is
-// a tab that opens alongside it once a term is selected — from the list
-// itself, a linked term in the pipeline, or a node in the graph.
-.glossary-body {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.25rem;
-  align-items: start;
-
-  &.detail-open {
-    grid-template-columns: minmax(220px, 300px) 1fr;
-  }
-
-  @media (max-width: $bp-mobile) {
-    grid-template-columns: 1fr;
-
-    &.detail-open {
-      grid-template-columns: 1fr;
-    }
-  }
-}
-
-.glossary-list {
-  max-height: 460px;
-  overflow-y: auto;
-
-  &::-webkit-scrollbar { width: 5px; }
-  &::-webkit-scrollbar-track { background: transparent; }
-  &::-webkit-scrollbar-thumb { background: #ddd; border-radius: 99px; }
-}
-
-.glossary-detail {
-  display: none;
-  position: sticky;
-  top: 1rem;
-
-  &.open {
-    display: block;
-    animation: detail-tab-in 0.2s ease;
-  }
-
-  @media (max-width: $bp-mobile) {
-    position: static;
-
-    &.open {
-      margin-top: 1.1rem;
-    }
-  }
-}
-
-@keyframes detail-tab-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.detail-close {
-  position: absolute;
-  top: 0.55rem;
-  right: 0.7rem;
-  z-index: 1;
-  background: none;
-  border: none;
-  font-size: 1.3rem;
-  line-height: 1;
-  color: #999;
-  cursor: pointer;
-
-  &:hover { color: #333; }
-}
-
-.alpha-group:not(:last-child) {
-  border-bottom: 1px solid #f0f0f0;
-}
+.alpha-group:not(:last-child) { border-bottom: 1px solid #f0f0f0; }
 
 .alpha-label {
   padding: 0.25rem 0.1rem;
@@ -677,7 +757,6 @@ $bp-mobile: 600px;
   position: sticky;
   top: 0;
   background: #fff;
-  z-index: 1;
 }
 
 .glossary-term {
@@ -693,9 +772,7 @@ $bp-mobile: 600px;
   transition: background 0.1s ease;
 }
 
-.glossary-term:hover {
-  background: #f7f7f7;
-}
+.glossary-term:hover { background: #f7f7f7; }
 
 .glossary-term.active {
   background: var(--color-teal-light);
@@ -721,12 +798,11 @@ $bp-mobile: 600px;
 .glossary-list-empty {
   color: #999;
   font-size: 0.88rem;
-  padding: 0.5rem 0;
 }
 
 
 // =============================================================================
-// CONCEPT GRAPH SECTION — collapsible
+// CONCEPT GRAPH — collapsible
 // =============================================================================
 .graph-section {
   border: 1px solid #e8e8e8;
@@ -746,25 +822,24 @@ $bp-mobile: 600px;
   cursor: pointer;
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--color-ink);
+  color: #333;
   transition: background 0.15s ease;
-
-  &:hover { background: var(--color-teal-light); }
-
-  .graph-chevron {
-    color: #999;
-    transition: transform 0.2s ease;
-  }
-
-  &.open .graph-chevron { transform: rotate(180deg); }
 }
+
+.graph-toggle:hover { background: var(--color-teal-light); }
+
+.graph-chevron {
+  color: #999;
+  transition: transform 0.2s ease;
+}
+
+.graph-toggle.open .graph-chevron { transform: rotate(180deg); }
 
 .graph-body {
   padding: 0 1.4rem 1.4rem;
   border-top: 1px solid #eee;
 }
 
-// Empty state (shown before a term is focused)
 .graph-empty-state {
   display: flex;
   align-items: center;
@@ -784,14 +859,8 @@ $bp-mobile: 600px;
   gap: 0.5rem;
 }
 
-.empty-inner p {
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-.empty-inner svg {
-  opacity: 0.4;
-}
+.empty-inner p { margin: 0; font-size: 0.9rem; }
+.empty-inner svg { opacity: 0.4; }
 
 #concept-graph-container {
   position: relative;
@@ -805,28 +874,19 @@ $bp-mobile: 600px;
   background: #fafafa;
   border: 1px solid #e8e8e8;
   border-radius: 6px;
-
-  // Globe parallax — JS applies a CSS 3D perspective tilt on mousemove.
-  transition: transform 0.1s ease-out;
-  will-change: transform;
 }
 
-.graph-node circle {
-  transition: fill-opacity 0.15s ease;
-}
+.graph-node circle { transition: fill-opacity 0.15s ease; }
 
 .def-link {
   color: var(--color-teal);
   cursor: pointer;
   text-decoration: underline;
   font-weight: 500;
-
-  &:hover {
-    color: #1f5fcc;
-  }
 }
 
-// ── Floating zoom controls ────────────────────────────────────────────────────
+.def-link:hover { color: #1f5fcc; }
+
 .graph-controls {
   position: absolute;
   top: 1.75rem;
@@ -835,7 +895,6 @@ $bp-mobile: 600px;
   flex-direction: column;
   gap: 0.3rem;
   z-index: 10;
-  pointer-events: auto;
 }
 
 .graph-ctrl-btn {
@@ -854,19 +913,14 @@ $bp-mobile: 600px;
   color: #555;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
-
-  &:hover {
-    background: #fff;
-    border-color: rgba(0, 0, 0, 0.22);
-    color: #222;
-  }
-
-  &:active {
-    background: #f0f0f0;
-  }
 }
 
-// ── Graph legend ──────────────────────────────────────────────────────────────
+.graph-ctrl-btn:hover {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.22);
+  color: #222;
+}
+
 .graph-legend {
   display: flex;
   gap: 1.25rem;
@@ -896,18 +950,15 @@ $bp-mobile: 600px;
 
 
 // =============================================================================
-// CONCEPT DETAIL CARD
+// CONCEPT DETAIL  (rendered into the central panel)
 // =============================================================================
 .concept-detail-inner {
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
-  padding: 1rem 2rem 1rem 1.1rem;
-  background: #fff;
+  padding: 0;
 }
 
 .concept-detail-header h3 {
   margin: 0 0 0.5rem;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -968,9 +1019,7 @@ $bp-mobile: 600px;
   text-decoration-style: dotted;
 }
 
-.rel-link:hover {
-  text-decoration-style: solid;
-}
+.rel-link:hover { text-decoration-style: solid; }
 
 .concept-tag-chips {
   display: flex;
@@ -978,50 +1027,53 @@ $bp-mobile: 600px;
   flex-wrap: wrap;
 }
 
-.view-graph-btn {
-  display: inline-flex;
+.concept-detail-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #eee;
+}
+
+.graph-link {
+  display: flex;
   align-items: center;
   gap: 0.35rem;
-  margin-top: 0.9rem;
-  padding: 0.4rem 0.75rem;
+  padding: 0.35rem 0.7rem;
   background: none;
-  border: 1px solid var(--color-teal);
+  border: 1px solid #ddd;
   border-radius: 999px;
-  color: var(--color-teal);
-  font-size: 0.8rem;
+  color: #666;
+  font-size: 0.78rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-
-  &:hover {
-    background: var(--color-teal);
-    color: #fff;
-  }
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
+
+.graph-link svg { color: #999; transition: color 0.15s ease; }
+
+.graph-link:hover {
+  border-color: var(--color-teal);
+  color: var(--color-teal-dark);
+  background: var(--color-teal-light);
+}
+
+.graph-link:hover svg { color: var(--color-teal); }
 
 
 // =============================================================================
-// ACCESSIBILITY
+// TABLET  —  sidebar drops above the main column but stays un-collapsed
+// (still no hidden drawer; just stacks instead of sitting beside it)
 // =============================================================================
-.mode-btn:focus-visible,
-.pipeline-toggle:focus-visible,
-.pipeline-node-header:focus-visible,
-.graph-toggle:focus-visible,
-.tag-filter:focus-visible,
-.glossary-term:focus-visible,
-.analogy-pill:focus-visible,
-.view-graph-btn:focus-visible,
-.detail-close:focus-visible,
-#search:focus-visible,
-#search-btn:focus-visible {
-  outline: 2px solid var(--color-teal);
-  outline-offset: 2px;
-}
+@media (max-width: $bp-tablet) {
+  .glossary-layout { grid-template-columns: 1fr; }
 
-@media (prefers-reduced-motion: reduce) {
-  .glossary-page * {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
+  .glossary-sidebar {
+    position: static;
+    max-height: none;
   }
 }
 
@@ -1031,53 +1083,69 @@ $bp-mobile: 600px;
 // =============================================================================
 @media (max-width: $bp-mobile) {
 
-  .glossary-page {
-    padding: 0.75rem;
+  .glossary-page { padding: 0.75rem; }
+
+  .top-section { flex-wrap: wrap; }
+
+  .view-settings-card {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    border-radius: 12px 12px 0 0;
+    transform: translateY(12px);
   }
 
-  .pipeline-layout {
-    grid-template-columns: 1fr;
-  }
+  .view-settings-card.popover-open { transform: translateY(0); }
 
-  .glossary-section,
-  .pipeline-detail {
-    padding: 1rem;
-  }
-
-  .pipeline-toggle {
+  // Sidebar collapses behind a toggle so it doesn't push the pipeline
+  // and detail panel below the fold on small screens.
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
     padding: 0.85rem 1rem;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #333;
   }
 
-  .pipeline-body {
-    padding: 0 1rem 1rem;
+  .sidebar-toggle-chevron {
+    color: #999;
+    transition: transform 0.2s ease;
   }
 
-  .glossary-toolbar {
-    flex-direction: column;
-    align-items: stretch;
+  .sidebar-toggle.open .sidebar-toggle-chevron { transform: rotate(180deg); }
+
+  .sidebar-body {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
   }
 
-  .search-box {
-    max-width: none;
+  .sidebar-body.open {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 1rem 1rem 0.75rem;
   }
 
-  .mode-toggle .mode-btn {
-    flex: 1;
-  }
+  .pipeline-wrapper { grid-template-columns: 1fr; }
 
-  .glossary-list {
-    max-height: 320px;
-  }
+  #detail-panel { padding: 1rem; }
 
-  // Shorter graph on mobile, globe tilt disabled
-  .graph-empty-state {
-    height: 220px;
-  }
+  .graph-empty-state { height: 220px; }
 
   #concept-graph {
     height: 280px;
-    // Disable 3D globe effect on touch devices to avoid interaction conflicts
     touch-action: pan-x pan-y;
-    &:hover { transform: none !important; }
   }
 }
