@@ -82,31 +82,43 @@ layout: default
         </div>
       </div>
 
-      <!-- ═══ PIPELINE + CENTRAL DETAIL ════════════════════════════ -->
-      <div class="pipeline-wrapper">
+      <!-- ═══ CENTRAL DETAIL + COLLAPSIBLE PIPELINE PANEL ═══════════ -->
+      <div class="content-row">
 
-        <div class="pipeline-vertical" id="pipeline-vertical">
-          {% for section in site.data.glossary.sections %}
-          <div class="pipeline-step" data-section="{{ section.id }}">
-            <div class="step-marker"><span class="step-dot"></span></div>
-            <div class="step-card">
-              <button class="pipeline-step-header" type="button">
-                <span class="step-title">{{ section.title }}</span>
-                <span class="step-chevron">&#9662;</span>
-              </button>
-              <div class="pipeline-step-body">
-                <p class="step-summary">{{ section.summary }}</p>
-              </div>
+        <div class="detail-column">
+          <div id="detail-panel">
+            <div id="detail-content">
+              <p class="detail-empty">Select a stage from the pipeline panel, or a term from the browse list, to see its definition here.</p>
             </div>
           </div>
-          {% endfor %}
         </div>
 
-        <div id="detail-panel">
-          <div id="detail-content">
-            <p class="detail-empty">Select a stage on the left, or a term from the browse list, to see its definition here.</p>
+        <aside class="pipeline-panel open" id="pipeline-panel">
+          <button id="pipeline-panel-toggle" class="pipeline-panel-toggle" type="button">
+            <span class="pipeline-panel-toggle-label">Pipeline stages</span>
+            <span class="pipeline-panel-toggle-chevron">&#9656;</span>
+          </button>
+
+          <div class="pipeline-panel-body" id="pipeline-panel-body">
+            <div class="pipeline-vertical" id="pipeline-vertical">
+              {% for section in site.data.glossary.sections %}
+              <div class="pipeline-step" data-section="{{ section.id }}">
+                <div class="step-marker"><span class="step-dot"></span></div>
+                <div class="step-card">
+                  <button class="pipeline-step-header" type="button">
+                    <span class="step-title">{{ section.title }}</span>
+                    <span class="step-chevron">&#9662;</span>
+                  </button>
+                  <div class="pipeline-step-body">
+                    <p class="step-summary">{{ section.summary }}</p>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
           </div>
-        </div>
+        </aside>
+
       </div>
 
       <!-- ═══ CONCEPT GRAPH — collapsible, opens only when asked ═══ -->

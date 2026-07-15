@@ -67,6 +67,16 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ═══════════════════════════════════════════════════════════════════
+  // PIPELINE PANEL — collapsible right-hand rail housing the vertical
+  // pipeline steps, kept out of the way of the definition + term list.
+  // ═══════════════════════════════════════════════════════════════════
+  const pipelinePanel        = document.getElementById("pipeline-panel");
+  const pipelinePanelToggle  = document.getElementById("pipeline-panel-toggle");
+  pipelinePanelToggle.addEventListener("click", () => {
+    pipelinePanel.classList.toggle("open");
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
   // ELEMENTS
   // ═══════════════════════════════════════════════════════════════════
   const steps           = document.querySelectorAll(".pipeline-step");
@@ -290,7 +300,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function showEmptyDetail() {
     activeSection   = null;
     activeConceptId = null;
-    content.innerHTML = `<p class="detail-empty">Select a stage on the left, or a term from the browse list, to see its definition here.</p>`;
+    content.innerHTML = `<p class="detail-empty">Select a stage from the pipeline panel, or a term from the browse list, to see its definition here.</p>`;
   }
 
   // Delegated-style (re-)attachment for links rendered into #detail-content
@@ -308,7 +318,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // PIPELINE STEP CLICK — vertical steps, each toggles open/closed
+  // PIPELINE STEPS — vertical list in the collapsible right panel,
+  // each step toggles open/closed independently
   // ═══════════════════════════════════════════════════════════════════
   steps.forEach(step => {
     const header = step.querySelector(".pipeline-step-header");
@@ -470,7 +481,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (graphManager) graphManager.setFocus(id);
 
     if (scrollToTop) {
-      document.querySelector(".pipeline-wrapper")
+      document.querySelector("#detail-panel")
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
