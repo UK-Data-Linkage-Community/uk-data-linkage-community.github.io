@@ -67,14 +67,73 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ═══════════════════════════════════════════════════════════════════
-  // PIPELINE PANEL — collapsible right-hand rail housing the vertical
-  // pipeline steps, kept out of the way of the definition + term list.
+  // SIDEBAR TABS (mobile) — Terms / Pipeline switcher. On tablet and
+  // desktop this is hidden and both panels sit in their normal spots,
+  // so this wiring is inert there.
+  // ═══════════════════════════════════════════════════════════════════
+  const sidebarTabs   = document.querySelectorAll(".sidebar-tab");
+  const sidebarPanels = document.querySelectorAll(".sidebar-tab-panel");
+
+  function setSidebarTab(tab) {
+    sidebarTabs.forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
+    sidebarPanels.forEach(panel =>
+      panel.classList.toggle("active", panel.dataset.tabPanel === tab)
+    );
+    // Lets CSS drop the 70vh scroll cap for the Pipeline tab — that cap
+    // exists so a long, searchable term list doesn't take over the page,
+    // but it was also clipping the much shorter pipeline accordion into
+    // its own little scrollbox instead of letting the page scroll normally.
+    sidebarBody.classList.toggle("showing-pipeline", tab === "pipeline");
+  }
+
+  sidebarTabs.forEach(btn => {
+    btn.addEventListener("click", () => setSidebarTab(btn.dataset.tab));
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // PIPELINE PANEL — a collapsible right-hand rail on tablet/desktop,
+  // kept out of the way of the definition + term list. On mobile there's
+  // no room for a rail beside anything, so instead of stacking it as its
+  // own accordion (which used to sit awkwardly between an often-empty
+  // detail panel and the graph section), it's reparented into the
+  // sidebar as a second "Pipeline" tab alongside "Terms" — one nav
+  // surface instead of two competing ones. Same DOM node, same
+  // listeners; only its position and an --embedded modifier change.
   // ═══════════════════════════════════════════════════════════════════
   const pipelinePanel        = document.getElementById("pipeline-panel");
   const pipelinePanelToggle  = document.getElementById("pipeline-panel-toggle");
+  const pipelinePanelAnchor  = document.getElementById("pipeline-panel-anchor");
+  const sidebarPipelineMount = document.getElementById("sidebar-pipeline-mount");
+
   pipelinePanelToggle.addEventListener("click", () => {
     pipelinePanel.classList.toggle("open");
   });
+
+  // Reads the real layout cutover point from CSS (--bp-stack, ultimately
+  // $bp-nav in abstracts/_variables) rather than duplicating a pixel
+  // value here, so this can't drift out of sync with the CSS breakpoint
+  // that switches the sidebar/pipeline into their stacked, tabbed form
+  // — both need to agree, or the panel gets reparented into the sidebar
+  // tab before (or after) the surrounding layout has actually stacked.
+  const bpStack = getComputedStyle(document.querySelector(".glossary-page"))
+    .getPropertyValue("--bp-stack").trim() || "1200px";
+  const stackQuery = window.matchMedia(`(max-width: ${bpStack})`);
+
+  function placePipelinePanel(isCompact) {
+    if (isCompact && pipelinePanel.parentElement !== sidebarPipelineMount) {
+      sidebarPipelineMount.appendChild(pipelinePanel);
+      pipelinePanel.classList.add("pipeline-panel--embedded", "open");
+    } else if (!isCompact && pipelinePanel.parentElement === sidebarPipelineMount) {
+      pipelinePanelAnchor.after(pipelinePanel);
+      // Undo the forced-open state from embedding — otherwise the rail
+      // reappears already expanded the first time the viewport widens
+      // back out, instead of collapsed like a fresh wide-mode load.
+      pipelinePanel.classList.remove("pipeline-panel--embedded", "open");
+    }
+  }
+
+  placePipelinePanel(stackQuery.matches);
+  stackQuery.addEventListener("change", e => placePipelinePanel(e.matches));
 
   // ═══════════════════════════════════════════════════════════════════
   // ELEMENTS

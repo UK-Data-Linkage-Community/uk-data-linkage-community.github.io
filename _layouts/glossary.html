@@ -16,71 +16,89 @@ layout: default
 
       <div class="sidebar-body" id="sidebar-body">
 
-        <div class="sidebar-search">
-          <div class="search-row">
-            <input type="text" id="search" placeholder="Search terms…" autocomplete="off" />
-            <button id="search-btn" type="button">Go</button>
-          </div>
-          <div id="suggestions"></div>
-          <div id="search-message"></div>
+        <!-- Mobile-only: switches which panel below is visible. Hidden
+             on tablet/desktop, where the sidebar always shows terms and
+             the pipeline lives in its own rail beside the detail panel. -->
+        <div class="mode-toggle sidebar-tabs" id="sidebar-tabs">
+          <button class="mode-btn sidebar-tab active" data-tab="terms" type="button">Terms</button>
+          <button class="mode-btn sidebar-tab" data-tab="pipeline" type="button">Pipeline</button>
         </div>
 
-        <div class="sidebar-filter">
-          <button id="filter-toggle" class="filter-toggle-btn" type="button">
-            <span id="filter-toggle-label">All terms</span>
-            <span class="filter-toggle-chevron">&#9662;</span>
-          </button>
-          <div id="filter-popover" class="filter-popover">
-            <div id="tag-filters" class="tag-filters"></div>
+        <div class="sidebar-tab-panel active" data-tab-panel="terms">
+
+          <div class="sidebar-search">
+            <div class="search-row">
+              <input type="text" id="search" placeholder="Search terms…" autocomplete="off" />
+              <button id="search-btn" type="button">Go</button>
+            </div>
+            <div id="suggestions"></div>
+            <div id="search-message"></div>
           </div>
+
+          <div class="sidebar-filter">
+            <button id="filter-toggle" class="filter-toggle-btn" type="button">
+              <span id="filter-toggle-label">All terms</span>
+              <span class="filter-toggle-chevron">&#9662;</span>
+            </button>
+            <div id="filter-popover" class="filter-popover">
+              <div id="tag-filters" class="tag-filters"></div>
+            </div>
+          </div>
+
+          <div class="sidebar-list-wrap">
+            <div id="glossary-list"></div>
+          </div>
+
         </div>
 
-        <div class="sidebar-list-wrap">
-          <div id="glossary-list"></div>
-        </div>
+        <!-- On mobile, JS moves #pipeline-panel in here. On tablet/desktop
+             this stays empty and the panel lives in .content-row instead. -->
+        <div class="sidebar-tab-panel" data-tab-panel="pipeline" id="sidebar-pipeline-mount"></div>
 
       </div>
     </aside>
 
-    <!-- ═══ MAIN COLUMN ══════════════════════════════════════════════ -->
-    <div class="glossary-main">
+    <!-- ═══ TOP SECTION — its own grid area so it always sits above the
+         sidebar, not just when the two happen to be side by side ═══ -->
+    <div class="top-section">
+      <div class="top-section-text">
+        <h1>{{ site.data.glossary.pipeline.title }}</h1>
+        <p>{{ site.data.glossary.pipeline.description }}</p>
+      </div>
 
-      <div class="top-section">
-        <div class="top-section-text">
-          <h1>{{ site.data.glossary.pipeline.title }}</h1>
-          <p>{{ site.data.glossary.pipeline.description }}</p>
+      <button id="view-settings-btn" class="view-settings-btn" type="button" aria-haspopup="true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/>
+        </svg>
+        <span>Search &amp; view</span>
+      </button>
+
+      <div id="view-settings-card" class="view-settings-card">
+        <button id="view-settings-close" class="drawer-close" type="button" aria-label="Close">&times;</button>
+
+        <div class="drawer-section">
+          <div class="drawer-label">Explanation style</div>
+          <div class="mode-toggle" id="mode-toggle">
+            <button class="mode-btn active" data-mode="technical" type="button">Technical</button>
+            <button class="mode-btn" data-mode="plain" type="button">Plain language</button>
+          </div>
         </div>
 
-        <button id="view-settings-btn" class="view-settings-btn" type="button" aria-haspopup="true">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="7"/><line x1="20" y1="20" x2="16.5" y2="16.5"/>
-          </svg>
-          <span>Search &amp; view</span>
-        </button>
-
-        <div id="view-settings-card" class="view-settings-card">
-          <button id="view-settings-close" class="drawer-close" type="button" aria-label="Close">&times;</button>
-
-          <div class="drawer-section">
-            <div class="drawer-label">Explanation style</div>
-            <div class="mode-toggle" id="mode-toggle">
-              <button class="mode-btn active" data-mode="technical" type="button">Technical</button>
-              <button class="mode-btn" data-mode="plain" type="button">Plain language</button>
-            </div>
-          </div>
-
-          <div class="drawer-section">
-            <div class="drawer-label">Display options</div>
-            <label class="toggle-row">
-              <span>Show analogies inline</span>
-              <span class="toggle-switch">
-                <input type="checkbox" id="pref-show-analogies" />
-                <span class="toggle-slider"></span>
-              </span>
-            </label>
-          </div>
+        <div class="drawer-section">
+          <div class="drawer-label">Display options</div>
+          <label class="toggle-row">
+            <span>Show analogies inline</span>
+            <span class="toggle-switch">
+              <input type="checkbox" id="pref-show-analogies" />
+              <span class="toggle-slider"></span>
+            </span>
+          </label>
         </div>
       </div>
+    </div>
+
+    <!-- ═══ MAIN COLUMN ══════════════════════════════════════════════ -->
+    <div class="glossary-main">
 
       <!-- ═══ CENTRAL DETAIL + COLLAPSIBLE PIPELINE PANEL ═══════════ -->
       <div class="content-row">
@@ -92,6 +110,11 @@ layout: default
             </div>
           </div>
         </div>
+
+        <!-- Marks where #pipeline-panel belongs at tablet/desktop widths.
+             On mobile, JS relocates the panel into the sidebar's Pipeline
+             tab instead, then moves it back here above this width. -->
+        <div id="pipeline-panel-anchor" style="display:none"></div>
 
         <aside class="pipeline-panel open" id="pipeline-panel">
           <button id="pipeline-panel-toggle" class="pipeline-panel-toggle" type="button">

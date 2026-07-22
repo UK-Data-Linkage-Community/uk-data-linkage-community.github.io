@@ -1,10 +1,27 @@
-$bp-mobile: 600px;
-$bp-tablet: 880px;
-
+// $bp-mobile and $bp-nav come from abstracts/_variables (imported
+// before this partial in main.scss) — no local declarations here, so
+// this page always agrees with the site's actual breakpoints.
+//
+// This page only has two layout states: "wide" (persistent sidebar +
+// side rail) and "compact" (everything stacked, sidebar/pipeline behind
+// toggles). They switch together at $bp-nav — the same point the site
+// nav itself collapses to its mobile form — there is deliberately no
+// separate tablet state, since a rail squeezed next to a fixed-width
+// sidebar has nowhere good to go between $bp-nav and true mobile widths.
+// (This used to key off $bp-desktop instead, which left a dead zone
+// between $bp-nav and $bp-desktop where the rest of the page had already
+// gone "mobile" but the glossary layout hadn't switched yet — the
+// pipeline rail stayed rendered as its own expandable rail instead of
+// living in the sidebar's Pipeline tab. That's what made "tablet" widths
+// look broken even though wide and true-mobile widths were both fine.)
+// --bp-stack exposes that single cutover point to glossary.js so the JS
+// (which reparents the pipeline panel into the sidebar tabs) can never
+// drift out of sync with the CSS that switches the layout.
 .glossary-page {
   --color-teal:       #2a9d8f;
   --color-teal-light: #eef8f7;
   --color-teal-dark:  #21756b;
+  --bp-stack:          #{$bp-nav};
 }
 
 
@@ -21,15 +38,26 @@ $bp-tablet: 880px;
 
 // =============================================================================
 // LAYOUT — persistent sidebar (left) + main column (right)
+// top-section is its own grid area (not nested inside .glossary-main) so
+// it always renders above the sidebar, in wide mode AND compact mode.
+// Previously it lived inside .glossary-main, which — once compact mode
+// stacks everything into one column — sits BELOW .glossary-sidebar in
+// source order, pushing the title/search-button row down underneath the
+// (possibly expanded) term list.
 // =============================================================================
 .glossary-layout {
   display: grid;
   grid-template-columns: 260px 1fr;
+  grid-template-areas:
+    "top     top"
+    "sidebar main";
   gap: 1.75rem;
   align-items: start;
 }
 
-.glossary-main { min-width: 0; }
+.top-section       { grid-area: top; }
+.glossary-sidebar   { grid-area: sidebar; }
+.glossary-main      { grid-area: main; min-width: 0; }
 
 
 // =============================================================================
@@ -162,6 +190,26 @@ $bp-tablet: 880px;
   gap: 1rem;
   overflow: hidden;
 }
+
+// Mobile-only tab switcher (Terms | Pipeline) — hidden on tablet/desktop
+// where both are always reachable in their normal positions. Scoped
+// under .sidebar-body (not just .sidebar-tabs) so this reliably beats
+// .mode-toggle's own `display: flex`, regardless of source order.
+.sidebar-body .sidebar-tabs { display: none; }
+
+// On tablet/desktop this is just an inert wrapper; the mobile media
+// query below is what turns it into an actual tab panel. It needs its
+// own flex/gap since its children (search, filter, list) used to get
+// that spacing directly from .sidebar-body before they were nested
+// one level deeper here.
+.sidebar-tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 0;
+}
+
+.sidebar-tab-panel[data-tab-panel="terms"] { flex: 1; }
 
 .sidebar-search { position: relative; }
 
@@ -482,6 +530,35 @@ $bp-tablet: 880px;
 
 .pipeline-panel:not(.open) .pipeline-panel-body { display: none; }
 
+// Applied by JS when the panel is living inside the sidebar's Pipeline
+// tab (mobile) instead of its normal rail position in .content-row.
+// The tab switch already controls visibility, so the panel's own
+// open/collapse toggle is redundant here and gets hidden.
+//
+// The .open compound selector is repeated here (matching .pipeline-panel
+// .open's own specificity) because the panel always carries the "open"
+// class while embedded, and .pipeline-panel.open's fixed 280px width
+// otherwise wins on specificity over the plain .pipeline-panel--embedded
+// rule below — which is what was locking the mobile pipeline tray to a
+// narrow fixed-width box instead of filling the sidebar.
+.pipeline-panel--embedded,
+.pipeline-panel--embedded.open {
+  position: static;
+  width: 100%;
+  flex-basis: auto;
+  max-height: none;
+  border: none;
+  border-radius: 0;
+}
+
+.pipeline-panel--embedded .pipeline-panel-toggle { display: none; }
+
+.pipeline-panel--embedded .pipeline-panel-body {
+  display: block;
+  max-height: none;
+  padding: 0.25rem 0 0;
+}
+
 
 // =============================================================================
 // PIPELINE  —  vertical steps with a connecting line, inside the panel
@@ -617,7 +694,7 @@ $bp-tablet: 880px;
   top: 1rem;
 }
 
-@media (max-width: $bp-tablet) {
+@media (max-width: $bp-nav) {
   #detail-panel { position: static; }
 }
 
@@ -1156,20 +1233,41 @@ $bp-tablet: 880px;
 
 
 // =============================================================================
-// TABLET  —  sidebar drops above the main column but stays un-collapsed
-// (still no hidden drawer; just stacks instead of sitting beside it)
+// COMPACT MODE  —  everything below $bp-nav (the same width the site nav
+// itself collapses at). One cutover, not two: the sidebar drops above the
+// main column, the pipeline rail becomes a full-width accordion, AND the
+// sidebar collapses behind a toggle with its own Terms/Pipeline tab
+// switcher. Previously this was split across a $bp-tablet (768px)
+// stacking query and a separate $bp-mobile (600px) collapse-behind-toggle
+// query, which left a dead zone between the two where the rail had
+// already given up its side-by-side position but the sidebar/tab-switcher
+// behaviour hadn't kicked in yet. Folding it into one query at $bp-desktop
+// removed THAT gap, but left a new one between $bp-nav and $bp-desktop —
+// where the rest of the page (nav included) had already gone mobile but
+// this layout hadn't — so the cutover now matches $bp-nav instead, in
+// sync with glossary.js and with the rest of the page.
 // =============================================================================
-@media (max-width: $bp-tablet) {
-  .glossary-layout { grid-template-columns: 1fr; }
+@media (max-width: $bp-nav) {
+  .glossary-page { padding: 0.75rem; }
+
+  .glossary-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "top"
+      "sidebar"
+      "main";
+  }
+
+  .top-section { flex-wrap: wrap; }
 
   .glossary-sidebar {
     position: static;
     max-height: none;
   }
 
-  // Below tablet width there's no room for a side-by-side rail, so the
-  // pipeline panel stacks under the detail panel and collapses by
-  // height (accordion) instead of by width (rail).
+  // No room for a side-by-side rail, so the pipeline panel stacks under
+  // the detail panel and collapses by height (accordion) instead of by
+  // width (rail).
   .content-row { flex-direction: column; }
 
   .pipeline-panel {
@@ -1179,7 +1277,13 @@ $bp-tablet: 880px;
     flex-basis: auto;
   }
 
-  .pipeline-panel-toggle {
+  // These need to match (or beat) the specificity of the collapsed-rail
+  // rules above (.pipeline-panel:not(.open) .pipeline-panel-toggle /
+  // -toggle-label), or the rail styling keeps winning here whenever the
+  // panel happens to be collapsed — which is exactly what was causing
+  // the vertical, rotated-text tray to still show up in compact mode.
+  .pipeline-panel .pipeline-panel-toggle,
+  .pipeline-panel:not(.open) .pipeline-panel-toggle {
     flex-direction: row;
     height: auto;
     padding: 0.85rem 1rem;
@@ -1187,7 +1291,8 @@ $bp-tablet: 880px;
     gap: 0;
   }
 
-  .pipeline-panel-toggle-label {
+  .pipeline-panel .pipeline-panel-toggle-label,
+  .pipeline-panel:not(.open) .pipeline-panel-toggle-label {
     writing-mode: horizontal-tb;
     transform: none;
   }
@@ -1196,17 +1301,24 @@ $bp-tablet: 880px;
   .pipeline-panel.open .pipeline-panel-toggle-chevron { transform: rotate(270deg); }
 
   .pipeline-panel-body { max-height: 340px; }
-}
 
+  // Terms/Pipeline switcher becomes a real tab control, and JS reparents
+  // #pipeline-panel into the Pipeline tab panel — same breakpoint as
+  // everything else above, so the panel is never mid-transition between
+  // "rail" and "embedded" while the surrounding layout has already moved on.
+  .sidebar-body .sidebar-tabs {
+    display: flex;
+    width: 100%;
+    flex-shrink: 0;
+  }
 
-// =============================================================================
-// MOBILE
-// =============================================================================
-@media (max-width: $bp-mobile) {
+  .sidebar-tabs .mode-btn {
+    white-space: nowrap;
+    min-width: 0;
+  }
 
-  .glossary-page { padding: 0.75rem; }
-
-  .top-section { flex-wrap: wrap; }
+  .sidebar-tab-panel { display: none; }
+  .sidebar-tab-panel.active { display: flex; }
 
   .view-settings-card {
     position: fixed;
@@ -1222,7 +1334,7 @@ $bp-tablet: 880px;
   .view-settings-card.popover-open { transform: translateY(0); }
 
   // Sidebar collapses behind a toggle so it doesn't push the pipeline
-  // and detail panel below the fold on small screens.
+  // and detail panel below the fold on small/medium screens.
   .sidebar-toggle {
     display: flex;
     align-items: center;
@@ -1259,6 +1371,14 @@ $bp-tablet: 880px;
     padding: 1rem 1rem 0.75rem;
   }
 
+  // The 70vh cap above is sized for a long, searchable term list — the
+  // pipeline accordion is much shorter and reads better as part of the
+  // normal page scroll than clipped into its own inner scrollbox.
+  .sidebar-body.open.showing-pipeline {
+    max-height: none;
+    overflow-y: visible;
+  }
+
   #detail-panel { padding: 1rem; }
 
   .graph-empty-state { height: 220px; }
@@ -1266,5 +1386,17 @@ $bp-tablet: 880px;
   #concept-graph {
     height: 280px;
     touch-action: pan-x pan-y;
+  }
+}
+
+
+// =============================================================================
+// NARROW-PHONE FINE-TUNING  —  cosmetic only. Everything structural
+// happens at $bp-desktop above; this just tightens spacing/type further down.
+// =============================================================================
+@media (max-width: $bp-mobile) {
+  .sidebar-tabs .mode-btn {
+    font-size: 0.76rem;
+    padding: 0.5rem 0.3rem;
   }
 }
