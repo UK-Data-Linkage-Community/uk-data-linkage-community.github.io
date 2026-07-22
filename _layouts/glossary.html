@@ -10,7 +10,7 @@ layout: default
     <aside class="glossary-sidebar" id="glossary-sidebar">
 
       <button id="sidebar-toggle" class="sidebar-toggle" type="button">
-        <span>Browse terms</span>
+        <span>Browse linkage terms</span>
         <span class="sidebar-toggle-chevron">&#9662;</span>
       </button>
 
@@ -62,8 +62,8 @@ layout: default
          sidebar, not just when the two happen to be side by side ═══ -->
     <div class="top-section">
       <div class="top-section-text">
-        <h1>{{ site.data.glossary.pipeline.title }}</h1>
-        <p>{{ site.data.glossary.pipeline.description }}</p>
+        <h1>{{ page.title }}</h1>
+        {{ content }}
       </div>
 
       <button id="view-settings-btn" class="view-settings-btn" type="button" aria-haspopup="true">
