@@ -576,6 +576,68 @@ document.addEventListener("DOMContentLoaded", function () {
     link:     "#c8d0da",
   };
 
+  // ─── Pill-node sizing ─────────────────────────────────────────────
+  // Nodes render as rounded "pills" with the label wrapped inside
+  // rather than a dot with text underneath. Sizes below are approximate
+  // (based on an average character width for the label font) rather
+  // than measured, which is fine here since it only needs to be close
+  // enough for the pill to visually contain its text.
+  const PILL_FONT        = 10.5;   // px, label font-size at rest
+  const PILL_LINE_HEIGHT = 13;     // px, distance between wrapped lines
+  const PILL_PAD_X       = 18;     // px, total horizontal padding
+  const PILL_PAD_Y       = 12;     // px, total vertical padding
+  const PILL_MIN_WIDTH   = 56;     // px
+  const PILL_MAX_WIDTH   = 100;    // px, wrap threshold
+  const PILL_CHAR_WIDTH  = 5.6;    // px, rough average glyph width at PILL_FONT
+  const PILL_MAX_LINES   = 2;
+
+  // Greedily wraps `label` into at most PILL_MAX_LINES lines that each
+  // fit within PILL_MAX_WIDTH, ellipsizing whatever's left over.
+  function wrapPillLabel(label) {
+    const maxChars = Math.max(4, Math.floor((PILL_MAX_WIDTH - PILL_PAD_X) / PILL_CHAR_WIDTH));
+    const words = label.split(/\s+/);
+    const lines = [];
+    let current = "";
+
+    words.forEach(word => {
+      const candidate = current ? `${current} ${word}` : word;
+      if (candidate.length <= maxChars || !current) {
+        current = candidate;
+      } else {
+        lines.push(current);
+        current = word;
+      }
+    });
+    if (current) lines.push(current);
+
+    if (lines.length > PILL_MAX_LINES) {
+      const kept = lines.slice(0, PILL_MAX_LINES);
+      let last = kept[PILL_MAX_LINES - 1];
+      while (last.length > maxChars - 1 && last.length > 1) last = last.slice(0, -1);
+      kept[PILL_MAX_LINES - 1] = last.replace(/\s+$/, "") + "…";
+      return kept;
+    }
+    return lines;
+  }
+
+  // Given a node with x/y/pillW/pillH (and current _scale), returns the
+  // point where a straight line toward (tx, ty) crosses the pill's
+  // rounded-rect boundary — so links touch the edge of the pill nearest
+  // the node it's connecting to, rather than all converging on one
+  // center point.
+  function pillEdgePoint(node, tx, ty) {
+    const dx = tx - node.x;
+    const dy = ty - node.y;
+    if (!dx && !dy) return { x: node.x, y: node.y };
+    const scale = node._scale || 1;
+    const hw = (node.pillW * scale) / 2;
+    const hh = (node.pillH * scale) / 2;
+    const sx = dx !== 0 ? hw / Math.abs(dx) : Infinity;
+    const sy = dy !== 0 ? hh / Math.abs(dy) : Infinity;
+    const t  = Math.min(sx, sy);
+    return { x: node.x + dx * t, y: node.y + dy * t };
+  }
+
   class ConceptGraphManager {
 
     constructor(svgEl, conceptMap, onNodeClick) {
@@ -593,9 +655,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     _buildData() {
-      this.nodes = Object.values(this.conceptMap).map(c => ({
-        id: c.id, label: c.prefLabel, tags: c.tags || []
-      }));
+      this.nodes = Object.values(this.conceptMap).map(c => {
+        const lines   = wrapPillLabel(c.prefLabel);
+        const longest = Math.max(...lines.map(l => l.length));
+        const pillW   = Math.max(PILL_MIN_WIDTH, Math.min(PILL_MAX_WIDTH, longest * PILL_CHAR_WIDTH + PILL_PAD_X));
+        const pillH   = lines.length * PILL_LINE_HEIGHT + PILL_PAD_Y;
+        return {
+          id: c.id, label: c.prefLabel, tags: c.tags || [],
+          lines, pillW, pillH, _scale: 1
+        };
+      });
 
       this.adj = new Map(this.nodes.map(n => [n.id, new Set()]));
 
@@ -649,11 +718,25 @@ document.addEventListener("DOMContentLoaded", function () {
          .attr("height",   this.H);
 
       const defs = svg.append("defs");
+
+      // Soft, tight drop-shadow so pills read as small floating cards
+      // rather than flat translucent blobs — this is what actually sells
+      // the "pill" silhouette at a glance, more than the border-radius does.
+      const shadow = defs.append("filter")
+        .attr("id", "cgm-pill-shadow")
+        .attr("x", "-40%").attr("y", "-40%")
+        .attr("width", "180%").attr("height", "180%");
+      shadow.append("feDropShadow")
+        .attr("dx", 0).attr("dy", 1)
+        .attr("stdDeviation", 1.6)
+        .attr("flood-color", "#1e293b")
+        .attr("flood-opacity", 0.22);
+
       ["broader", "narrower", "related"].forEach(t => {
         defs.append("marker")
           .attr("id",           `cgm-arrow-${t}`)
           .attr("viewBox",      "0 -5 10 10")
-          .attr("refX",         18).attr("refY", 0)
+          .attr("refX",         6).attr("refY", 0)
           .attr("markerWidth",  5).attr("markerHeight", 5)
           .attr("orient",       "auto")
           .append("path")
@@ -684,39 +767,63 @@ document.addEventListener("DOMContentLoaded", function () {
           .attr("class",  "graph-node")
           .style("cursor", "pointer");
 
-      nodeG.append("circle")
+      // Everything visual (glow, pill, label) lives in a nested group so
+      // setFocus() can scale it with a simple transform instead of having
+      // to resize/re-wrap the pill and text individually.
+      const nodeInner = nodeG.append("g").attr("class", "node-inner");
+
+      nodeInner.append("rect")
         .attr("class",        "node-glow")
-        .attr("r",            0)
+        .attr("x",            d => -d.pillW / 2 - 6)
+        .attr("y",            d => -d.pillH / 2 - 6)
+        .attr("width",        d => d.pillW + 12)
+        .attr("height",       d => d.pillH + 12)
+        .attr("rx",           d => (d.pillH + 12) / 2)
         .attr("fill",         PALETTE.center)
-        .attr("fill-opacity", 0.12)
+        .attr("fill-opacity", 0)
         .attr("stroke",       "none");
 
-      nodeG.append("circle")
-        .attr("class",          "node-circle")
-        .attr("r",              5)
-        .attr("fill",           PALETTE.ghost)
-        .attr("fill-opacity",   0.55)
+      nodeInner.append("rect")
+        .attr("class",          "node-pill")
+        .attr("x",              d => -d.pillW / 2)
+        .attr("y",              d => -d.pillH / 2)
+        .attr("width",          d => d.pillW)
+        .attr("height",         d => d.pillH)
+        .attr("rx",             d => d.pillH / 2)
+        .attr("fill",           "#fff")
+        .attr("fill-opacity",   0.96)
         .attr("stroke",         PALETTE.ghost)
-        .attr("stroke-width",   1.2)
-        .attr("stroke-opacity", 0.3);
+        .attr("stroke-width",   1.4)
+        .attr("stroke-opacity", 0.5)
+        .attr("filter",         "url(#cgm-pill-shadow)");
 
-      nodeG.append("text")
-        .attr("class",        "node-label")
-        .text(d => d.label.length > 20 ? d.label.slice(0, 18) + "…" : d.label)
-        .attr("text-anchor",  "middle")
-        .attr("dy",           15)
-        .attr("font-size",    "10.5px")
-        .attr("fill",         "#222")
-        .attr("fill-opacity", 0.75)
-        .style("pointer-events", "none")
-        .style("user-select",    "none");
+      nodeInner.each(function (d) {
+        const label = d3.select(this).append("text")
+          .attr("class",        "node-label")
+          .attr("text-anchor",  "middle")
+          .attr("font-size",    `${PILL_FONT}px`)
+          .attr("font-weight",  600)
+          .attr("fill",         "#1e293b")
+          .attr("fill-opacity", 0.88)
+          .style("pointer-events", "none")
+          .style("user-select",    "none");
+
+        const startY = -((d.lines.length - 1) * PILL_LINE_HEIGHT) / 2;
+        d.lines.forEach((line, i) => {
+          label.append("tspan")
+            .attr("x",  0)
+            .attr("y",  startY + i * PILL_LINE_HEIGHT)
+            .attr("dy", "0.32em")
+            .text(line);
+        });
+      });
 
       nodeG
         .on("mouseenter", function () {
-          d3.select(this).select(".node-circle").attr("stroke-width", 2.4);
+          d3.select(this).select(".node-pill").attr("stroke-width", 2.4);
         })
         .on("mouseleave", function () {
-          d3.select(this).select(".node-circle").attr("stroke-width", 1.2);
+          d3.select(this).select(".node-pill").attr("stroke-width", 1.2);
         })
         .on("click", (e, d) => {
           e.stopPropagation();
@@ -736,7 +843,8 @@ document.addEventListener("DOMContentLoaded", function () {
           })
       );
 
-      this._nodeG = nodeG;
+      this._nodeG     = nodeG;
+      this._nodeInner = nodeInner;
     }
 
     _startSimulation() {
@@ -749,15 +857,27 @@ document.addEventListener("DOMContentLoaded", function () {
             .distance(110)
             .strength(0.35)
         )
-        .force("charge",  d3.forceManyBody().strength(-220))
-        .force("center",  d3.forceCenter(W / 2, H / 2))
-        .force("collide", d3.forceCollide(20))
-        .on("tick", () => {
-          this._linkSel
-            .attr("x1", d => d.source.x).attr("y1", d => d.source.y)
-            .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
-          this._nodeG.attr("transform", d => `translate(${d.x ?? 0},${d.y ?? 0})`);
-        });
+        .force("charge", d3.forceManyBody().strength(-220))
+        .force("center", d3.forceCenter(W / 2, H / 2))
+        // Collision radius uses each pill's half-diagonal instead of a
+        // fixed dot radius, since pills vary in width/height with label
+        // length — otherwise longer labels would overlap their neighbors.
+        .force("collide", d3.forceCollide(d => Math.hypot(d.pillW / 2, d.pillH / 2) + 6))
+        .on("tick", () => this._updatePositions());
+    }
+
+    // Positions node groups and draws links so they touch each pill's
+    // edge (in the direction of the node at the other end) rather than
+    // its center. Called on every simulation tick, and also once after
+    // setFocus() finishes resizing pills, since a settled simulation
+    // won't otherwise re-tick to reflect the new sizes.
+    _updatePositions() {
+      this._nodeG.attr("transform", d => `translate(${d.x ?? 0},${d.y ?? 0})`);
+      this._linkSel
+        .attr("x1", d => pillEdgePoint(d.source, d.target.x, d.target.y).x)
+        .attr("y1", d => pillEdgePoint(d.source, d.target.x, d.target.y).y)
+        .attr("x2", d => pillEdgePoint(d.target, d.source.x, d.source.y).x)
+        .attr("y2", d => pillEdgePoint(d.target, d.source.x, d.source.y).y);
     }
 
     _attachControls() {
@@ -786,56 +906,71 @@ document.addEventListener("DOMContentLoaded", function () {
       this.focusId = id;
       const dist   = this._bfs(id);
 
+      const T = 380;
+
       this._nodeG.each((d, i, nodes) => {
-        const g    = d3.select(nodes[i]);
-        const circ = g.select(".node-circle");
-        const glow = g.select(".node-glow");
-        const lbl  = g.select(".node-label");
-        const dv   = dist.get(d.id) ?? 99;
+        const g     = d3.select(nodes[i]);
+        const inner = g.select(".node-inner");
+        const pill  = g.select(".node-pill");
+        const glow  = g.select(".node-glow");
+        const lbl   = g.select(".node-label");
+        const dv    = dist.get(d.id) ?? 99;
         const isCenter = d.id === id;
 
-        let r, fill, fillOp, strokeOp, glowR, fontSize, fontOp;
+        // `border` is the relation-tinted ring color; the pill's own
+        // fill stays a constant white card and only its opacity fades
+        // with distance, so hue no longer has to do double duty for
+        // both "what kind of relation" and "how far away" at once.
+        let scale, border, fillOp, strokeOp, glowOp, fontOp;
 
         if (isCenter) {
-          r = 13; fill = PALETTE.center;
-          fillOp = 1; strokeOp = 0.7;
-          glowR = 22; fontSize = "13px"; fontOp = 1;
+          scale = 1.3; border = PALETTE.center;
+          fillOp = 0.98; strokeOp = 0.9; glowOp = 0.16; fontOp = 1;
         } else if (dv === 1) {
           const t = this._relType(id, d.id);
-          r = 8.5; fill = PALETTE[t] || PALETTE.ghost;
-          fillOp = 0.85; strokeOp = 0.55;
-          glowR = 0; fontSize = "11px"; fontOp = 0.92;
+          scale = 1.05; border = PALETTE[t] || PALETTE.ghost;
+          fillOp = 0.94; strokeOp = 0.65; glowOp = 0; fontOp = 0.92;
         } else if (dv === 2) {
-          r = 6; fill = PALETTE.ghost;
-          fillOp = 0.42; strokeOp = 0.22;
-          glowR = 0; fontSize = "9.5px"; fontOp = 0.5;
+          scale = 0.85; border = PALETTE.ghost;
+          fillOp = 0.6; strokeOp = 0.3; glowOp = 0; fontOp = 0.5;
         } else if (dv === 3) {
-          r = 4.5; fill = PALETTE.ghost;
-          fillOp = 0.22; strokeOp = 0.1;
-          glowR = 0; fontSize = "7.5px"; fontOp = 0.25;
+          scale = 0.7; border = PALETTE.ghost;
+          fillOp = 0.32; strokeOp = 0.15; glowOp = 0; fontOp = 0.25;
         } else {
-          r = 3; fill = PALETTE.ghost;
-          fillOp = 0.09; strokeOp = 0.05;
-          glowR = 0; fontSize = "0px"; fontOp = 0;
+          scale = 0.6; border = PALETTE.ghost;
+          fillOp = 0.12; strokeOp = 0.06; glowOp = 0; fontOp = 0;
         }
 
-        const T = 380;
-        circ.transition().duration(T)
-          .attr("r",              r)
-          .attr("fill",           fill)
+        // Link endpoints are recalculated from d._scale once the
+        // transitions below finish (see the setTimeout after this loop),
+        // so keep it in sync with whatever scale we're animating to.
+        d._scale = scale;
+
+        inner.transition().duration(T).attr("transform", `scale(${scale})`);
+
+        pill.transition().duration(T)
+          .attr("fill",           "#fff")
           .attr("fill-opacity",   fillOp)
-          .attr("stroke",         fill)
+          .attr("stroke",         border)
+          .attr("stroke-width",   isCenter ? 2 : 1.4)
           .attr("stroke-opacity", strokeOp);
 
         glow.transition().duration(T)
-          .attr("r",    glowR)
-          .attr("fill", isCenter ? PALETTE.center : fill);
+          .attr("fill",         isCenter ? PALETTE.center : border)
+          .attr("fill-opacity", glowOp);
 
-        lbl.transition().duration(T)
-          .attr("dy",           r + 8)
-          .attr("font-size",    fontSize)
-          .attr("fill-opacity", fontOp);
+        lbl.transition().duration(T).attr("fill-opacity", fontOp);
       });
+
+      // Pills resizing doesn't itself re-tick the (possibly settled)
+      // simulation, so nudge link endpoints to follow along over the
+      // same transition duration instead of jumping once at the end.
+      const start = performance.now();
+      const animateLinks = (now) => {
+        this._updatePositions();
+        if (now - start < T) requestAnimationFrame(animateLinks);
+      };
+      requestAnimationFrame(animateLinks);
 
       this._linkSel.each((l, i, links) => {
         const srcId = typeof l.source === "object" ? l.source.id : l.source;
