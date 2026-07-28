@@ -1,6 +1,6 @@
-pipeline:
-  title: "Glossary (coming soon)"
-  description: "End-to-end conceptual pipeline for record linkage."
+#pipeline:
+#  title: "Glossary (coming soon)"
+#  description: "End-to-end conceptual pipeline for record linkage."
 
 sections:
   - id: scoping
@@ -69,183 +69,358 @@ sections:
 skos:
   concepts:
 
-    # datatype
-    - id: entity
-      prefLabel: Entity
-      definition: A thing, place, event, object, or person about which data has been collected.
-      tags: [datatype]
-      narrower: [record, cluster]
-
-    - id: graph
-      prefLabel: Graph
-      definition: A data structure or visual model representing relationships between entities ({{nodes}}) connected by {{edge}}s.
-      tags: [datatype, visualisation]
-      narrower: [node, edge]
-      related: [chart, cluster, entity]
-
-    - id: table
-      prefLabel: Table
-      definition: A structured dataset composed of rows (records) and columns (fields).
-      tags: [datatype]
-      related: [record]
-
-    - id: record
-      prefLabel: Record
-      definition: A single observation or {{entity}} instance within a dataset, typically represented as a row in a {{table}}.
-      tags: [datatype]
-      related: [table, candidate_pairs]
-
-    - id: node
-      prefLabel: Node
-      definition: An individual point in a {{graph}} representing an {{entity}} or {{record}}.
-      tags: [datatype]
-      related: [edge, entity, record]
-
-    - id: edge
-      prefLabel: Edge
-      definition: A connection between two {{node}}s in a {{graph}}, representing a relationship such as a {{link}}.
-      tags: [datatype]
-      related: [node, link]
-
-    - id: cluster
-      prefLabel: Cluster
-      definition: A group of {{record}}s inferred to represent the same real-world {{entity}}.
-      tags: [datatype]
-      narrower: [cluster_id]
-      related: [entity_resolution, deduplicate, clerical_review, link]
-
-    - id: cluster_id
-      prefLabel: Cluster ID
-      definition: A unique identifier assigned to a {{cluster}} of {{record}}s representing the same {{entity}}.
-      tags: [datatype]
-      related: [entity_resolution, link]
-
-    # method
-
-    - id: entity_resolution
-      prefLabel: Entity Resolution
-      altLabel: [Record Linkage, Entity Matching, Data Linkage]
-      definition: The process of determining whether multiple {{record}}s in one or more datasets refer to the same real-world {{entity}}.
-      tags: [method]
-      narrower: [probabilistic_linkage, deterministic_linkage, deduplicate, data_linkage, entity]
-      related: [blocking, comparisons, cluster, splink]
+    - id: splink
+      prefLabel: Splink
+      definition: A Python package for probabilistic record linkage (entity resolution) that allows you to deduplicate and link records from datasets without unique identifiers.
+      plainDefinition: "A group of tools for the Python coding language that are specifically designed to help connect data without relying on information that can identify a person, organisation, etc."
+      tags: [probabilistic, tool, python]
+      related: [probabilistic_linkage, fellegi_sunter_model, blocking]
 
     - id: deduplicate
       prefLabel: Deduplicate
-      altLabel: [Deduplication]
       definition: Identification and removal of duplicate/redundant data in order to improve efficiency and reduce dataset size.
-      tags: [method, processing]
-      related: [cluster, data_cleaning]
+      plainDefinition: "Identifying  and removing data in a dataset that represents the same person, organisation, object, etc. This means that the dataset is smaller, and therefore easier to process downstream."
+      tags: [method]
+      related: [cluster]
 
-    - id: clerical_review
-      prefLabel: Clerical Review
-      definition: Manual evaluation of {{cluster}}s that cannot be confidently defined as a match or non-match during linkage. This is usually done by a small team or person.
-      tags: [method, evaluation, comparison]
-      related: [linkage_metrics, cluster, gold_standard]
+    - id: entity
+      prefLabel: Entity
+      definition: "A thing, place, event, object or person about which data has been collected."
+      plainDefinition: "A real-world person, place, thing, event, or organisation that information is about."
+      tags: [datatype]
 
-    - id: lexicon_mapping
-      prefLabel: Lexicon Mapping
-      definition: Process of matching/mapping different vocabularies, terminologies or coding systems to a common format using a pre-defined lexicon (e.g. mapping nicknames to their original source name).
-      tags: [method, processing]
-      related: [data_cleaning, address_matching]
-
-    - id: address_matching
-      prefLabel: Address Matching
-      definition: Process of matching/mapping addresses or postcodes to a known reference point/database of address data.
-      tags: [method, processing]
-      related: [data_cleaning, lexicon_mapping, string_similarity]
-
-    # tool
-    # probabilistic
+    - id: entity_resolution
+      prefLabel: Entity Resolution
+      definition: The process of determining if multiple records all belong to the same entity.
+      plainDefinition: "Working out which records refer to the same real-world person, place, thing, or organisation."
+      tags: [method]
+      narrower: [entity]
+      related: [data_linkage]
 
     - id: probabilistic_linkage
       prefLabel: Probabilistic Linkage
-      altLabel: [Probabilistic Matching]
       definition: An evidence based approach to matching records. Takes data from across the entire dataset to determine matches based on using a threshold value instead of using concrete rules. Generally good for lower quality datasets where thresholds can be adjusted to account for errors or studies that don’t need to follow specific linkage requirements.
-      tags: [method, probabilistic]
-      narrower: [fellegi_sunter]
-      related: [deterministic_linkage, comparisons, linkage_metrics, weight, splink]
-
-    # deterministic
+      plainDefinition: "Matching records based on how likely they are to belong to the same entity, using evidence and a score or threshold rather than fixed rules."
+      analogy: "Imagine deciding whether two people are the same person based on several clues. They have similar name, address, and date of birth, but no single clue is conclusive. You weigh the evidence and decide whether the overall case is strong enough."
+      tags: [probabilistic, method]
+      related: [fuzzy_match, splink]
 
     - id: deterministic_linkage
       prefLabel: Deterministic Linkage
-      altLabel: [Rules-based Linkage]
-      definition: A strict rules-based approach where records must satisfy exact matching criteria to be considered a match. It works more directly than probabilistic linkage using set rules to determine what is classed as a match. This form of matching generally tends to be faster to run and good for higher quality datasets or those that have very specific linking requirements.
-      tags: [method, deterministic]
-      related: [probabilistic_linkage, match_key, blocking_rules]
+      definition: "A rules based approach to matching records. Works more directly than probabilistic linkage using set rules to determine what is classed as a match. Generally, tends to be faster to run and good for higher quality datasets or those that have very specific linking requirements."
+      plainDefinition: "Matching records using specific, predefined rules."
+      tags: [deterministic, method]
 
-    # comparison
+    - id: fellegi_sunter_model
+      prefLabel: "Fellegi-Sunter Model"
+      definition: "A probabilistic record linkage model that assigns match probabilities to record pairs using field-level agreement weights, typically framed as likelihood ratios between match and non-match classes."
+      plainDefinition: A statistical method for estimating how likely it is that two records belong to the same entity by weighing how much their individual fields agree or disagree.
+      tags: [probabilistic, method, model]
+      related: [splink, m_value_match_probability, u_value_non_match_probability, term_frequency_adjustment]
 
     - id: blocking
       prefLabel: Blocking
-      definition: A strategy for reducing the number of record pairs to compare by only comparing records that share a common blocking key value. More technically, it reduces the number of edges to be considered during matching. In Splink, this is normally done through a series of Blocking Rules, which are used to focus what the matching process considers during running.
-      tags: [ method, comparison ]
-      narrower: [ blocking_rules, blocking_key ]
-      related: [ comparisons, candidate_pairs, splink ]
+      definition: "A technique used to reduce the number of edges that need to be considered by a model during matching, thereby making it more efficient."
+      plainDefinition: Narrowing down the records that need to be compared so the matching process is faster and more efficient.
+      tags: [deterministic, comparison]
+      narrower: [blocking_rules]
+      related: [comparisons, splink]
+
+    - id: clerical_review
+      prefLabel: Clerical review
+      definition: "manual evaluation of clusters that cannot be confidently defined as a match or non-match during linkage"
+      plainDefinition: Manually checking uncertain potential matches to decide whether they are a match or not.
+      tags: [method, evaluation]
+      related: [cluster, linkage_metrics, linkage_metrics]
+
+    - id: data_linkage
+      prefLabel: Data linkage
+      definition: "Another term for record linkage and by extension, entity resolution"
+      plainDefinition: "Connecting records from different sources when they refer to the same real-world entity."
+      related: [entity_resolution]
+
+    - id: lexicon_mapping
+      prefLabel: Lexicon Mapping
+      definition: "Process of matching/mapping different vocabularies, teminologies or coding systems to a common format using a pre-defined lexicon (e.g. mapping nicknames to their original source name)"
+      plainDefinition: "Converting different words, names, or coding systems into a common set of terms."
+      tags: [method, processing]
+      related: [address_matching]
+
+    - id: address_matching
+      prefLabel: Address Matching
+      definition: Process of matching/mapping addresses or postcodes to a known reference point/database of address data
+      plainDefinition: Matching an address or postcode to a known address or location in a reference database.
+      tags: [method]
+      related: [data_cleaning, lexicon_mapping]
+
+    - id: chart
+      prefLabel: Chart
+      definition: "A visual representation of data, in the context of record linkage they are typically used for exploratory analysis or reporting linkage quality rather than representing relationships between individual records."
+      plainDefinition: "A visual way of presenting data, often used to explore results or show how well a linkage process performed."
+      tags: [evaluation, visualisation]
+      related: [graph]
+
+    - id: graph
+      prefLabel: Graph
+      definition: A data structure or visual model representing relationships between entities (nodes) connected by edges.
+      plainDefinition: A way of representing entities and the connections between them.
+      analogy: "A graph can be thought of as a map of connections. The entities are the points on the map, and the links between them are the roads showing how they are connected."
+      related: [chart]
+
+    - id: data_cleaning
+      prefLabel: Data Cleaning
+      definition: "The Process of cleaning unwanted or incorrect records or data errors from a dataset prior to linkage being performed. an example of this would be removing non-standard characters from a name column."
+      plainDefinition: "Finding and correcting or removing errors, inconsistencies, or unwanted data before matching records."
+      tags: [method, processing]
+      related: [address_matching]
+
+    - id: linkage_metrics
+      prefLabel: Linkage Metrics
+      definition: Tests and code snippets designed to assess the effectiveness of a linkage run. This is often done in terms of precision and recall.
+      plainDefinition: Measures used to assess how well a record linkage process has performed.
+      tags: [evaluation]
+      related: [clerical_review]
 
     - id: blocking_rules
       prefLabel: Blocking Rules
-      definition: Rules used in the Blocking process to direct the linking algorithm as to what variables and as to what manner blocking should be performed on.
-      tags: [ method ]
-      related: [ blocking_key, match_key, deterministic_linkage ]
-
-    - id: blocking_key
-      prefLabel: Blocking Key
-      definition: A derived value or field transformation used to partition records into groups for efficient pairwise comparison.
-      tags: [ method, comparison ]
-      related: [ blocking_rules, candidate_pairs, match_key ]
+      definition: Rules used in the Blocking process to direct the linking algorithm as to what variables and as to what manner blocking should be performed on
+      plainDefinition: Rules that determine which records should be compared with each other during the matching process.
+      tags: [deterministic, method, comparison]
 
     - id: comparisons
       prefLabel: Comparisons
       definition: The process or resulting features derived from evaluating similarity or equality between fields of record pairs.
-      tags: [ method, comparison, evaluation ]
-      narrower: [ similarity_function, agreement_pattern ]
-      related: [ agreement_pattern, blocking, candidate_pairs, splink ]
+      plainDefinition: The results of checking how similar or different fields are between two records.
+      tags: [method, comparison, evaluation]
+      related: [blocking]
 
-    - id: similarity_function
-      prefLabel: Similarity Function
-      definition: A mathematical function that quantifies the similarity between two values, often producing a score between 0 and 1.
-      tags: [ method, comparison , probabilistic ]
-      narrower: [ cosine_similarity, jaro_winkler_similarity, levenshtein_distance ]
+    - id: table
+      prefLabel: Table
+      definition: A structured dataset composed of rows (records) and columns (fields)
+      plainDefinition: Data organised into rows and columns.
+
+    - id: record
+      prefLabel: Record
+      definition: "A single observation or entity instance within a dataset, typically represented as a row in a table."
+      plainDefinition: "One row of data describing a person, thing, event, or other observation."
+
+    - id: link
+      prefLabel: Link
+      definition: "A connection between two or more records indicating they refer to the same real-world entity. Links may be deterministic (certain match) or probabilistic (based on match score/threshold)."
+      plainDefinition: "A connection between records that indicates they are believed to refer to the same real-world entity."
+
+    - id: match_score
+      prefLabel: Match score
+      definition: A numerical value representing the strength of similarity between two records based on comparison fields. It is typically used as input to thresholding or probabilistic models.
+      plainDefinition: A number showing how similar two records are and how strongly they appear to match.
+      tags: [probabilistic, comparison]
+      related: [term_frequency_adjustment]
+
+    - id: match_probability
+      prefLabel: Match probability
+      definition: "The estimated likelihood that two records refer to the same real-world entity, often derived from a probabilistic linkage model using match scores and prior distributions."
+      plainDefinition: "An estimate of how likely it is that two records refer to the same real-world entity."
+      tags: [probabilistic, comparison]
+      related: [term_frequency_adjustment]
+
+    - id: cluster
+      prefLabel: Cluster
+      definition: "A group of records inferred to represent the same real-world entity."
+      plainDefinition: "A group of records believed to refer to the same real-world entity."
+      tags: [datatype]
+      narrower: [entity]
+      related: [clerical_review, deduplicate]
+
+    - id: personally_identifiable_information
+      prefLabel: Personally Identifiable Information
+      definition: "Data elements that can directly or indirectly identify an individual (e.g., name, address, date of birth)."
+      plainDefinition: "Information that can identify a person, either on its own or when combined with other information."
+      tags: [privacy]
+
+    - id: pseudonymisation
+      prefLabel: Pseudonymisation
+      definition: The process of replacing identifiable data with artificial identifiers or tokens so that records cannot be directly linked to individuals without additional information.
+      plainDefinition: Replacing identifying information with artificial identifiers so that a person cannot be directly identified without additional information.
+
+    - id: linkage_key
+      prefLabel: Linkage key
+      definition: "A field or constructed identifier used to facilitate linking records across datasets, often derived from deterministic rules or hashed combinations of attributes."
+      plainDefinition: A value used to help identify and connect records that belong to the same entity across datasets.
+      tags: [method]
+
+    - id: information_governance
+      prefLabel: Information Governance
+      definition: "The policies, processes, and standards that control how data is managed, accessed, shared, and protected within an organisation, including how identity and linkage data are handled."
+      plainDefinition: "The rules and processes an organisation uses to manage, protect, access, and share data responsibly."
+      tags: [privacy]
+
+    - id: precision
+      prefLabel: Precision
+      definition: "A linkage evaluation metric measuring the proportion of predicted matches that are true matches, indicating how many identified links are correct."
+      plainDefinition: "Of all the matches identified, the proportion that are actually correct."
+      analogy: "Imagine a fishing net designed to catch a particular type of fish. Precision asks: of everything the net caught, how much was actually what you were looking for?"
+      tags: [evaluation]
+      related: [f_score]
+
+    - id: recall
+      prefLabel: Recall
+      definition: "A linkage evaluation metric measuring the proportion of true matches that are correctly identified, indicating how completely matches are recovered."
+      plainDefinition: "Of all the true matches that exist, the proportion that the linkage process successfully finds."
+      related: [f_score]
+
+    - id: edit_distance
+      prefLabel: Edit distance
+      definition: "A string similarity measure representing the minimum number of single-character operations (insertions, deletions, substitutions) required to transform one string into another, commonly used in name or address matching."
+      plainDefinition: "The number of single-character changes needed to turn one piece of text into another."
+      tags: [probabilistic, method, comparison]
 
     - id: cosine_similarity
-      prefLabel: Cosine Similarity
-      definition: A vector-based similarity measure that computes the cosine of the angle between two feature vectors. Commonly used on token or embedding representations of data during linkage.
-      tags: [ method, comparison, probabilistic ]
-      related: [ jaro_winkler_similarity, string_similarity ]
+      prefLabel: Cosine similarity
+      definition: "A vector-based similarity measure that computes the cosine of the angle between two feature vectors. Commonly used on token or embedding representations of data during linkage."
+      plainDefinition: A measure of how similar two items are based on the numerical representations used to describe them.
+      tags: [method, comparison, evaluation]
+      related: ["jaro-winkler_similarity"]
 
-    - id: jaro_winkler_similarity
-      prefLabel: Jaro-Winkler Similarity
-      definition: A string similarity metric that measures how closely two text values match, giving higher weight to common prefixes. It is commonly used to compare names.
-      tags: [ method, comparison, probabilistic ]
-      related: [ cosine_similarity, string_similarity ]
+    - id: "jaro-winkler_similarity"
+      prefLabel: "Jaro-Winkler Similarity"
+      definition: "A string similarity metric that measures how closely two text values match, giving higher weight to common prefixes. It is commonly used to compare names."
+      plainDefinition: "A measure of how similar two pieces of text are, particularly useful for names and values with similar beginnings."
+      tags: [probabilistic, method, comparison]
+      related: [cosine_similarity, soundex]
 
     - id: levenshtein_distance
-      prefLabel: Levenshtein Distance
+      prefLabel: Levenshtein distance
       definition: A notable and commonly used implementation of edit distance.
-      tags: [ method, comparison, probabilistic ]
-      related: [ cosine_similarity, Jaro_Winkler_similarity, string_similarity ]
+      plainDefinition: "A commonly used way of counting the number of single-character changes needed to turn one piece of text into another."
+      tags: [probabilistic, method, comparison]
+      related: [soundex]
 
+    - id: true_positive
+      prefLabel: True positive
+      definition: A record pair correctly classified as a match when it is in fact a true match
+      plainDefinition: A match that was identified correctly.
+      related: [accuracy]
 
-    # evaluation
-    # visualisation
-    # processing
+    - id: false_positive
+      prefLabel: False positive
+      definition: "A record pair incorrectly classified as a match when it is actually a non-match."
+      plainDefinition: A match that was identified incorrectly.
+      tags: [datatype, evaluation]
+      related: [specificity, accuracy]
 
-    - id: data_cleaning
-      prefLabel: Data Cleaning
-      definition: The Process of cleaning unwanted or incorrect records or data errors from a dataset prior to linkage being performed. an example of this would be removing non-standard characters from a name column.
+    - id: false_negative
+      prefLabel: False negative
+      definition: "A record pair incorrectly classified as a non-match when it is actually a true match."
+      plainDefinition: A true match that the system failed to identify.
+      tags: [datatype, evaluation]
+      related: [negative_predictive_value, accuracy]
+
+    - id: true_negative
+      prefLabel: True negative
+      definition: "A record pair correctly classified as a non-match when it is in fact not a match."
+      plainDefinition: "A non-match that was correctly identified as not being a match."
+      related: [specificity, negative_predictive_value, accuracy]
+
+    - id: "quasi-identifier"
+      prefLabel: "Quasi-identifier"
+      definition: An attribute or set of attributes that are not unique identifiers on their own but can be combined to uniquely identify an individual.
+      plainDefinition: Information that may not identify someone by itself but can identify them when combined with other information.
+
+    - id: exact_match
+      prefLabel: Exact match
+      definition: "A comparison outcome where two fields are identical in value (after any standardisation), often used in deterministic linkage rules."
+      plainDefinition: Two values that are the same after any standard formatting or cleaning has been applied.
+      tags: [deterministic, comparison]
+
+    - id: fuzzy_match
+      prefLabel: Fuzzy match
+      definition: "A match determined by similarity above a threshold rather than exact equality, allowing for typographical errors, variations, or noise."
+      plainDefinition: "A match between values that are similar enough to be considered a match, even though they are not exactly the same."
+      tags: [probabilistic, comparison]
+      related: [soundex, probabilistic_linkage]
+
+    - id: data_standardisation
+      prefLabel: Data Standardisation
+      definition: "The process of transforming data into a consistent format (e.g., casing, date formats, abbreviations) to improve comparability across records."
+      plainDefinition: Putting data into a consistent format so that it can be compared more easily.
       tags: [method, processing]
-      related: [entity_resolution, lexicon_mapping, address_matching, deduplicate]
 
-    # Tool
+    - id: data_harmonisation
+      prefLabel: Data Harmonisation
+      definition: "The alignment of data from different sources into a common schema, structure, and semantic interpretation to enable consistent comparison and linkage."
+      plainDefinition: "Making data from different sources consistent in structure, meaning, and format so that it can be compared and used together."
+      tags: [method, processing]
 
-    - id: splink
-      prefLabel: Splink
-      definition: A Python package for probabilistic {{entity resolution}} that allows you to {{deduplicate}} and link records from datasets without unique identifiers.
-      tags: [tool, probabilistic]
-      related: [probabilistic_linkage, comparisons, blocking, linkage_metrics]
+    - id: "privacy-preserving_record_linkage"
+      prefLabel: "Privacy-preserving record linkage"
+      definition: "Techniques for linking records across datasets without revealing sensitive personal information, often using encryption, hashing, or secure computation."
+      plainDefinition: Linking records while protecting people's personal information from being directly exposed.
+      tags: [method, privacy]
 
-    # model
+    - id: soundex
+      prefLabel: Soundex
+      definition: "A phonetic encoding algorithm that converts names into codes based on their pronunciation rather than their spelling, allowing records with similar-sounding names (e.g., Smith and Smyth) to be matched despite spelling differences.\n\nNumerous language- and country-specific variants have since been developed—such as Daitch–Mokotoff Soundex for Central and Eastern European names, Cologne Phonetics for German, and adaptations used in Scotland and other countries—to better reflect local naming conventions and pronunciation patterns."
+      plainDefinition: "A method that turns a name into a code based on how it sounds, so names with different spellings but similar pronunciations can be identified as possible matches."
+      tags: [method]
+      related: [fuzzy_match, "jaro-winkler_similarity", levenshtein_distance]
 
-    # privacy
+    - id: m_value_match_probability
+      prefLabel: "m-value (match probability)"
+      definition: "The probability that a linkage variable agrees between two records given that the records belong to the same individual, denoted P(agreement ∣ match). It represents how reliably a field agrees among true matches."
+      plainDefinition: How often the information should match if the two records really belong to the same entity/person.
+      narrower: [fellegi_sunter_model]
+      related: [fellegi_sunter_model]
+
+    - id: u_value_non_match_probability
+      prefLabel: "u-value (non-match probability)"
+      definition: "The probability that a linkage variable agrees between two records given that the records belong to different individuals, denoted P(agreement ∣ non-match). It represents the chance of agreement occurring by coincidence."
+      plainDefinition: How often two different record happen to have the same information by chance.
+      narrower: [fellegi_sunter_model]
+      related: [fellegi_sunter_model, term_frequency_adjustment]
+
+    - id: term_frequency_adjustment
+      prefLabel: Term Frequency Adjustment
+      definition: "A method used in probabilistic record linkage to adjust agreement weights according to the frequency of the agreeing value. It typically modifies the estimated probability of agreement among non-matches (u-value), so that agreements on rare values contribute more evidence for a match than agreements on common values."
+      plainDefinition: "Matching on an unusual name (like \"Quigley\") tells you more than matching on a very common name (like \"Smith\"), so the matching score is adjusted to reflect this."
+      tags: [probabilistic, comparison]
+      narrower: [fellegi_sunter_model]
+      related: [fellegi_sunter_model, match_probability, match_score, u_value_non_match_probability]
+
+    - id: specificity
+      prefLabel: Specificity
+      definition: "The number of non-matching record pairs correctly classified as non-matches divided by the total number of truly non-matching record pairs (i.e., sum of true negatives and false positives)."
+      plainDefinition: "Proportion of true non-matching record pairs that are correctly classified as non-matches."
+      tags: [evaluation]
+      narrower: [linkage_metrics]
+      related: [false_positive, true_negative]
+
+    - id: negative_predictive_value
+      prefLabel: Negative predictive value
+      definition: "The number of correctly identified non-matching record pairs divided by the total number of record pairs classified as non-matches (i.e., sum of true negatives and false negatives)."
+      plainDefinition: "Proportion of record pairs classified as non-matches that are truly non-matches."
+      tags: [evaluation]
+      narrower: [linkage_metrics]
+      related: [false_negative, true_negative]
+
+    - id: f_score
+      prefLabel: F1 Score
+      definition: The harmonic mean of precision and recall that is designed to provide a single performance metric that gives equal weight to both measures.
+      plainDefinition: Combines precision and recall into a single measure of overall linkage accuracy.
+      tags: [evaluation]
+      narrower: [linkage_metrics]
+      related: [precision, recall]
+
+    - id: accuracy
+      prefLabel: Accuracy
+      definition: "Number of correctly classified record pairs (i.e., sum of true positives and true negatives) divided by the total number of record pairs evaluated (i.e., sum of true positives, true negatives, false positives, and false negatives)."
+      plainDefinition: "Proportion of all record pairs that are classified by a linkage algorithm, including both correctly identified matches and correctly identified non-matches."
+      tags: [evaluation]
+      narrower: [linkage_metrics]
+      related: [false_negative, false_positive, true_negative, true_positive]
+
+    - id: linkage_error
+      prefLabel: Linkage error
+      definition: "The misclassification of record pairs during the data linkage process, comprising two types of classification errors: false positive errors (incorrectly linking non-matching records) and false negative errors (failing to link matching records)."
+      plainDefinition: "Linkage error refers to any error that occurs when a linkage algorithm incorrectly determines whether two records belong to the same real-world entity. Such errors can affect analysis and interpretation of data, leading to incorrect conclusions and misuse of data."
+      tags: [method]
+      narrower: [false_negative, false_positive]
