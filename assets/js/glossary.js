@@ -4,16 +4,192 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!data) { console.error("Glossary data not loaded"); return; }
 
   // ═══════════════════════════════════════════════════════════════════
+  // GENERIC POPOVER  (small floating card anchored near its trigger
+  // button — used for the "Search & view" card and the tag-filter
+  // dropdown. Closes on outside click, Escape, or its own close button.)
+  // ═══════════════════════════════════════════════════════════════════
+  function makePopover(triggerEl, cardEl, closeEl) {
+    function open() {
+      // Close any other open popovers first so only one shows at a time.
+      document.querySelectorAll(".popover-open").forEach(el => {
+        if (el !== cardEl) el.classList.remove("popover-open");
+      });
+      cardEl.classList.add("popover-open");
+      triggerEl.classList.add("active");
+    }
+    function close() {
+      cardEl.classList.remove("popover-open");
+      triggerEl.classList.remove("active");
+    }
+    const isOpen = () => cardEl.classList.contains("popover-open");
+
+    triggerEl.addEventListener("click", e => {
+      e.stopPropagation();
+      isOpen() ? close() : open();
+    });
+    if (closeEl) closeEl.addEventListener("click", close);
+    cardEl.addEventListener("click", e => e.stopPropagation());
+    document.addEventListener("click", e => {
+      if (isOpen() && !cardEl.contains(e.target) && e.target !== triggerEl) close();
+    });
+
+    return { open, close, isOpen };
+  }
+
+  const viewSettingsPopover = makePopover(
+    document.getElementById("view-settings-btn"),
+    document.getElementById("view-settings-card"),
+    document.getElementById("view-settings-close")
+  );
+
+  const filterPopover = makePopover(
+    document.getElementById("filter-toggle"),
+    document.getElementById("filter-popover"),
+    null
+  );
+
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    if (viewSettingsPopover.isOpen()) viewSettingsPopover.close();
+    if (filterPopover.isOpen()) filterPopover.close();
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // SIDEBAR (mobile) — the term browser is always visible on desktop;
+  // on narrow screens it collapses behind a toggle so it doesn't push
+  // the pipeline below the fold.
+  // ═══════════════════════════════════════════════════════════════════
+  const sidebarToggle = document.getElementById("sidebar-toggle");
+  const sidebarBody    = document.getElementById("sidebar-body");
+  sidebarToggle.addEventListener("click", () => {
+    sidebarToggle.classList.toggle("open");
+    sidebarBody.classList.toggle("open");
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // SIDEBAR TABS (mobile) — Terms / Pipeline switcher. On tablet and
+  // desktop this is hidden and both panels sit in their normal spots,
+  // so this wiring is inert there.
+  // ═══════════════════════════════════════════════════════════════════
+  const sidebarTabs   = document.querySelectorAll(".sidebar-tab");
+  const sidebarPanels = document.querySelectorAll(".sidebar-tab-panel");
+
+  function setSidebarTab(tab) {
+    sidebarTabs.forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tab));
+    sidebarPanels.forEach(panel =>
+      panel.classList.toggle("active", panel.dataset.tabPanel === tab)
+    );
+    // Lets CSS drop the 70vh scroll cap for the Pipeline tab — that cap
+    // exists so a long, searchable term list doesn't take over the page,
+    // but it was also clipping the much shorter pipeline accordion into
+    // its own little scrollbox instead of letting the page scroll normally.
+    sidebarBody.classList.toggle("showing-pipeline", tab === "pipeline");
+  }
+
+  sidebarTabs.forEach(btn => {
+    btn.addEventListener("click", () => setSidebarTab(btn.dataset.tab));
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // PIPELINE PANEL — a collapsible right-hand rail on tablet/desktop,
+  // kept out of the way of the definition + term list. On mobile there's
+  // no room for a rail beside anything, so instead of stacking it as its
+  // own accordion (which used to sit awkwardly between an often-empty
+  // detail panel and the graph section), it's reparented into the
+  // sidebar as a second "Pipeline" tab alongside "Terms" — one nav
+  // surface instead of two competing ones. Same DOM node, same
+  // listeners; only its position and an --embedded modifier change.
+  // ═══════════════════════════════════════════════════════════════════
+  const pipelinePanel        = document.getElementById("pipeline-panel");
+  const pipelinePanelToggle  = document.getElementById("pipeline-panel-toggle");
+  const pipelinePanelAnchor  = document.getElementById("pipeline-panel-anchor");
+  const sidebarPipelineMount = document.getElementById("sidebar-pipeline-mount");
+
+  pipelinePanelToggle.addEventListener("click", () => {
+    pipelinePanel.classList.toggle("open");
+  });
+
+  // Reads the real layout cutover point from CSS (--bp-stack, ultimately
+  // $bp-nav in abstracts/_variables) rather than duplicating a pixel
+  // value here, so this can't drift out of sync with the CSS breakpoint
+  // that switches the sidebar/pipeline into their stacked, tabbed form
+  // — both need to agree, or the panel gets reparented into the sidebar
+  // tab before (or after) the surrounding layout has actually stacked.
+  const bpStack = getComputedStyle(document.querySelector(".glossary-page"))
+    .getPropertyValue("--bp-stack").trim() || "1200px";
+  const stackQuery = window.matchMedia(`(max-width: ${bpStack})`);
+
+  function placePipelinePanel(isCompact) {
+    if (isCompact && pipelinePanel.parentElement !== sidebarPipelineMount) {
+      sidebarPipelineMount.appendChild(pipelinePanel);
+      pipelinePanel.classList.add("pipeline-panel--embedded", "open");
+    } else if (!isCompact && pipelinePanel.parentElement === sidebarPipelineMount) {
+      pipelinePanelAnchor.after(pipelinePanel);
+      // Undo the forced-open state from embedding — otherwise the rail
+      // reappears already expanded the first time the viewport widens
+      // back out, instead of collapsed like a fresh wide-mode load.
+      pipelinePanel.classList.remove("pipeline-panel--embedded", "open");
+    }
+  }
+
+  placePipelinePanel(stackQuery.matches);
+  stackQuery.addEventListener("change", e => placePipelinePanel(e.matches));
+
+  // ═══════════════════════════════════════════════════════════════════
   // ELEMENTS
   // ═══════════════════════════════════════════════════════════════════
-  const steps       = document.querySelectorAll(".pipeline-step");
-  const panel       = document.getElementById("detail-panel");
-  const content     = document.getElementById("detail-content");
-  const connector   = document.getElementById("connector");
-  const searchInput = document.getElementById("search");
-  const searchBtn   = document.getElementById("search-btn");
-  const suggestions = document.getElementById("suggestions");
-  const message     = document.getElementById("search-message");
+  const steps           = document.querySelectorAll(".pipeline-step");
+  const content          = document.getElementById("detail-content");
+  const searchInput      = document.getElementById("search");
+  const searchBtn        = document.getElementById("search-btn");
+  const suggestions      = document.getElementById("suggestions");
+  const message          = document.getElementById("search-message");
+  const modeToggle       = document.getElementById("mode-toggle");
+  const prefShowAnalogies = document.getElementById("pref-show-analogies");
+
+  const graphToggle      = document.getElementById("graph-toggle");
+  const graphBody        = document.getElementById("graph-body");
+  const graphEmptyState  = document.getElementById("graph-empty-state");
+  const graphContainer   = document.getElementById("concept-graph-container");
+
+  // Graph starts collapsed and its inner container hidden — controlled
+  // directly with inline styles so this doesn't depend on external CSS.
+  graphBody.style.display      = "none";
+  graphContainer.style.display = "none";
+
+  // ═══════════════════════════════════════════════════════════════════
+  // DISPLAY PREFERENCES
+  // ═══════════════════════════════════════════════════════════════════
+  let defMode      = "technical"; // "technical" | "plain"
+  let showAnalogies = false;      // always-expanded analogy text vs. click-to-reveal pill
+
+  function getDefinitionText(concept) {
+    if (defMode === "plain" && concept.plainDefinition) {
+      return concept.plainDefinition;
+    }
+    return concept.definition;
+  }
+
+  function rerenderActiveView() {
+    if (activeConceptId)      renderConceptDetail(activeConceptId);
+    else if (activeSection)   renderSection(activeSection);
+  }
+
+  modeToggle.querySelectorAll(".mode-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.mode === defMode) return;
+      defMode = btn.dataset.mode;
+      modeToggle.querySelectorAll(".mode-btn").forEach(b =>
+        b.classList.toggle("active", b === btn)
+      );
+      rerenderActiveView();
+    });
+  });
+
+  prefShowAnalogies.addEventListener("change", () => {
+    showAnalogies = prefShowAnalogies.checked;
+    rerenderActiveView();
+  });
 
   // ═══════════════════════════════════════════════════════════════════
   // CONCEPT MAP
@@ -34,11 +210,27 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Definition text + an analogy, shown inline or as an expandable pill
+  // depending on the "Show analogies inline" preference.
+  function renderDefinitionBlock(c) {
+    const defHtml = linkifyDefinition(getDefinitionText(c));
+
+    if (!c.analogy) {
+      return `<span class="panel-def">${defHtml}</span>`;
+    }
+
+    if (showAnalogies) {
+      return `<span class="panel-def">${defHtml}</span>
+              <span class="analogy-text analogy-text--inline">${c.analogy}</span>`;
+    }
+
+    return `<span class="panel-def">${defHtml}</span>
+            <button class="analogy-pill" data-analogy-for="${c.id}" type="button">Analogy</button>
+            <span class="analogy-text" id="analogy-${c.id}" style="display:none">${c.analogy}</span>`;
+  }
+
   // ═══════════════════════════════════════════════════════════════════
   // INFER BROADER FROM NARROWER DECLARATIONS
-  // Only 'narrower' needs to be specified in the YAML data.
-  // For each concept with narrower: [childId, ...], we automatically push
-  // the parent's id into each child's .broader array.
   // ═══════════════════════════════════════════════════════════════════
   Object.values(conceptMap).forEach(concept => {
     (concept.narrower || []).forEach(childId => {
@@ -67,9 +259,21 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ═══════════════════════════════════════════════════════════════════
-  // RENDER PIPELINE DETAIL PANEL
+  // CENTRAL PANEL — renders EITHER a pipeline section overview OR a
+  // single concept's full detail. Both pipeline clicks and term/search
+  // selection write into the same #detail-content element.
   // ═══════════════════════════════════════════════════════════════════
+  let activeSection    = null;
+  let activeConceptId  = null;
+
+  function clearPipelineActive() {
+    steps.forEach(s => s.classList.remove("active"));
+  }
+
   function renderSection(section) {
+    activeSection   = section;
+    activeConceptId = null;
+
     let html = `<p class="section-summary">${section.summary}</p>`;
 
     section.methods.forEach(m => {
@@ -86,7 +290,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <p class="panel-concept">
               <strong class="concept-link" data-id="${c.id}">${c.prefLabel}</strong>
               <span class="panel-tags">${tagHtml}</span>
-              <span class="panel-def">${linkifyDefinition(c.definition)}</span>
+              ${renderDefinitionBlock(c)}
             </p>`;
         });
       } else {
@@ -97,38 +301,101 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     content.innerHTML = html;
+    attachContentLinkHandlers();
+  }
 
-    content.querySelectorAll(".concept-link").forEach(el => {
-      el.addEventListener("click", () =>
-        selectGlossaryConcept(el.dataset.id, true)
-      );
+  function renderConceptDetail(conceptId) {
+    const concept = conceptMap[conceptId];
+    if (!concept) return;
+
+    activeConceptId = conceptId;
+    activeSection    = null;
+
+    const makeLinks = ids =>
+      ids.map(id => {
+        const label = conceptMap[id]?.prefLabel || id;
+        return `<span class="rel-link" data-id="${id}">${label}</span>`;
+      }).join(", ");
+
+    const relationRows = [];
+    if (concept.broader?.length)  relationRows.push(`<span class="rel-label broader-label">Broader</span> ${makeLinks(concept.broader)}`);
+    if (concept.narrower?.length) relationRows.push(`<span class="rel-label narrower-label">Narrower</span> ${makeLinks(concept.narrower)}`);
+    if (concept.related?.length)  relationRows.push(`<span class="rel-label related-label">Related</span> ${makeLinks(concept.related)}`);
+
+    const altHtml = (concept.altLabel || [])
+      .map(a => `<span class="alt-label">${a}</span>`)
+      .join("");
+
+    const tagHtml = (concept.tags || [])
+      .map(t => `<span class="tag-chip tag-chip--${t}" data-tag="${t}">${t}</span>`)
+      .join("");
+
+    content.innerHTML = `
+      <div class="concept-detail-inner">
+        <div class="concept-detail-header">
+          <h3>${concept.prefLabel} ${altHtml}</h3>
+        </div>
+        <p class="concept-def">${renderDefinitionBlock(concept)}</p>
+        ${relationRows.length
+          ? `<div class="concept-relations">
+               ${relationRows.map(r => `<div class="relation-row">${r}</div>`).join("")}
+             </div>`
+          : ""}
+        <div class="concept-detail-footer">
+          <div class="concept-tag-chips">${tagHtml}</div>
+          <button class="graph-link" type="button" data-graph-for="${concept.id}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/>
+              <line x1="7" y1="11" x2="17" y2="6"/><line x1="7" y1="13" x2="17" y2="18"/>
+            </svg>
+            View in concept graph
+          </button>
+        </div>
+      </div>`;
+
+    attachContentLinkHandlers();
+  }
+
+  function showEmptyDetail() {
+    activeSection   = null;
+    activeConceptId = null;
+    content.innerHTML = `<p class="detail-empty">Select a stage from the pipeline panel, or a term from the browse list, to see its definition here.</p>`;
+  }
+
+  // Delegated-style (re-)attachment for links rendered into #detail-content
+  function attachContentLinkHandlers() {
+    content.querySelectorAll(".concept-link, .def-link, .rel-link").forEach(el => {
+      el.addEventListener("click", () => selectGlossaryConcept(el.dataset.id, false));
     });
-    content.querySelectorAll(".def-link").forEach(el => {
-      el.addEventListener("click", () =>
-        selectGlossaryConcept(el.dataset.id, true)
-      );
+    content.querySelectorAll(".graph-link").forEach(el => {
+      el.addEventListener("click", () => {
+        expandGraphSection();
+        document.querySelector(".graph-section")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
     });
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // PIPELINE STEP CLICK
+  // PIPELINE STEPS — vertical list in the collapsible right panel,
+  // each step toggles open/closed independently
   // ═══════════════════════════════════════════════════════════════════
   steps.forEach(step => {
-    step.addEventListener("click", () => {
+    const header = step.querySelector(".pipeline-step-header");
+    header.addEventListener("click", () => {
       const id      = step.dataset.section;
       const section = data.sections.find(s => s.id === id);
       if (!section) return;
 
-      steps.forEach(s => s.classList.remove("active"));
-      step.classList.add("active");
+      const wasActive = step.classList.contains("active");
+      clearPipelineActive();
 
-      renderSection(section);
-      panel.classList.add("open");
-
-      const rect   = step.getBoundingClientRect();
-      const parent = step.parentElement.getBoundingClientRect();
-      connector.style.width     = rect.width + "px";
-      connector.style.transform = `translateX(${rect.left - parent.left}px)`;
+      if (!wasActive) {
+        step.classList.add("active");
+        renderSection(section);
+      } else {
+        showEmptyDetail();
+      }
     });
   });
 
@@ -167,12 +434,9 @@ document.addEventListener("DOMContentLoaded", function () {
       allTerms.find(t => t.term.toLowerCase().includes(q));
 
     if (match) {
-      const btn = document.querySelector(
-        `.pipeline-step[data-section="${match.section}"]`
-      );
-      if (btn) btn.click();
       message.textContent = "";
-      selectGlossaryConcept(match.id, false);
+      viewSettingsPopover.close();
+      selectGlossaryConcept(match.id, true);
     } else {
       message.textContent = "No match found in glossary.";
     }
@@ -184,45 +448,32 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // ═══════════════════════════════════════════════════════════════════
-  // GLOSSARY LIST
+  // BROWSE DRAWER — tag filters + term list
   // ═══════════════════════════════════════════════════════════════════
-  let activeFilter    = null;
-  let activeConceptId = null;
+  let activeFilter = null;
 
-  function getAllTags() {
-    const tagSet = new Set();
+  function getTagCounts() {
+    const counts = new Map();
     data.skos.concepts.forEach(c =>
-      (c.tags || []).forEach(t => tagSet.add(t))
+      (c.tags || []).forEach(t => counts.set(t, (counts.get(t) || 0) + 1))
     );
-    return [...tagSet].sort();
+    return counts;
   }
 
   function renderTagFilters() {
-    const tags = getAllTags();
+    const counts = getTagCounts();
+    const tags   = [...counts.keys()].sort();
+    const total  = data.skos.concepts.length;
 
-    const filtersDiv = document.getElementById("tag-filters");
-    const parent     = filtersDiv.parentElement;
+    const container = document.getElementById("tag-filters");
 
-    if (!document.querySelector(".tag-filters-wrapper")) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "tag-filters-wrapper";
-
-      const label = document.createElement("span");
-      label.className   = "tag-filters-label";
-      label.textContent = "Category key / filter";
-
-      parent.insertBefore(wrapper, filtersDiv);
-      wrapper.appendChild(label);
-      wrapper.appendChild(filtersDiv);
-    }
-
-    const container = filtersDiv;
-
-    let html = `<button class="tag-filter active" data-tag="">All</button>`;
+    let html = `<button class="tag-filter active" data-tag="">All <span class="tag-count">${total}</span></button>`;
     tags.forEach(t => {
-      html += `<button class="tag-filter tag-filter--${t}" data-tag="${t}">${t}</button>`;
+      html += `<button class="tag-filter tag-filter--${t}" data-tag="${t}">${t} <span class="tag-count">${counts.get(t)}</span></button>`;
     });
     container.innerHTML = html;
+
+    const filterLabel = document.getElementById("filter-toggle-label");
 
     container.querySelectorAll(".tag-filter").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -231,7 +482,9 @@ document.addEventListener("DOMContentLoaded", function () {
         );
         btn.classList.add("active");
         activeFilter = btn.dataset.tag || null;
+        filterLabel.textContent = activeFilter ? `${activeFilter} (${counts.get(activeFilter)})` : "All terms";
         renderGlossaryList();
+        filterPopover.close();
       });
     });
   }
@@ -266,112 +519,54 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     if (currentLetter) html += `</div>`;
 
-    container.innerHTML = html;
+    container.innerHTML = html || `<p class="glossary-list-empty">No terms match this filter.</p>`;
 
     container.querySelectorAll(".glossary-term").forEach(el => {
       el.addEventListener("click", () => {
-        activeConceptId = el.dataset.id;
-        container.querySelectorAll(".glossary-term").forEach(t =>
-          t.classList.remove("active")
-        );
-        el.classList.add("active");
-        renderConceptGraph(el.dataset.id);
+        clearPipelineActive();
+        selectGlossaryConcept(el.dataset.id, false);
       });
     });
   }
 
-  // Navigate to a concept: re-render list, update detail card + graph focus
-  function selectGlossaryConcept(id, scrollIntoView) {
+  // Navigate to a concept: update central panel, list highlight, graph focus
+  function selectGlossaryConcept(id, scrollToTop) {
     activeConceptId = id;
-    renderGlossaryList();
-    renderConceptGraph(id);
-    if (scrollIntoView) {
-      document.querySelector(".glossary-section")
+    renderConceptDetail(id);
+    renderGlossaryList(); // re-render so the matching list row highlights
+
+    // The concept graph is opt-in only — never auto-expand it. If the
+    // user already has it open, just re-focus it on the new selection.
+    if (graphManager) graphManager.setFocus(id);
+
+    if (scrollToTop) {
+      document.querySelector("#detail-panel")
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    requestAnimationFrame(() => {
-      document.querySelector(`.glossary-term[data-id="${id}"]`)
-        ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    });
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // RENDER CONCEPT DETAIL CARD
-  // (graph update is now handled separately by ConceptGraphManager)
+  // ANALOGY PILLS — global delegated toggle
   // ═══════════════════════════════════════════════════════════════════
-  function renderConceptDetail(conceptId) {
-    const concept = conceptMap[conceptId];
-    if (!concept) return;
-
-    const makeLinks = ids =>
-      ids.map(id => {
-        const label = conceptMap[id]?.prefLabel || id;
-        return `<span class="rel-link" data-id="${id}">${label}</span>`;
-      }).join(", ");
-
-    const relationRows = [];
-    if (concept.broader?.length)  relationRows.push(`<span class="rel-label broader-label">Broader</span> ${makeLinks(concept.broader)}`);
-    if (concept.narrower?.length) relationRows.push(`<span class="rel-label narrower-label">Narrower</span> ${makeLinks(concept.narrower)}`);
-    if (concept.related?.length)  relationRows.push(`<span class="rel-label related-label">Related</span> ${makeLinks(concept.related)}`);
-
-    const altHtml = (concept.altLabel || [])
-      .map(a => `<span class="alt-label">${a}</span>`)
-      .join("");
-
-    const tagHtml = (concept.tags || [])
-      .map(t => `<span class="tag-chip tag-chip--${t}" data-tag="${t}">${t}</span>`)
-      .join("");
-
-    document.getElementById("concept-detail").innerHTML = `
-      <div class="concept-detail-inner">
-        <div class="concept-detail-header">
-          <h3>${concept.prefLabel} ${altHtml}</h3>
-        </div>
-        <p class="concept-def">${linkifyDefinition(concept.definition)}</p>
-        ${relationRows.length
-          ? `<div class="concept-relations">
-               ${relationRows.map(r => `<div class="relation-row">${r}</div>`).join("")}
-             </div>`
-          : ""}
-        <div class="concept-tag-chips">${tagHtml}</div>
-      </div>`;
-
-    document.querySelectorAll(".rel-link").forEach(el => {
-      el.addEventListener("click", () =>
-        selectGlossaryConcept(el.dataset.id, false)
-      );
-    });
-    document.querySelectorAll(".def-link").forEach(el => {
-      el.addEventListener("click", () =>
-        selectGlossaryConcept(el.dataset.id, false)
-      );
-    });
-  }
-
-  // Unified entry point: update detail card AND graph focus
-  function renderConceptGraph(conceptId) {
-    renderConceptDetail(conceptId);
-    if (graphManager) graphManager.setFocus(conceptId);
-  }
+  document.addEventListener("click", e => {
+    const pill = e.target.closest(".analogy-pill");
+    if (!pill) return;
+    const id   = pill.dataset.analogyFor;
+    const text = document.getElementById(`analogy-${id}`);
+    if (!text) return;
+    const isOpen = text.style.display !== "none";
+    text.style.display = isOpen ? "none" : "block";
+    pill.classList.toggle("open", !isOpen);
+  });
 
   // ═══════════════════════════════════════════════════════════════════
   // CONCEPT GRAPH MANAGER
   // ─────────────────────────────────────────────────────────────────
   // Builds the full graph ONCE from all concepts. On every setFocus()
   // call it runs a BFS to compute hop-distance from the selected node
-  // and transitions node/link visual weights accordingly — no DOM
-  // teardown, no simulation restart, no redundant physics.
-  //
-  // Features:
-  //   • Persistent D3 force simulation (runs → settles → stays)
-  //   • BFS depth-fade: nodes dim/shrink with distance from focus
-  //   • Smooth pan-to-node via d3.zoom.transform transition
-  //   • Globe parallax: CSS 3D perspective tilt on mousemove
-  //   • Draggable nodes (locally reheat simulation)
-  //   • Zoom controls (in / out / fit-all)
+  // and transitions node/link visual weights accordingly.
   // ═══════════════════════════════════════════════════════════════════
 
-  // Colour palette (mirrors SCSS variables)
   const PALETTE = {
     center:   "#2a9d8f",
     broader:  "#e07b39",
@@ -395,16 +590,13 @@ document.addEventListener("DOMContentLoaded", function () {
       this._initSVG();
       this._startSimulation();
       this._attachControls();
-      this._attachGlobe();
     }
 
-    // ── Build all nodes + edges (called once) ───────────────────────
     _buildData() {
       this.nodes = Object.values(this.conceptMap).map(c => ({
         id: c.id, label: c.prefLabel, tags: c.tags || []
       }));
 
-      // Undirected adjacency map for BFS
       this.adj = new Map(this.nodes.map(n => [n.id, new Set()]));
 
       const seen = new Set();
@@ -412,7 +604,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const addEdge = (src, tgt, type) => {
         if (!this.adj.has(src) || !this.adj.has(tgt)) return;
-        // Stable dedup key regardless of direction
         const key = src < tgt ? `${src}§${tgt}` : `${tgt}§${src}`;
         if (seen.has(key)) return;
         seen.add(key);
@@ -421,16 +612,12 @@ document.addEventListener("DOMContentLoaded", function () {
         this.adj.get(tgt).add(src);
       };
 
-      // Process narrower + related; broader is already inferred above
-      // and would produce duplicate edges — the dedup handles it safely,
-      // but we skip it to avoid unnecessary type-shadowing.
       Object.values(this.conceptMap).forEach(c => {
         (c.narrower || []).forEach(t => addEdge(c.id, t, "narrower"));
         (c.related  || []).forEach(t => addEdge(c.id, t, "related"));
       });
     }
 
-    // ── BFS: returns Map<id, hopDistance> from startId ─────────────
     _bfs(startId) {
       const dist = new Map([[startId, 0]]);
       const q    = [startId];
@@ -444,27 +631,23 @@ document.addEventListener("DOMContentLoaded", function () {
       return dist;
     }
 
-    // ── Determine the semantic relationship from focusId → neighborId
     _relType(focusId, neighborId) {
       const c  = this.conceptMap[focusId];
       const nb = this.conceptMap[neighborId];
       if ((c?.narrower || []).includes(neighborId)) return "narrower";
       if ((c?.broader  || []).includes(neighborId)) return "broader";
       if ((c?.related  || []).includes(neighborId)) return "related";
-      // Inverse: if neighbor declared narrower→focus, focus is broader
       if ((nb?.narrower || []).includes(focusId))   return "broader";
       if ((nb?.broader  || []).includes(focusId))   return "narrower";
       return "related";
     }
 
-    // ── Build SVG structure ─────────────────────────────────────────
     _initSVG() {
       const svg = d3.select(this.svgEl);
       svg.selectAll("*").remove();
       svg.attr("viewBox", `0 0 ${this.W} ${this.H}`)
          .attr("height",   this.H);
 
-      // Arrow markers for typed depth-1 links
       const defs = svg.append("defs");
       ["broader", "narrower", "related"].forEach(t => {
         defs.append("marker")
@@ -479,16 +662,13 @@ document.addEventListener("DOMContentLoaded", function () {
             .attr("opacity", 0.55);
       });
 
-      // Root group that d3.zoom transforms
       this._g = svg.append("g").attr("class", "cgm-root");
 
-      // Zoom behaviour (pan + scroll-to-zoom)
       this._zoom = d3.zoom()
         .scaleExtent([0.08, 6])
         .on("zoom", e => this._g.attr("transform", e.transform));
       svg.call(this._zoom);
 
-      // ── Links layer ──────────────────────────────────────────────
       this._linkSel = this._g.append("g").attr("class", "cgm-links")
         .selectAll("line")
         .data(this.links)
@@ -497,7 +677,6 @@ document.addEventListener("DOMContentLoaded", function () {
           .attr("stroke-width",   0.8)
           .attr("stroke-opacity", 0.28);
 
-      // ── Nodes layer ──────────────────────────────────────────────
       const nodeG = this._g.append("g").attr("class", "cgm-nodes")
         .selectAll("g")
         .data(this.nodes)
@@ -505,7 +684,6 @@ document.addEventListener("DOMContentLoaded", function () {
           .attr("class",  "graph-node")
           .style("cursor", "pointer");
 
-      // Glow ring (only visible on the focused center node)
       nodeG.append("circle")
         .attr("class",        "node-glow")
         .attr("r",            0)
@@ -513,7 +691,6 @@ document.addEventListener("DOMContentLoaded", function () {
         .attr("fill-opacity", 0.12)
         .attr("stroke",       "none");
 
-      // Main circle
       nodeG.append("circle")
         .attr("class",          "node-circle")
         .attr("r",              5)
@@ -523,7 +700,6 @@ document.addEventListener("DOMContentLoaded", function () {
         .attr("stroke-width",   1.2)
         .attr("stroke-opacity", 0.3);
 
-      // Label
       nodeG.append("text")
         .attr("class",        "node-label")
         .text(d => d.label.length > 20 ? d.label.slice(0, 18) + "…" : d.label)
@@ -535,7 +711,6 @@ document.addEventListener("DOMContentLoaded", function () {
         .style("pointer-events", "none")
         .style("user-select",    "none");
 
-      // Hover highlight
       nodeG
         .on("mouseenter", function () {
           d3.select(this).select(".node-circle").attr("stroke-width", 2.4);
@@ -548,7 +723,6 @@ document.addEventListener("DOMContentLoaded", function () {
           this.onNodeClick(d.id);
         });
 
-      // Drag (locally reheats simulation)
       nodeG.call(
         d3.drag()
           .on("start", (e, d) => {
@@ -565,7 +739,6 @@ document.addEventListener("DOMContentLoaded", function () {
       this._nodeG = nodeG;
     }
 
-    // ── Force simulation (runs once, settles naturally) ─────────────
     _startSimulation() {
       const { W, H } = this;
 
@@ -587,7 +760,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    // ── Floating zoom controls ──────────────────────────────────────
     _attachControls() {
       const container = this.svgEl.parentElement;
       const ctrl = document.createElement("div");
@@ -596,6 +768,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const makeBtn = (icon, title, fn) => {
         const b = document.createElement("button");
         b.className   = "graph-ctrl-btn";
+        b.type        = "button";
         b.title       = title;
         b.textContent = icon;
         b.addEventListener("click", e => { e.stopPropagation(); fn(); });
@@ -609,19 +782,10 @@ document.addEventListener("DOMContentLoaded", function () {
       container.appendChild(ctrl);
     }
 
-    _attachGlobe() {
-      const el = this.svgEl;
-      el.style.transition = "transform 0.1s ease-out";
-    }
-
-    // ── Update all visuals for a new focus concept ──────────────────
-    // This is the hot path — called on every concept selection.
-    // It never rebuilds the DOM or restarts the simulation.
     setFocus(id) {
       this.focusId = id;
       const dist   = this._bfs(id);
 
-      // ── Node visuals (circle size + opacity) ──────────────────────
       this._nodeG.each((d, i, nodes) => {
         const g    = d3.select(nodes[i]);
         const circ = g.select(".node-circle");
@@ -633,36 +797,29 @@ document.addEventListener("DOMContentLoaded", function () {
         let r, fill, fillOp, strokeOp, glowR, fontSize, fontOp;
 
         if (isCenter) {
-          // Focused node: full size + colour + glow ring
           r = 13; fill = PALETTE.center;
           fillOp = 1; strokeOp = 0.7;
           glowR = 22; fontSize = "13px"; fontOp = 1;
-
         } else if (dv === 1) {
-          // Immediate neighbours: coloured by relationship type
           const t = this._relType(id, d.id);
           r = 8.5; fill = PALETTE[t] || PALETTE.ghost;
           fillOp = 0.85; strokeOp = 0.55;
           glowR = 0; fontSize = "11px"; fontOp = 0.92;
-
         } else if (dv === 2) {
           r = 6; fill = PALETTE.ghost;
           fillOp = 0.42; strokeOp = 0.22;
           glowR = 0; fontSize = "9.5px"; fontOp = 0.5;
-
         } else if (dv === 3) {
           r = 4.5; fill = PALETTE.ghost;
           fillOp = 0.22; strokeOp = 0.1;
           glowR = 0; fontSize = "7.5px"; fontOp = 0.25;
-
         } else {
-          // Far nodes: tiny ghost dots, labels hidden
           r = 3; fill = PALETTE.ghost;
           fillOp = 0.09; strokeOp = 0.05;
           glowR = 0; fontSize = "0px"; fontOp = 0;
         }
 
-        const T = 380; // ms transition
+        const T = 380;
         circ.transition().duration(T)
           .attr("r",              r)
           .attr("fill",           fill)
@@ -680,7 +837,6 @@ document.addEventListener("DOMContentLoaded", function () {
           .attr("fill-opacity", fontOp);
       });
 
-      // ── Link visuals (colour + opacity) ───────────────────────────
       this._linkSel.each((l, i, links) => {
         const srcId = typeof l.source === "object" ? l.source.id : l.source;
         const tgtId = typeof l.target === "object" ? l.target.id : l.target;
@@ -692,27 +848,23 @@ document.addEventListener("DOMContentLoaded", function () {
         const lk = d3.select(links[i]);
 
         if (minD === 0 && maxD === 1) {
-          // Direct edge from focus: coloured + arrow
           lk.transition().duration(380)
             .attr("stroke",       PALETTE[l.type] || PALETTE.related)
             .attr("stroke-width", 1.9)
             .attr("stroke-opacity", 0.62)
             .attr("marker-end",   `url(#cgm-arrow-${l.type})`);
-
         } else if (minD <= 1 && maxD === 2) {
           lk.transition().duration(380)
             .attr("stroke",         PALETTE.link)
             .attr("stroke-width",   1)
             .attr("stroke-opacity", 0.18)
             .attr("marker-end",     null);
-
         } else if (minD <= 2 && maxD <= 3) {
           lk.transition().duration(380)
             .attr("stroke",         PALETTE.link)
             .attr("stroke-width",   0.7)
             .attr("stroke-opacity", 0.08)
             .attr("marker-end",     null);
-
         } else {
           lk.transition().duration(380)
             .attr("stroke",         PALETTE.link)
@@ -722,12 +874,10 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
 
-      // ── Smooth pan to the focused node ───────────────────────────
       const node = this.nodes.find(n => n.id === id);
       if (node?.x != null) {
         this._panTo(node.x, node.y);
       } else {
-        // Simulation may not have placed it yet — retry briefly
         const check = setInterval(() => {
           const n = this.nodes.find(n => n.id === id);
           if (n?.x != null) { this._panTo(n.x, n.y); clearInterval(check); }
@@ -748,7 +898,6 @@ document.addEventListener("DOMContentLoaded", function () {
         );
     }
 
-    // Zoom out to show the whole graph
     fitAll() {
       d3.select(this.svgEl)
         .transition().duration(500).ease(d3.easeCubicOut)
@@ -757,7 +906,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // ═══════════════════════════════════════════════════════════════════
-  // GRAPH BOOTSTRAP — called once on page load
+  // GRAPH SECTION — collapsible, built lazily on first expand.
+  // Visibility is set directly with inline styles, not just classes,
+  // so showing/hiding never depends on external CSS being present.
   // ═══════════════════════════════════════════════════════════════════
   let graphManager = null;
 
@@ -765,28 +916,39 @@ document.addEventListener("DOMContentLoaded", function () {
     const svgEl = document.getElementById("concept-graph");
     if (!svgEl || graphManager) return;
 
-    // Show the graph container immediately (unfocused full view)
-    // The empty state placeholder is no longer needed.
-    const emptyState = document.getElementById("graph-empty-state");
-    const container  = document.getElementById("concept-graph-container");
-    if (emptyState) emptyState.style.display = "none";
-    if (container)  container.style.display  = "block";
+    graphEmptyState.style.display = "none";
+    graphContainer.style.display  = "block";
 
-    // Wait one frame so the SVG has its final rendered width
     requestAnimationFrame(() => {
       graphManager = new ConceptGraphManager(
         svgEl,
         conceptMap,
         id => selectGlossaryConcept(id, false)
       );
-
-      // If a concept was already selected before the graph was ready, apply focus
       if (activeConceptId) graphManager.setFocus(activeConceptId);
     });
   }
 
+  function expandGraphSection() {
+    const isOpen = graphBody.style.display === "block";
+    if (!isOpen) {
+      graphBody.style.display = "block";
+      graphToggle.classList.add("open");
+    }
+    initConceptGraph(); // no-op after the first call; always (re-)focuses below
+    if (graphManager && activeConceptId) graphManager.setFocus(activeConceptId);
+  }
+
+  graphToggle.addEventListener("click", () => {
+    const isOpen = graphBody.style.display === "block";
+    graphBody.style.display = isOpen ? "none" : "block";
+    graphToggle.classList.toggle("open", !isOpen);
+    if (!isOpen) initConceptGraph(); // no-op after the first call
+  });
+
   // ═══════════════════════════════════════════════════════════════════
-  // GLOBAL TAG CLICK HANDLER (works everywhere)
+  // GLOBAL TAG CLICK HANDLER (works everywhere — filters the always-
+  // visible sidebar list to that tag and scrolls/expands it into view)
   // ═══════════════════════════════════════════════════════════════════
   document.addEventListener("click", e => {
     const chip = e.target.closest(".tag-chip");
@@ -800,8 +962,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const filter = document.querySelector(`.tag-filter[data-tag="${tag}"]`);
     if (filter) filter.click();
 
-    document.querySelector(".glossary-section")
-      ?.scrollIntoView({ behavior: "smooth" });
+    sidebarToggle.classList.add("open");
+    sidebarBody.classList.add("open");
+    document.getElementById("glossary-sidebar")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
   // ═══════════════════════════════════════════════════════════════════
@@ -810,7 +974,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function initGlossary() {
     renderTagFilters();
     renderGlossaryList();
-    initConceptGraph();
+    // Concept graph builds lazily on first expand — see graphToggle handler.
   }
 
   requestAnimationFrame(initGlossary);

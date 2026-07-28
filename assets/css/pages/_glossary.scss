@@ -1,9 +1,27 @@
-$bp-mobile: 600px;
-
+// $bp-mobile and $bp-nav come from abstracts/_variables (imported
+// before this partial in main.scss) — no local declarations here, so
+// this page always agrees with the site's actual breakpoints.
+//
+// This page only has two layout states: "wide" (persistent sidebar +
+// side rail) and "compact" (everything stacked, sidebar/pipeline behind
+// toggles). They switch together at $bp-nav — the same point the site
+// nav itself collapses to its mobile form — there is deliberately no
+// separate tablet state, since a rail squeezed next to a fixed-width
+// sidebar has nowhere good to go between $bp-nav and true mobile widths.
+// (This used to key off $bp-desktop instead, which left a dead zone
+// between $bp-nav and $bp-desktop where the rest of the page had already
+// gone "mobile" but the glossary layout hadn't switched yet — the
+// pipeline rail stayed rendered as its own expandable rail instead of
+// living in the sidebar's Pipeline tab. That's what made "tablet" widths
+// look broken even though wide and true-mobile widths were both fine.)
+// --bp-stack exposes that single cutover point to glossary.js so the JS
+// (which reparents the pipeline panel into the sidebar tabs) can never
+// drift out of sync with the CSS that switches the layout.
 .glossary-page {
   --color-teal:       #2a9d8f;
   --color-teal-light: #eef8f7;
   --color-teal-dark:  #21756b;
+  --bp-stack:          #{$bp-nav};
 }
 
 
@@ -11,42 +29,361 @@ $bp-mobile: 600px;
 // PAGE SHELL
 // =============================================================================
 .glossary-page {
-  max-width: 1100px;
+  position: relative;
+  max-width: 1550px;
   margin: 0 auto;
   padding: 1rem;
 }
 
 
 // =============================================================================
+// LAYOUT — persistent sidebar (left) + main column (right)
+// top-section is its own grid area (not nested inside .glossary-main) so
+// it always renders above the sidebar, in wide mode AND compact mode.
+// Previously it lived inside .glossary-main, which — once compact mode
+// stacks everything into one column — sits BELOW .glossary-sidebar in
+// source order, pushing the title/search-button row down underneath the
+// (possibly expanded) term list.
+// =============================================================================
+.glossary-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  grid-template-areas:
+    "top     top"
+    "sidebar main";
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.top-section       { grid-area: top; }
+.glossary-sidebar   { grid-area: sidebar; }
+.glossary-main      { grid-area: main; min-width: 0; }
+
+
+// =============================================================================
 // TOP SECTION
 // =============================================================================
 .top-section {
+  position: relative;
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
+
+  h1 { margin: 0 0 0.35rem; font-size: 1.6rem; }
+  p  { margin: 0; color: #666; max-width: 60ch; }
 }
 
-.top-left { flex: 2; }
-.top-right { flex: 1; }
+.top-section-text { min-width: 0; }
+
+
+// =============================================================================
+// "SEARCH & VIEW" — small trigger button + floating popover card
+// =============================================================================
+.view-settings-btn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  background: #fff;
+  color: #444;
+  border: 1px solid #ddd;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.view-settings-btn svg { color: #999; transition: color 0.15s ease; }
+
+.view-settings-btn:hover,
+.view-settings-btn.active {
+  border-color: var(--color-teal);
+  color: var(--color-teal-dark);
+}
+
+.view-settings-btn:hover svg,
+.view-settings-btn.active svg { color: var(--color-teal); }
+
+.view-settings-card {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  width: min(300px, 90vw);
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.14);
+  padding: 1.25rem 1.25rem 1rem;
+  z-index: 50;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
+}
+
+.view-settings-card.popover-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.drawer-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.7rem;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: #999;
+  cursor: pointer;
+}
+
+.drawer-close:hover { color: #333; }
+
+.drawer-section {
+  margin-bottom: 1.25rem;
+}
+
+.drawer-section:last-child {
+  margin-bottom: 0;
+}
+
+.drawer-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #999;
+  margin-bottom: 0.5rem;
+}
+
+
+// =============================================================================
+// SIDEBAR — always-visible term browser
+// =============================================================================
+.glossary-sidebar {
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+}
+
+// Hidden entirely on desktop — the sidebar is always open there.
+.sidebar-toggle { display: none; }
+
+.sidebar-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 1rem 1rem 0.75rem;
+  gap: 1rem;
+  overflow: hidden;
+}
+
+// Mobile-only tab switcher (Terms | Pipeline) — hidden on tablet/desktop
+// where both are always reachable in their normal positions. Scoped
+// under .sidebar-body (not just .sidebar-tabs) so this reliably beats
+// .mode-toggle's own `display: flex`, regardless of source order.
+.sidebar-body .sidebar-tabs { display: none; }
+
+// On tablet/desktop this is just an inert wrapper; the mobile media
+// query below is what turns it into an actual tab panel. It needs its
+// own flex/gap since its children (search, filter, list) used to get
+// that spacing directly from .sidebar-body before they were nested
+// one level deeper here.
+.sidebar-tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  min-height: 0;
+}
+
+.sidebar-tab-panel[data-tab-panel="terms"] { flex: 1; }
+
+.sidebar-search { position: relative; }
+
+.sidebar-list-wrap {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 0.5rem;
+  margin: 0 -1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+
+// =============================================================================
+// FILTER DROPDOWN  (compact button + popover, replaces the pill wall)
+// =============================================================================
+.sidebar-filter { position: relative; }
+
+.filter-toggle-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  background: #f7f8fa;
+  border: 1px solid #e2e5ea;
+  border-radius: 6px;
+  color: #444;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.filter-toggle-btn:hover,
+.filter-toggle-btn.active {
+  border-color: var(--color-teal);
+  background: var(--color-teal-light);
+}
+
+.filter-toggle-chevron {
+  color: #999;
+  transition: transform 0.15s ease;
+  font-size: 0.75em;
+}
+
+.filter-toggle-btn.active .filter-toggle-chevron { transform: rotate(180deg); }
+
+.filter-popover {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+  padding: 0.75rem;
+  z-index: 50;
+  max-height: 260px;
+  overflow-y: auto;
+
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
+}
+
+.filter-popover.popover-open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+
+// =============================================================================
+// EXPLANATION-STYLE + MODE TOGGLE
+// =============================================================================
+.mode-toggle {
+  display: flex;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 0.5rem 0.4rem;
+  border: none;
+  background: #fff;
+  color: #666;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.mode-btn + .mode-btn { border-left: 1px solid #ddd; }
+.mode-btn:hover { background: var(--color-teal-light); }
+.mode-btn.active { background: var(--color-teal); color: #fff; }
+
+
+// =============================================================================
+// DISPLAY-OPTIONS TOGGLE SWITCHES
+// =============================================================================
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  font-size: 0.85rem;
+  color: #444;
+  cursor: pointer;
+}
+
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+  flex-shrink: 0;
+
+  input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+}
+
+.toggle-slider {
+  position: absolute;
+  inset: 0;
+  background: #ccc;
+  border-radius: 999px;
+  transition: background 0.15s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 2px;
+    width: 16px;
+    height: 16px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.15s ease;
+  }
+}
+
+.toggle-switch input:checked + .toggle-slider {
+  background: var(--color-teal);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(16px);
+}
 
 
 // =============================================================================
 // SEARCH
 // =============================================================================
-.search-box {
-  position: relative;
-}
-
 .search-row {
   display: flex;
   gap: 0.5rem;
+  align-items: stretch;
 }
 
 #search {
-  width: 100%;
-  padding: 0.6rem;
+  flex: 1;
+  min-width: 0;
+  height: 2.4rem;
+  padding: 0 0.7rem;
   box-sizing: border-box;
   border: 1px solid #ccc;
   border-radius: 4px;
@@ -54,7 +391,9 @@ $bp-mobile: 600px;
 }
 
 #search-btn {
-  padding: 0.5rem 0.9rem;
+  height: 2.4rem;
+  padding: 0 0.9rem;
+  box-sizing: border-box;
   cursor: pointer;
   white-space: nowrap;
   background: var(--color-teal);
@@ -62,12 +401,11 @@ $bp-mobile: 600px;
   border: none;
   border-radius: 4px;
   font-size: 0.9rem;
+  line-height: 1;
   transition: background 0.15s ease;
 }
 
-#search-btn:hover {
-  background: var(--color-teal-dark);
-}
+#search-btn:hover { background: var(--color-teal-dark); }
 
 #search-message {
   font-size: 0.85rem;
@@ -84,7 +422,7 @@ $bp-mobile: 600px;
   display: none;
   z-index: 100;
   border-radius: 0 0 4px 4px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
 }
 
 .suggestion {
@@ -93,125 +431,278 @@ $bp-mobile: 600px;
   font-size: 0.9rem;
 }
 
-.suggestion:hover {
-  background: #f5f5f5;
-}
+.suggestion:hover { background: #f5f5f5; }
 
 
 // =============================================================================
-// PIPELINE  –  bordered steps with right-pointing arrow between each
+// CONTENT ROW  —  detail panel (flex) + collapsible pipeline panel (right)
 // =============================================================================
-.pipeline-wrapper {
-  margin-top: 1rem;
-}
-
-.pipeline {
+.content-row {
   display: flex;
-  position: relative;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin: 1rem 0 1.5rem;
 }
 
-// ── Shared sizing variables ───────────────────────────────────────────────────
-$step-h:   72px;
-$half-h:   36px;
-$arrow-w:  12px;
-$bdr-w:    0.0px;
-$bdr-c:    #c4cad8;
-$step-bg:  #eef1f5;
-$hover-bg: #dde3ec;
-
-.pipeline-step {
+.detail-column {
   flex: 1;
-  height: $step-h;
+  min-width: 0;
+}
+
+
+// =============================================================================
+// PIPELINE PANEL  —  collapsible right-hand rail housing the vertical
+// pipeline. Collapses to a narrow labelled rail so it stops competing
+// with the definition for space.
+// =============================================================================
+.pipeline-panel {
+  flex: 0 0 46px;
+  width: 46px;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  background: #fff;
+  position: sticky;
+  top: 1rem;
+  max-height: calc(100vh - 2rem);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: flex-basis 0.22s ease, width 0.22s ease;
+}
+
+.pipeline-panel.open {
+  flex: 0 0 280px;
+  width: 280px;
+}
+
+.pipeline-panel-toggle {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 0 ($arrow-w + 8px) 0 0.9rem;
-  font-size: 0.85rem;
-  text-align: center;
-  background: $step-bg;
-  color: #555;
-  border: $bdr-w none $bdr-c;
-  border-right: none;
+  justify-content: space-between;
+  width: 100%;
+  flex-shrink: 0;
+  padding: 0.85rem 1rem;
+  background: none;
+  border: none;
   cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #333;
+  transition: background 0.15s ease;
+}
+
+.pipeline-panel-toggle:hover { background: var(--color-teal-light); }
+
+.pipeline-panel.open .pipeline-panel-toggle {
+  border-bottom: 1px solid #eee;
+}
+
+.pipeline-panel:not(.open) .pipeline-panel-toggle {
+  flex-direction: column-reverse;
+  height: 100%;
+  padding: 1rem 0.4rem;
+  gap: 0.9rem;
+}
+
+.pipeline-panel-toggle-label { white-space: nowrap; }
+
+.pipeline-panel:not(.open) .pipeline-panel-toggle-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  letter-spacing: 0.01em;
+}
+
+.pipeline-panel-toggle-chevron {
+  flex-shrink: 0;
+  color: #999;
+  font-size: 0.8em;
+  transition: transform 0.2s ease;
+}
+
+.pipeline-panel.open .pipeline-panel-toggle-chevron { transform: rotate(180deg); }
+
+.pipeline-panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.9rem;
+}
+
+.pipeline-panel:not(.open) .pipeline-panel-body { display: none; }
+
+// Applied by JS when the panel is living inside the sidebar's Pipeline
+// tab (mobile) instead of its normal rail position in .content-row.
+// The tab switch already controls visibility, so the panel's own
+// open/collapse toggle is redundant here and gets hidden.
+//
+// The .open compound selector is repeated here (matching .pipeline-panel
+// .open's own specificity) because the panel always carries the "open"
+// class while embedded, and .pipeline-panel.open's fixed 280px width
+// otherwise wins on specificity over the plain .pipeline-panel--embedded
+// rule below — which is what was locking the mobile pipeline tray to a
+// narrow fixed-width box instead of filling the sidebar.
+.pipeline-panel--embedded,
+.pipeline-panel--embedded.open {
+  position: static;
+  width: 100%;
+  flex-basis: auto;
+  max-height: none;
+  border: none;
+  border-radius: 0;
+}
+
+.pipeline-panel--embedded .pipeline-panel-toggle { display: none; }
+
+.pipeline-panel--embedded .pipeline-panel-body {
+  display: block;
+  max-height: none;
+  padding: 0.25rem 0 0;
+}
+
+
+// =============================================================================
+// PIPELINE  —  vertical steps with a connecting line, inside the panel
+// =============================================================================
+.pipeline-vertical {
   position: relative;
-  transition: background 0.15s ease, color 0.15s ease;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -$bdr-w;
-    right: -($arrow-w + $bdr-w);
-    width: 0; height: 0;
-    border-style: solid;
-    border-width: ($half-h + $bdr-w) 0 ($half-h + $bdr-w) ($arrow-w + $bdr-w);
-    border-color: transparent transparent transparent $bdr-c;
-    z-index: 1;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: -$arrow-w;
-    width: 0; height: 0;
-    border-style: solid;
-    border-width: $half-h 0 $half-h $arrow-w;
-    border-color: transparent transparent transparent $step-bg;
-    z-index: 2;
-  }
-
-  &:first-child {
-    border-radius: 1px 0 0 1px;
-  }
-
-  &:last-child {
-    border-right: $bdr-w solid $bdr-c;
-    border-radius: 0 1px 1px 0;
-    padding-right: 0.9rem;
-    &::before,
-    &::after { display: none; }
-  }
-
-  &:hover {
-    background: $hover-bg;
-    color: #333;
-    &::after { border-left-color: $hover-bg; }
-  }
 }
 
-@for $i from 1 through 20 {
-  .pipeline-step:nth-child(#{$i}) { z-index: #{21 - $i}; }
+// The connecting line running down through every step's dot marker
+.pipeline-vertical::before {
+  content: "";
+  position: absolute;
+  left: 9px;
+  top: 1.15rem;
+  bottom: 1.15rem;
+  width: 2px;
+  background: #dde1e8;
 }
 
-.pipeline-step.active {
+.pipeline-step {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+
+.step-marker {
+  flex: 0 0 20px;
+  display: flex;
+  justify-content: center;
+  padding-top: 0.85rem;
+  z-index: 1;
+}
+
+.step-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #c4cad8;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.pipeline-step.active .step-dot {
   background: var(--color-teal);
-  color: #fff;
+  border-color: var(--color-teal-dark);
+  box-shadow: 0 0 0 4px var(--color-teal-light);
+}
+
+.step-card {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #eef1f5;
+}
+
+.pipeline-step.active .step-card {
   border-color: var(--color-teal-dark);
 }
-.pipeline-step.active::before { border-left-color: var(--color-teal-dark); }
-.pipeline-step.active::after  { border-left-color: var(--color-teal); }
 
-#connector {
-  height: 4px;
-  width: 0;
+.pipeline-step-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #555;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.pipeline-step-header:hover {
+  background: #dde3ec;
+  color: #333;
+}
+
+.step-title { font-weight: 500; }
+
+.step-chevron {
+  color: #999;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.pipeline-step.active .pipeline-step-header {
   background: var(--color-teal);
-  transition: width 0.25s ease, transform 0.25s ease;
+  color: #fff;
+}
+
+.pipeline-step.active .step-chevron {
+  color: #fff;
+  transform: rotate(180deg);
+}
+
+.pipeline-step-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+.pipeline-step.active .pipeline-step-body {
+  max-height: 220px;
+}
+
+.step-summary {
+  margin: 0;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.78rem;
+  color: #666;
+  background: #fff;
 }
 
 
 // =============================================================================
-// DETAIL PANEL
+// CENTRAL DETAIL PANEL  (shared by pipeline sections AND single concepts)
 // =============================================================================
 #detail-panel {
-  display: none;
-  border: 1px solid #ddd;
-  border-top: none;
-  padding: 1rem;
-  background: #fafafa;
+  border: 1px solid #e4e4e4;
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(20, 22, 28, 0.05);
+  min-height: 240px;
+  margin-bottom: 1.5rem;
+  position: sticky;
+  top: 1rem;
 }
 
-#detail-panel.open {
-  display: block;
+@media (max-width: $bp-nav) {
+  #detail-panel { position: static; }
+}
+
+.detail-empty {
+  color: #aaa;
+  font-size: 0.88rem;
+  text-align: center;
+  margin: 3rem 0;
 }
 
 #detail-panel .section-summary {
@@ -224,6 +715,8 @@ $hover-bg: #dde3ec;
   margin: 0.9rem 0 0.4rem;
   color: #333;
 }
+
+#detail-panel h3:first-child { margin-top: 0; }
 
 .panel-concept {
   display: flex;
@@ -241,23 +734,66 @@ $hover-bg: #dde3ec;
   text-decoration-style: dotted;
 }
 
-.concept-link:hover {
-  text-decoration-style: solid;
+.concept-link:hover { text-decoration-style: solid; }
+
+.panel-tags { display: flex; gap: 0.2rem; }
+
+.panel-def { flex: 1 0 100%; color: #555; }
+
+
+// =============================================================================
+// ANALOGY  (expandable pill, or always-inline per display preference)
+// =============================================================================
+.analogy-pill {
+  display: inline-block;
+  margin: 0.3rem 0.4rem 0 0;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid #e07b39;
+  background: #fdf1e7;
+  color: #b45309;
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-radius 0.2s ease, padding 0.2s ease;
 }
 
-.panel-tags {
-  display: flex;
-  gap: 0.2rem;
+.analogy-pill:hover,
+.analogy-pill.open {
+  background: #e07b39;
+  color: #fff;
 }
 
-.panel-def {
+.analogy-pill.open {
+  border-radius: 8px;
+  padding: 0.55rem 0.22rem;
+  writing-mode: vertical-lr;
+  text-orientation: sideways;
+}
+
+.analogy-text {
+  display: block;
   flex: 1 0 100%;
-  color: #555;
+  margin: 0.5rem 0 0.15rem;
+  padding: 0.6rem 0.8rem;
+  background: #fdf1e7;
+  border-left: 3px solid #e07b39;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.85rem;
+  color: #444;
+  line-height: 1.45;
+  max-width: 60ch;
+}
+
+// When shown inline (display preference), no click needed, so drop the
+// pointer/hover cues that imply interactivity
+.analogy-text--inline {
+  margin-top: 0.4rem;
 }
 
 
 // =============================================================================
-// TAG CHIPS  (shared across pipeline panel and glossary list)
+// TAG CHIPS  (shared across central panel and term list)
 // =============================================================================
 .tag-chip {
   display: inline-block;
@@ -276,7 +812,6 @@ $hover-bg: #dde3ec;
   transform: translateY(-1px);
 }
 
-// In the glossary term list, chips become small colour dots
 .glossary-term .tag-chip {
   padding: 0;
   width: 8px;
@@ -288,11 +823,8 @@ $hover-bg: #dde3ec;
   transition: opacity 0.1s ease;
 }
 
-.glossary-term:hover .tag-chip {
-  opacity: 1;
-}
+.glossary-term:hover .tag-chip { opacity: 1; }
 
-// ── Chip colour palette ───────────────────────────────────────────────────────
 .tag-chip--datatype      { color: #dc2626; }
 .tag-chip--evaluation    { color: #ea580c; }
 .tag-chip--python        { color: #ca8a04; }
@@ -306,7 +838,6 @@ $hover-bg: #dde3ec;
 .tag-chip--model         { color: #a21caf; }
 .tag-chip--comparison    { color: #db2777; }
 
-// Dot variants in the glossary list use background, not text colour
 .glossary-term .tag-chip--datatype      { background: #dc2626; border-color: #dc2626; }
 .glossary-term .tag-chip--evaluation    { background: #ea580c; border-color: #ea580c; }
 .glossary-term .tag-chip--python        { background: #ca8a04; border-color: #ca8a04; }
@@ -322,63 +853,53 @@ $hover-bg: #dde3ec;
 
 
 // =============================================================================
-// TAG FILTERS (category key + filter controls)
+// TAG FILTERS  (now live in the left "browse" drawer)
 // =============================================================================
-.tag-filters-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  flex-wrap: wrap;
-}
-
-.tag-filters-label {
-  font-size: 0.72rem;
-  color: #999;
-  white-space: nowrap;
-  font-style: italic;
-}
-
 .tag-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .tag-filter {
   padding: 0.2rem 0.65rem;
   font-size: 0.75rem;
   border-radius: 999px;
-  border: 1.5px solid rgba(0,0,0,0.12);
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
   background: transparent;
   color: #666;
   cursor: pointer;
   transition: all 0.15s ease;
-
-  &:hover {
-    background: rgba(0,0,0,0.04);
-  }
-
-  &.active {
-    background: rgba(0,0,0,0.05);
-    font-weight: 500;
-  }
 }
 
-// Per-category filter colours
-.tag-filter--method        { color: #2563eb; border-color: rgba(37,  99,  235, 0.3); }
-.tag-filter--model         { color: #a21caf; border-color: rgba(162, 28,  175, 0.3); }
-.tag-filter--evaluation    { color: #ea580c; border-color: rgba(234, 88,  12,  0.3); }
-.tag-filter--metric        { color: #06b6d4; border-color: rgba(6,   182, 212, 0.3); }
-.tag-filter--tool          { color: #16a34a; border-color: rgba(22,  163, 74,  0.3); }
-.tag-filter--datatype      { color: #ef4444; border-color: rgba(239, 68,  68,  0.3); }
-.tag-filter--comparison    { color: #ec4899; border-color: rgba(236, 72,  153, 0.3); }
-.tag-filter--probabilistic { color: #7c3aed; border-color: rgba(124, 58,  237, 0.3); }
-.tag-filter--deterministic { color: #d97706; border-color: rgba(217, 119, 6,   0.3); }
-.tag-filter--visualisation { color: #059669; border-color: rgba(5,   150, 105, 0.3); }
-.tag-filter--python        { color: #ca8a04; border-color: rgba(202, 138, 4,   0.3); }
-.tag-filter--core          { color: #0284c7; border-color: rgba(2,   132, 199, 0.3); }
+.tag-filter:hover { background: rgba(0, 0, 0, 0.04); }
 
-// Active state gains a teal border for all categories
+.tag-filter.active {
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 500;
+}
+
+.tag-count {
+  background: rgba(0, 0, 0, 0.07);
+  color: #777;
+  border-radius: 999px;
+  padding: 0 0.4rem;
+  font-size: 0.68rem;
+}
+
+.tag-filter--method        { color: #2563eb; border-color: rgba(37, 99, 235, 0.3); }
+.tag-filter--model         { color: #a21caf; border-color: rgba(162, 28, 175, 0.3); }
+.tag-filter--evaluation    { color: #ea580c; border-color: rgba(234, 88, 12, 0.3); }
+.tag-filter--metric        { color: #06b6d4; border-color: rgba(6, 182, 212, 0.3); }
+.tag-filter--tool          { color: #16a34a; border-color: rgba(22, 163, 74, 0.3); }
+.tag-filter--datatype      { color: #ef4444; border-color: rgba(239, 68, 68, 0.3); }
+.tag-filter--comparison    { color: #ec4899; border-color: rgba(236, 72, 153, 0.3); }
+.tag-filter--probabilistic { color: #7c3aed; border-color: rgba(124, 58, 237, 0.3); }
+.tag-filter--deterministic { color: #d97706; border-color: rgba(217, 119, 6, 0.3); }
+.tag-filter--visualisation { color: #059669; border-color: rgba(5, 150, 105, 0.3); }
+.tag-filter--python        { color: #ca8a04; border-color: rgba(202, 138, 4, 0.3); }
+.tag-filter--core          { color: #0284c7; border-color: rgba(2, 132, 199, 0.3); }
+
 .tag-filter--method.active,
 .tag-filter--model.active,
 .tag-filter--evaluation.active,
@@ -396,55 +917,21 @@ $hover-bg: #dde3ec;
 }
 
 
-.glossary-body {
-  display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
-  min-height: 460px;
-}
-
-
 // =============================================================================
-// LEFT: alphabetical term list
+// TERM LIST  (now lives in the left "browse" drawer)
 // =============================================================================
-.glossary-list-panel {
-  flex: 0 0 290px;
-  max-height: 560px;
-  overflow-y: auto;
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
-  scroll-behavior: smooth;
-}
-
-.glossary-list-panel::-webkit-scrollbar {
-  width: 5px;
-}
-
-.glossary-list-panel::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.glossary-list-panel::-webkit-scrollbar-thumb {
-  background: #ddd;
-  border-radius: 99px;
-}
-
-.alpha-group:not(:last-child) {
-  border-bottom: 1px solid #f0f0f0;
-}
+.alpha-group:not(:last-child) { border-bottom: 1px solid #f0f0f0; }
 
 .alpha-label {
-  padding: 0.25rem 0.75rem;
+  padding: 0.25rem 0.1rem;
   font-size: 0.7rem;
   font-weight: 700;
   color: #bbb;
-  background: #fafafa;
-  border-bottom: 1px solid #f3f3f3;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   position: sticky;
   top: 0;
-  z-index: 1;
+  background: #fff;
 }
 
 .glossary-term {
@@ -452,16 +939,15 @@ $hover-bg: #dde3ec;
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.42rem 0.75rem;
+  padding: 0.42rem 0.5rem;
   cursor: pointer;
   font-size: 0.88rem;
   border-left: 3px solid transparent;
+  border-radius: 4px;
   transition: background 0.1s ease;
 }
 
-.glossary-term:hover {
-  background: #f7f7f7;
-}
+.glossary-term:hover { background: #f7f7f7; }
 
 .glossary-term.active {
   background: var(--color-teal-light);
@@ -484,27 +970,61 @@ $hover-bg: #dde3ec;
   align-items: center;
 }
 
-
-// =============================================================================
-// RIGHT: graph + detail panel
-// =============================================================================
-.glossary-detail-panel {
-  flex: 1;
-  position: sticky;
-  top: 1rem;
-  align-self: flex-start;
+.glossary-list-empty {
+  color: #999;
+  font-size: 0.88rem;
 }
 
-// Empty state (shown before JS initialises the graph)
+
+// =============================================================================
+// CONCEPT GRAPH — collapsible
+// =============================================================================
+.graph-section {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.graph-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 1rem 1.4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+  transition: background 0.15s ease;
+}
+
+.graph-toggle:hover { background: var(--color-teal-light); }
+
+.graph-chevron {
+  color: #999;
+  transition: transform 0.2s ease;
+}
+
+.graph-toggle.open .graph-chevron { transform: rotate(180deg); }
+
+.graph-body {
+  padding: 0 1.4rem 1.4rem;
+  border-top: 1px solid #eee;
+}
+
 .graph-empty-state {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 420px;
+  height: 300px;
   border: 1px dashed #ddd;
   border-radius: 6px;
   background: #fafafa;
   color: #bbb;
+  margin-top: 1.2rem;
 }
 
 .empty-inner {
@@ -514,66 +1034,42 @@ $hover-bg: #dde3ec;
   gap: 0.5rem;
 }
 
-.empty-inner p {
-  margin: 0;
-  font-size: 0.9rem;
-}
+.empty-inner p { margin: 0; font-size: 0.9rem; }
+.empty-inner svg { opacity: 0.4; }
 
-.empty-inner svg {
-  opacity: 0.4;
-}
-
-// =============================================================================
-// CONCEPT GRAPH
-// =============================================================================
-
-// Container holds both the SVG canvas and the floating zoom controls
 #concept-graph-container {
   position: relative;
+  margin-top: 1.2rem;
 }
 
 #concept-graph {
   width: 100%;
-  height: 420px;           // taller than before to give the graph room to breathe
+  height: 420px;
   display: block;
   background: #fafafa;
   border: 1px solid #e8e8e8;
   border-radius: 6px;
-
-  // Globe parallax — JS applies a CSS 3D perspective tilt on mousemove.
-  // The transition gives it a smooth, fluid feel.
-  transition: transform 0.1s ease-out;
-  // Prevent layout shifts when the 3D transform is applied
-  will-change: transform;
 }
 
-// Smooth circle transitions (kept from original)
-.graph-node circle {
-  transition: fill-opacity 0.15s ease;
-}
+.graph-node circle { transition: fill-opacity 0.15s ease; }
 
 .def-link {
   color: var(--color-teal);
   cursor: pointer;
   text-decoration: underline;
   font-weight: 500;
-
-  &:hover {
-    color: #1f5fcc;
-  }
 }
 
-// ── Floating zoom controls ────────────────────────────────────────────────────
+.def-link:hover { color: #1f5fcc; }
+
 .graph-controls {
   position: absolute;
-  top: 0.55rem;
+  top: 1.75rem;
   right: 0.55rem;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
   z-index: 10;
-  // Prevent the 3D SVG tilt from misaligning the buttons
-  pointer-events: auto;
 }
 
 .graph-ctrl-btn {
@@ -592,19 +1088,14 @@ $hover-bg: #dde3ec;
   color: #555;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
-
-  &:hover {
-    background: #fff;
-    border-color: rgba(0, 0, 0, 0.22);
-    color: #222;
-  }
-
-  &:active {
-    background: #f0f0f0;
-  }
 }
 
-// ── Graph legend ──────────────────────────────────────────────────────────────
+.graph-ctrl-btn:hover {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.22);
+  color: #222;
+}
+
 .graph-legend {
   display: flex;
   gap: 1.25rem;
@@ -634,18 +1125,15 @@ $hover-bg: #dde3ec;
 
 
 // =============================================================================
-// CONCEPT DETAIL CARD
+// CONCEPT DETAIL  (rendered into the central panel)
 // =============================================================================
 .concept-detail-inner {
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
-  padding: 1rem 1.1rem;
-  background: #fff;
+  padding: 0;
 }
 
 .concept-detail-header h3 {
   margin: 0 0 0.5rem;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -666,6 +1154,8 @@ $hover-bg: #dde3ec;
   color: #444;
   line-height: 1.55;
   margin: 0 0 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .concept-relations {
@@ -704,9 +1194,7 @@ $hover-bg: #dde3ec;
   text-decoration-style: dotted;
 }
 
-.rel-link:hover {
-  text-decoration-style: solid;
-}
+.rel-link:hover { text-decoration-style: solid; }
 
 .concept-tag-chips {
   display: flex;
@@ -714,75 +1202,204 @@ $hover-bg: #dde3ec;
   flex-wrap: wrap;
 }
 
+.concept-detail-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #eee;
+}
+
+.graph-link {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 999px;
+  color: #666;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.graph-link svg { color: #999; transition: color 0.15s ease; }
+
+.graph-link:hover {
+  border-color: var(--color-teal);
+  color: var(--color-teal-dark);
+  background: var(--color-teal-light);
+}
+
+.graph-link:hover svg { color: var(--color-teal); }
+
 
 // =============================================================================
-// MOBILE
+// COMPACT MODE  —  everything below $bp-nav (the same width the site nav
+// itself collapses at). One cutover, not two: the sidebar drops above the
+// main column, the pipeline rail becomes a full-width accordion, AND the
+// sidebar collapses behind a toggle with its own Terms/Pipeline tab
+// switcher. Previously this was split across a $bp-tablet (768px)
+// stacking query and a separate $bp-mobile (600px) collapse-behind-toggle
+// query, which left a dead zone between the two where the rail had
+// already given up its side-by-side position but the sidebar/tab-switcher
+// behaviour hadn't kicked in yet. Folding it into one query at $bp-desktop
+// removed THAT gap, but left a new one between $bp-nav and $bp-desktop —
+// where the rest of the page (nav included) had already gone mobile but
+// this layout hadn't — so the cutover now matches $bp-nav instead, in
+// sync with glossary.js and with the rest of the page.
 // =============================================================================
-@media (max-width: $bp-mobile) {
+@media (max-width: $bp-nav) {
+  .glossary-page { padding: 0.75rem; }
 
-  .top-section {
-    flex-direction: column;
-    align-items: flex-start;
+  .glossary-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "top"
+      "sidebar"
+      "main";
   }
 
-  .pipeline {
-    flex-direction: column;
-    gap: 2px;
-  }
+  .top-section { flex-wrap: wrap; }
 
-  .pipeline-step,
-  .pipeline-step:first-child,
-  .pipeline-step:last-child {
-    clip-path: none;
-    border-radius: 4px;
-    border: 1px solid #ddd;
-    margin-right: 0;
-    padding: 0.6rem 1rem;
-    background: #f5f7fa;
-  }
-
-  .pipeline-step.active {
-    background: var(--color-teal);
-    border-color: var(--color-teal);
-    color: #fff;
-  }
-
-  .tag-filters-wrapper {
-    align-items: flex-start;
-  }
-
-  .tag-filters {
-    justify-content: flex-start;
-  }
-
-  .glossary-controls {
-    flex-direction: column;
-  }
-
-  .glossary-body {
-    flex-direction: column;
-  }
-
-  .glossary-list-panel {
-    flex: none;
-    width: 100%;
-    max-height: 300px;
-  }
-
-  .glossary-detail-panel {
+  .glossary-sidebar {
     position: static;
-    width: 100%;
+    max-height: none;
   }
 
-  // Shorter graph on mobile, globe tilt disabled
-  .graph-empty-state {
-    height: 260px;
+  // No room for a side-by-side rail, so the pipeline panel stacks under
+  // the detail panel and collapses by height (accordion) instead of by
+  // width (rail).
+  .content-row { flex-direction: column; }
+
+  .pipeline-panel {
+    position: static;
+    max-height: none;
+    width: 100%;
+    flex-basis: auto;
   }
+
+  // These need to match (or beat) the specificity of the collapsed-rail
+  // rules above (.pipeline-panel:not(.open) .pipeline-panel-toggle /
+  // -toggle-label), or the rail styling keeps winning here whenever the
+  // panel happens to be collapsed — which is exactly what was causing
+  // the vertical, rotated-text tray to still show up in compact mode.
+  .pipeline-panel .pipeline-panel-toggle,
+  .pipeline-panel:not(.open) .pipeline-panel-toggle {
+    flex-direction: row;
+    height: auto;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid #eee;
+    gap: 0;
+  }
+
+  .pipeline-panel .pipeline-panel-toggle-label,
+  .pipeline-panel:not(.open) .pipeline-panel-toggle-label {
+    writing-mode: horizontal-tb;
+    transform: none;
+  }
+
+  .pipeline-panel:not(.open) .pipeline-panel-toggle-chevron { transform: rotate(90deg); }
+  .pipeline-panel.open .pipeline-panel-toggle-chevron { transform: rotate(270deg); }
+
+  .pipeline-panel-body { max-height: 340px; }
+
+  // Terms/Pipeline switcher becomes a real tab control, and JS reparents
+  // #pipeline-panel into the Pipeline tab panel — same breakpoint as
+  // everything else above, so the panel is never mid-transition between
+  // "rail" and "embedded" while the surrounding layout has already moved on.
+  .sidebar-body .sidebar-tabs {
+    display: flex;
+    width: 100%;
+    flex-shrink: 0;
+  }
+
+  .sidebar-tabs .mode-btn {
+    white-space: nowrap;
+    min-width: 0;
+  }
+
+  .sidebar-tab-panel { display: none; }
+  .sidebar-tab-panel.active { display: flex; }
+
+  .view-settings-card {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    border-radius: 12px 12px 0 0;
+    transform: translateY(12px);
+  }
+
+  .view-settings-card.popover-open { transform: translateY(0); }
+
+  // Sidebar collapses behind a toggle so it doesn't push the pipeline
+  // and detail panel below the fold on small/medium screens.
+  .sidebar-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .sidebar-toggle-chevron {
+    color: #999;
+    transition: transform 0.2s ease;
+  }
+
+  .sidebar-toggle.open .sidebar-toggle-chevron { transform: rotate(180deg); }
+
+  .sidebar-body {
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+  }
+
+  .sidebar-body.open {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 1rem 1rem 0.75rem;
+  }
+
+  .sidebar-body.open.showing-pipeline {
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  #detail-panel { padding: 1rem; }
+
+  .graph-empty-state { height: 220px; }
 
   #concept-graph {
-    height: 300px;
-    // Disable 3D globe effect on touch devices to avoid interaction conflicts
+    height: 280px;
     touch-action: pan-x pan-y;
-    &:hover { transform: none !important; }
+  }
+}
+
+
+// =============================================================================
+// NARROW-PHONE FINE-TUNING
+// =============================================================================
+@media (max-width: $bp-mobile) {
+  .sidebar-tabs .mode-btn {
+    font-size: 0.76rem;
+    padding: 0.5rem 0.3rem;
   }
 }

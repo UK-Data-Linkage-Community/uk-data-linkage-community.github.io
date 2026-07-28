@@ -1,9 +1,5 @@
 ---
 layout: glossary
-title: "Glossary"
+title: "Glossary (coming soon)"
 permalink: resources/glossary/
 ---
-
-## Glossary Pipeline
-
-Click a stage to explore methods and definitions.
