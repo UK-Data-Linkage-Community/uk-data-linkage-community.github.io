@@ -755,13 +755,20 @@
   font-size: 0.72rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, color 0.15s ease, border-radius 0.2s ease, padding 0.2s ease;
 }
 
 .analogy-pill:hover,
 .analogy-pill.open {
   background: #e07b39;
   color: #fff;
+}
+
+.analogy-pill.open {
+  border-radius: 8px;
+  padding: 0.55rem 0.22rem;
+  writing-mode: vertical-lr;
+  text-orientation: sideways;
 }
 
 .analogy-text {
