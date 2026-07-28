@@ -814,8 +814,8 @@
 
 .glossary-term .tag-chip {
   padding: 0;
-  width: 8px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   font-size: 0;
   line-height: 0;
@@ -967,8 +967,12 @@
 .term-tags-inline {
   flex-shrink: 0;
   display: flex;
-  gap: 0.25rem;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-end;
   align-items: center;
+  gap: 0.15rem;
+  max-height: 15px; // ~2 dots per column before wrapping into a new one
 }
 
 .glossary-list-empty {

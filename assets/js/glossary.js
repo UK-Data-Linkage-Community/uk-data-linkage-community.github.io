@@ -211,11 +211,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Definition text + an analogy, shown inline or as an expandable pill
-  // depending on the "Show analogies inline" preference.
-  function renderDefinitionBlock(c) {
+  // depending on the "Show analogies inline" preference. Pass
+  // allowAnalogy=false to suppress the analogy entirely (used for the
+  // pipeline section overview, where the term list is dense and the
+  // analogy pill is reserved for the fuller concept-detail view).
+  function renderDefinitionBlock(c, allowAnalogy = true) {
     const defHtml = linkifyDefinition(getDefinitionText(c));
 
-    if (!c.analogy) {
+    if (!allowAnalogy || !c.analogy) {
       return `<span class="panel-def">${defHtml}</span>`;
     }
 
@@ -290,7 +293,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <p class="panel-concept">
               <strong class="concept-link" data-id="${c.id}">${c.prefLabel}</strong>
               <span class="panel-tags">${tagHtml}</span>
-              ${renderDefinitionBlock(c)}
+              ${renderDefinitionBlock(c, false)}
             </p>`;
         });
       } else {
@@ -902,7 +905,12 @@ document.addEventListener("DOMContentLoaded", function () {
       container.appendChild(ctrl);
     }
 
-    setFocus(id) {
+    // `selected` controls whether the focus node renders as the teal
+    // "Selected" pill. Pass false for an ambient/default focus (e.g.
+    // panning near a starting concept when the graph is opened without
+    // an explicit term choice) so the view centers there without
+    // claiming anything is actually selected.
+    setFocus(id, selected = true) {
       this.focusId = id;
       const dist   = this._bfs(id);
 
@@ -915,7 +923,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const glow  = g.select(".node-glow");
         const lbl   = g.select(".node-label");
         const dv    = dist.get(d.id) ?? 99;
-        const isCenter = d.id === id;
+        const isCenter = selected && d.id === id;
 
         // `border` is the relation-tinted ring color; the pill's own
         // fill stays a constant white card and only its opacity fades
@@ -926,10 +934,12 @@ document.addEventListener("DOMContentLoaded", function () {
         if (isCenter) {
           scale = 1.3; border = PALETTE.center;
           fillOp = 0.98; strokeOp = 0.9; glowOp = 0.16; fontOp = 1;
-        } else if (dv === 1) {
-          const t = this._relType(id, d.id);
-          scale = 1.05; border = PALETTE[t] || PALETTE.ghost;
-          fillOp = 0.94; strokeOp = 0.65; glowOp = 0; fontOp = 0.92;
+        } else if (dv === 0 || dv === 1) {
+          // dv === 0 here only happens when selected=false (the focus
+          // node itself, rendered like a near neighbor rather than the
+          // highlighted center).
+          border = dv === 1 ? (PALETTE[this._relType(id, d.id)] || PALETTE.ghost) : PALETTE.ghost;
+          scale = 1.05; fillOp = 0.94; strokeOp = 0.65; glowOp = 0; fontOp = 0.92;
         } else if (dv === 2) {
           scale = 0.85; border = PALETTE.ghost;
           fillOp = 0.6; strokeOp = 0.3; glowOp = 0; fontOp = 0.5;
@@ -1047,6 +1057,20 @@ document.addEventListener("DOMContentLoaded", function () {
   // ═══════════════════════════════════════════════════════════════════
   let graphManager = null;
 
+  // When the graph is opened cold (no term already selected), pan it
+  // near this concept as an ambient starting point rather than leaving
+  // it centered on nothing — but don't mark anything as "Selected".
+  const DEFAULT_GRAPH_FOCUS_ID = "entity-resolution";
+
+  function focusGraphOnCurrentOrDefault() {
+    if (!graphManager) return;
+    if (activeConceptId) {
+      graphManager.setFocus(activeConceptId);
+    } else if (conceptMap[DEFAULT_GRAPH_FOCUS_ID]) {
+      graphManager.setFocus(DEFAULT_GRAPH_FOCUS_ID, false);
+    }
+  }
+
   function initConceptGraph() {
     const svgEl = document.getElementById("concept-graph");
     if (!svgEl || graphManager) return;
@@ -1060,7 +1084,7 @@ document.addEventListener("DOMContentLoaded", function () {
         conceptMap,
         id => selectGlossaryConcept(id, false)
       );
-      if (activeConceptId) graphManager.setFocus(activeConceptId);
+      focusGraphOnCurrentOrDefault();
     });
   }
 
@@ -1071,14 +1095,17 @@ document.addEventListener("DOMContentLoaded", function () {
       graphToggle.classList.add("open");
     }
     initConceptGraph(); // no-op after the first call; always (re-)focuses below
-    if (graphManager && activeConceptId) graphManager.setFocus(activeConceptId);
+    focusGraphOnCurrentOrDefault();
   }
 
   graphToggle.addEventListener("click", () => {
     const isOpen = graphBody.style.display === "block";
-    graphBody.style.display = isOpen ? "none" : "block";
-    graphToggle.classList.toggle("open", !isOpen);
-    if (!isOpen) initConceptGraph(); // no-op after the first call
+    if (isOpen) {
+      graphBody.style.display = "none";
+      graphToggle.classList.remove("open");
+      return;
+    }
+    expandGraphSection();
   });
 
   // ═══════════════════════════════════════════════════════════════════
