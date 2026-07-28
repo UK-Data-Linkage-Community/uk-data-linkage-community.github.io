@@ -158,6 +158,39 @@ document.addEventListener("DOMContentLoaded", function () {
   graphContainer.style.display = "none";
 
   // ═══════════════════════════════════════════════════════════════════
+  // CONCEPT GRAPH — lives at the bottom of whichever term is currently
+  // open, rather than as its own always-visible section. It's a single
+  // DOM node (so the D3 graph inside it is only ever built once); we
+  // move that same node into and out of the detail panel as the person
+  // navigates, the same reparenting trick used for the pipeline panel
+  // above. It's always moved OUT before content.innerHTML runs (which
+  // would otherwise destroy it) and back IN afterward if a concept is
+  // showing.
+  // ═══════════════════════════════════════════════════════════════════
+  const graphSection = graphToggle.closest(".graph-section") || graphBody.parentElement;
+
+  // Unlike the pipeline panel, the graph has no legitimate "page" home —
+  // it only ever makes sense attached to one specific term. So instead of
+  // parking it back at its original spot in the markup (which made it
+  // appear as a standalone, term-less section whenever no concept was
+  // active), it's parked in a detached, hidden holder whenever it isn't
+  // mounted inside a concept's own detail view.
+  const graphSectionHolder = document.createElement("div");
+  graphSectionHolder.style.display = "none";
+  graphSectionHolder.appendChild(graphSection);
+  document.body.appendChild(graphSectionHolder);
+
+  function homeGraphSection() {
+    if (graphSection.parentElement !== graphSectionHolder) {
+      graphSectionHolder.appendChild(graphSection);
+    }
+  }
+
+  function mountGraphSectionInto(container) {
+    if (container) container.appendChild(graphSection);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
   // DISPLAY PREFERENCES
   // ═══════════════════════════════════════════════════════════════════
   let defMode      = "technical"; // "technical" | "plain"
@@ -274,6 +307,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderSection(section) {
+    // Not a single-term view — the graph dropdown only belongs at the
+    // bottom of a concept's own detail, so park it back at its home
+    // spot in the page rather than leaving it orphaned mid-innerHTML-swap.
+    homeGraphSection();
+
     activeSection   = section;
     activeConceptId = null;
 
@@ -311,6 +349,11 @@ document.addEventListener("DOMContentLoaded", function () {
     const concept = conceptMap[conceptId];
     if (!concept) return;
 
+    // Detach the graph section BEFORE wiping content — it may currently
+    // be sitting inside content (from the previously-viewed concept),
+    // and innerHTML would silently destroy it otherwise.
+    homeGraphSection();
+
     activeConceptId = conceptId;
     activeSection    = null;
 
@@ -346,20 +389,20 @@ document.addEventListener("DOMContentLoaded", function () {
           : ""}
         <div class="concept-detail-footer">
           <div class="concept-tag-chips">${tagHtml}</div>
-          <button class="graph-link" type="button" data-graph-for="${concept.id}">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/>
-              <line x1="7" y1="11" x2="17" y2="6"/><line x1="7" y1="13" x2="17" y2="18"/>
-            </svg>
-            View in concept graph
-          </button>
         </div>
       </div>`;
+
+    // The graph section (with its own toggle header) is reparented in
+    // here, at the very bottom, so it reads as this term's own
+    // "concept graph" dropdown rather than a separate page section.
+    mountGraphSectionInto(content.querySelector(".concept-detail-inner"));
 
     attachContentLinkHandlers();
   }
 
   function showEmptyDetail() {
+    homeGraphSection();
+
     activeSection   = null;
     activeConceptId = null;
     content.innerHTML = `<p class="detail-empty">Select a stage from the pipeline panel, or a term from the browse list, to see its definition here.</p>`;
@@ -369,13 +412,6 @@ document.addEventListener("DOMContentLoaded", function () {
   function attachContentLinkHandlers() {
     content.querySelectorAll(".concept-link, .def-link, .rel-link").forEach(el => {
       el.addEventListener("click", () => selectGlossaryConcept(el.dataset.id, false));
-    });
-    content.querySelectorAll(".graph-link").forEach(el => {
-      el.addEventListener("click", () => {
-        expandGraphSection();
-        document.querySelector(".graph-section")
-          ?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
     });
   }
 
@@ -735,11 +771,13 @@ document.addEventListener("DOMContentLoaded", function () {
         .attr("flood-color", "#1e293b")
         .attr("flood-opacity", 0.22);
 
+      // refX is centered (5, not 6) since these sit at the midpoint of
+      // a path via marker-mid rather than at a line's end via marker-end.
       ["broader", "narrower", "related"].forEach(t => {
         defs.append("marker")
           .attr("id",           `cgm-arrow-${t}`)
           .attr("viewBox",      "0 -5 10 10")
-          .attr("refX",         6).attr("refY", 0)
+          .attr("refX",         5).attr("refY", 0)
           .attr("markerWidth",  5).attr("markerHeight", 5)
           .attr("orient",       "auto")
           .append("path")
@@ -755,10 +793,15 @@ document.addEventListener("DOMContentLoaded", function () {
         .on("zoom", e => this._g.attr("transform", e.transform));
       svg.call(this._zoom);
 
+      // Links are <path> elements (not <line>) purely so a marker-mid
+      // arrowhead has a real interior vertex to anchor to — the path is
+      // still just two straight segments through the same start/mid/end
+      // points a line would use.
       this._linkSel = this._g.append("g").attr("class", "cgm-links")
-        .selectAll("line")
+        .selectAll("path")
         .data(this.links)
-        .join("line")
+        .join("path")
+          .attr("fill",           "none")
           .attr("stroke",         PALETTE.link)
           .attr("stroke-width",   0.8)
           .attr("stroke-opacity", 0.28);
@@ -857,16 +900,37 @@ document.addEventListener("DOMContentLoaded", function () {
         .force("link",
           d3.forceLink(this.links)
             .id(d => d.id)
-            .distance(110)
-            .strength(0.35)
+            .distance(90)
+            .strength(0.55)
         )
-        .force("charge", d3.forceManyBody().strength(-220))
+        // distanceMax keeps far-apart nodes from exerting a long-range
+        // shove on each other, which is what caused the initial layout
+        // to feel erratic — repulsion now only acts locally, so neighbor
+        // spacing settles evenly instead of a few nodes flying outward.
+        .force("charge", d3.forceManyBody().strength(-200).distanceMax(260))
         .force("center", d3.forceCenter(W / 2, H / 2))
+        // Weak, constant pull toward the center on both axes so the
+        // whole layout stays put instead of slowly drifting off-frame
+        // once alpha cools — this is what makes it feel "stable" at rest.
+        .force("x", d3.forceX(W / 2).strength(0.045))
+        .force("y", d3.forceY(H / 2).strength(0.045))
         // Collision radius uses each pill's half-diagonal instead of a
         // fixed dot radius, since pills vary in width/height with label
         // length — otherwise longer labels would overlap their neighbors.
-        .force("collide", d3.forceCollide(d => Math.hypot(d.pillW / 2, d.pillH / 2) + 6))
-        .on("tick", () => this._updatePositions());
+        // A couple of extra iterations spread neighbors more evenly
+        // around each node rather than settling for the first
+        // non-overlapping arrangement it finds.
+        .force("collide", d3.forceCollide(d => Math.hypot(d.pillW / 2, d.pillH / 2) + 6).iterations(3))
+        .on("tick", () => this._updatePositions())
+        .stop();
+
+      // Warm-start: run the simulation to a near-settled state silently
+      // before it's ever painted, so the graph opens calm and in place
+      // instead of visibly flinging nodes around for the first second.
+      for (let i = 0; i < 300; i++) this._sim.tick();
+      this._updatePositions();
+
+      this._sim.alphaTarget(0).restart();
     }
 
     // Positions node groups and draws links so they touch each pill's
@@ -876,11 +940,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // won't otherwise re-tick to reflect the new sizes.
     _updatePositions() {
       this._nodeG.attr("transform", d => `translate(${d.x ?? 0},${d.y ?? 0})`);
-      this._linkSel
-        .attr("x1", d => pillEdgePoint(d.source, d.target.x, d.target.y).x)
-        .attr("y1", d => pillEdgePoint(d.source, d.target.x, d.target.y).y)
-        .attr("x2", d => pillEdgePoint(d.target, d.source.x, d.source.y).x)
-        .attr("y2", d => pillEdgePoint(d.target, d.source.x, d.source.y).y);
+      this._linkSel.attr("d", d => {
+        const p1 = pillEdgePoint(d.source, d.target.x, d.target.y);
+        const p2 = pillEdgePoint(d.target, d.source.x, d.source.y);
+        const mx = (p1.x + p2.x) / 2;
+        const my = (p1.y + p2.y) / 2;
+        return `M${p1.x},${p1.y}L${mx},${my}L${p2.x},${p2.y}`;
+      });
     }
 
     _attachControls() {
@@ -993,29 +1059,35 @@ document.addEventListener("DOMContentLoaded", function () {
         const lk = d3.select(links[i]);
 
         if (minD === 0 && maxD === 1) {
+          // Color (and arrow) from the FOCUSED node's point of view, not
+          // the edge's stored/absolute type — otherwise a link up to a
+          // broader term shows blue instead of matching that term's
+          // orange border whenever the focus is the narrower side.
+          const neighborId = srcId === id ? tgtId : srcId;
+          const relType     = this._relType(id, neighborId);
           lk.transition().duration(380)
-            .attr("stroke",       PALETTE[l.type] || PALETTE.related)
+            .attr("stroke",       PALETTE[relType] || PALETTE.related)
             .attr("stroke-width", 1.9)
             .attr("stroke-opacity", 0.62)
-            .attr("marker-end",   `url(#cgm-arrow-${l.type})`);
+            .attr("marker-mid",   `url(#cgm-arrow-${relType})`);
         } else if (minD <= 1 && maxD === 2) {
           lk.transition().duration(380)
             .attr("stroke",         PALETTE.link)
             .attr("stroke-width",   1)
             .attr("stroke-opacity", 0.18)
-            .attr("marker-end",     null);
+            .attr("marker-mid",     null);
         } else if (minD <= 2 && maxD <= 3) {
           lk.transition().duration(380)
             .attr("stroke",         PALETTE.link)
             .attr("stroke-width",   0.7)
             .attr("stroke-opacity", 0.08)
-            .attr("marker-end",     null);
+            .attr("marker-mid",     null);
         } else {
           lk.transition().duration(380)
             .attr("stroke",         PALETTE.link)
             .attr("stroke-width",   0.5)
             .attr("stroke-opacity", 0.03)
-            .attr("marker-end",     null);
+            .attr("marker-mid",     null);
         }
       });
 
