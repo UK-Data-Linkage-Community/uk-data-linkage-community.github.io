@@ -9,7 +9,7 @@ permalink: /acknowledgements/
   <p class="contribute-intro">
     This project exists because of the people who've given their time,
     code, data, and ideas to it. Our <a href="/people/">founders and core
-    team</a> have their own page — this one is for everyone else who's
+    team</a> have their own page so this one is for everyone else who's
     helped build it.
   </p>
 

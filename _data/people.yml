@@ -68,10 +68,10 @@ contributors:
   #              and the link, unless `url` overrides the link target
   # url:         optional, overrides the link target (use for a
   #              personal site etc. instead of/as well as GitHub)
-  - id: jane-doe
-    name: "Jane Doe"
-    affiliation: "University X"
-    github: janedoe
+  - id: james
+    name: "James Kemmery"
+    affiliation: "SeRP UK, Swansea University"
+    github: JamesKemmery
 
   - id: alex-park
     name: "Alex Park"
