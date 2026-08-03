@@ -7,18 +7,26 @@
   specific thanks — not just a chip. Pulls from site.data.people.members.
 
   Avatar priority: `image` (local) > `github` avatar > initials fallback.
-  Link target: `url` if set, else github profile if `github` is set,
-  else no link (plain text name).
+  Primary name link: github profile if set, else `url` (personal site).
+
+  Icon row: auto-detected from which fields are present — no manual
+  icon selection needed. Supported: github, linkedin, orcid, scholar,
+  url (personal site). `github`/`linkedin`/`orcid`/`scholar` accept
+  either a bare username/ID or a full URL. `extra_links` is a generic
+  fallback for anything else (Mastodon, a paper, etc.) — each item is
+  `{label, url}` and optionally `icon` (a Font Awesome class), defaulting
+  to a plain link icon if omitted.
 {%- endcomment -%}
 
-<!-- DEBUG members-list: site.data.people = {{ site.data.people | jsonify }} -->
 {%- assign spotlighted = site.data.people.members -%}
 {%- if spotlighted and spotlighted.size > 0 -%}
 <ul class="member-spotlight-grid">
   {%- for person in spotlighted -%}
-    {%- assign link_url = person.url | default: nil -%}
-    {%- if link_url == nil and person.github -%}
+    {%- assign link_url = nil -%}
+    {%- if person.github -%}
       {%- assign link_url = "https://github.com/" | append: person.github -%}
+    {%- elsif person.url -%}
+      {%- assign link_url = person.url -%}
     {%- endif -%}
 
   <li class="member-spotlight-card" id="{{ person.id }}">
@@ -40,21 +48,101 @@
     </span>
 
     <span class="member-spotlight-card__body">
-      {%- if link_url -%}
-      <a class="member-spotlight-card__name" href="{{ link_url }}" target="_blank" rel="noopener">{{ person.name }}</a>
-      {%- else -%}
-      <span class="member-spotlight-card__name">{{ person.name }}</span>
-      {%- endif -%}
+      <span class="member-spotlight-card__heading">
+        {%- if link_url -%}
+        <a class="member-spotlight-card__name" href="{{ link_url }}" target="_blank" rel="noopener">{{ person.name }}</a>
+        {%- else -%}
+        <span class="member-spotlight-card__name">{{ person.name }}</span>
+        {%- endif -%}
+
+        {%- if person.role -%}
+        <span class="member-spotlight-card__role">{{ person.role }}</span>
+        {%- endif -%}
+      </span>
 
       {%- if person.affiliation -%}
       <span class="member-spotlight-card__affiliation">{{ person.affiliation }}</span>
       {%- endif -%}
 
       {%- if person.content -%}
-      <p class="member-spotlight-card__note">{{ person.content }}</p>
+        {%- assign note_is_long = false -%}
+        {%- if person.content.size > 220 -%}
+          {%- assign note_is_long = true -%}
+        {%- endif -%}
+      <p class="member-spotlight-card__note{% if note_is_long %} member-spotlight-card__note--clamped{% endif %}">{{ person.content }}</p>
+        {%- if note_is_long -%}
+      <button type="button" class="member-spotlight-card__toggle">Read more</button>
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- if person.github or person.linkedin or person.orcid or person.scholar or person.url or person.extra_links -%}
+      <span class="member-spotlight-card__icon-links">
+        {%- if person.github -%}
+        <a class="member-spotlight-card__icon-link" href="https://github.com/{{ person.github }}" target="_blank" rel="noopener" title="GitHub" aria-label="{{ person.name }} on GitHub">
+          <i class="fa-brands fa-github" aria-hidden="true"></i>
+        </a>
+        {%- endif -%}
+
+        {%- if person.orcid -%}
+          {%- assign orcid_url = person.orcid -%}
+          {%- unless orcid_url contains "http" -%}
+            {%- assign orcid_url = "https://orcid.org/" | append: orcid_url -%}
+          {%- endunless -%}
+        <a class="member-spotlight-card__icon-link" href="{{ orcid_url }}" target="_blank" rel="noopener" title="ORCID" aria-label="{{ person.name }} on ORCID">
+          <i class="fa-brands fa-orcid" aria-hidden="true"></i>
+        </a>
+        {%- endif -%}
+
+        {%- if person.scholar -%}
+          {%- assign scholar_url = person.scholar -%}
+          {%- unless scholar_url contains "http" -%}
+            {%- assign scholar_url = "https://scholar.google.com/citations?user=" | append: scholar_url -%}
+          {%- endunless -%}
+        <a class="member-spotlight-card__icon-link" href="{{ scholar_url }}" target="_blank" rel="noopener" title="Google Scholar" aria-label="{{ person.name }} on Google Scholar">
+          <i class="fa-solid fa-graduation-cap" aria-hidden="true"></i>
+        </a>
+        {%- endif -%}
+
+        {%- if person.linkedin -%}
+          {%- assign linkedin_url = person.linkedin -%}
+          {%- unless linkedin_url contains "http" -%}
+            {%- assign linkedin_url = "https://www.linkedin.com/in/" | append: linkedin_url -%}
+          {%- endunless -%}
+        <a class="member-spotlight-card__icon-link" href="{{ linkedin_url }}" target="_blank" rel="noopener" title="LinkedIn" aria-label="{{ person.name }} on LinkedIn">
+          <i class="fa-brands fa-linkedin" aria-hidden="true"></i>
+        </a>
+        {%- endif -%}
+
+        {%- if person.url -%}
+        <a class="member-spotlight-card__icon-link" href="{{ person.url }}" target="_blank" rel="noopener" title="Website" aria-label="{{ person.name }}'s website">
+          <i class="fa-solid fa-globe" aria-hidden="true"></i>
+        </a>
+        {%- endif -%}
+
+        {%- if person.extra_links -%}
+          {%- for link in person.extra_links -%}
+        <a class="member-spotlight-card__icon-link" href="{{ link.url }}" target="_blank" rel="noopener" title="{{ link.label }}" aria-label="{{ person.name }} — {{ link.label }}">
+          <i class="{{ link.icon | default: 'fa-solid fa-link' }}" aria-hidden="true"></i>
+        </a>
+          {%- endfor -%}
+        {%- endif -%}
+      </span>
       {%- endif -%}
     </span>
   </li>
   {%- endfor -%}
 </ul>
+<script>
+  (function () {
+    if (window.__memberSpotlightToggleBound) return;
+    window.__memberSpotlightToggleBound = true;
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('.member-spotlight-card__toggle');
+      if (!btn) return;
+      var card = btn.closest('.member-spotlight-card');
+      var expanded = card.classList.toggle('is-expanded');
+      btn.textContent = expanded ? 'Read less' : 'Read more';
+    });
+  })();
+</script>
 {%- endif -%}

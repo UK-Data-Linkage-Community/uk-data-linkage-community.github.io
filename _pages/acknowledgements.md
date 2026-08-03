@@ -6,8 +6,6 @@ permalink: /acknowledgements/
 
 <div class="contribute-page">
 
-  <pre>{{ site.data.people | jsonify }}</pre>
-
   <p class="contribute-intro">
     This project exists because of the people who've given their time,
     code, data, and ideas to it. Our <a href="/people/">founders and core

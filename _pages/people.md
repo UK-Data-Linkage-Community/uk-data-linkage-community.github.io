@@ -5,7 +5,7 @@ permalink: /people/
 headshot_width: "200px"
 ---
 
-{% for person in site.data.people %}
+{% for person in site.data.people.founders %}
 <div class="person">
   <div class="person-info">
     <h2>{{ person.name }}</h2>

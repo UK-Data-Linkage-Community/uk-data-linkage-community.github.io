@@ -42,7 +42,23 @@ members:
   - id: jason-summers
     name: "Jason Summers"
     github: jsonSummers
-    content: ""
+    affiliation: "SeRP UK, Swansea University"
+    role: "Assistant Researcher"
+    orcid: "0009-0006-4161-2865"
+    scholar: "gpECkAAAAJ"
+    linkedin: "jsonsummers"
+#    url: "https://example.com"
+    content: "Assiting in community and website development"
+
+  - id: member-mike-edwards
+    name: "Mike Edwards"
+    github: medwar99
+    affiliation: "SeRP UK, Swansea University"
+    role: "Principal Data Linkage Architect"
+    orcid: "0000-0003-3367-969X"
+    scholar: "gny4gIoAAAAJ"
+    linkedin: "mike-edwards-65006634"
+    content: "Leading the development of record linkage solutions and methodologies. Leading the development of record linkage solutions and methodologiesLeading the development of record linkage solutions and methodologiesLeading the development of record linkage solutions and methodologiesLeading the development of record linkage solutions and methodologiesLeading the development of record linkage solutions and methodologiesLeading the development of record linkage solutions and methodologiesLeading the development of record linkage solutions and methodologies"
 
 contributors:
   # id:          required, stable key / anchor
