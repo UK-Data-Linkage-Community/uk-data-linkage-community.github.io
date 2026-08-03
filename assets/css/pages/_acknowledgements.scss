@@ -1,0 +1,246 @@
+// Page-specific styling for /acknowledgements/
+// Import this into your main stylesheet, e.g.:
+//   @import "pages/contribute";
+
+.contribute-page {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+}
+
+.contribute-intro {
+  color: var(--color-grey);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+
+  a {
+    color: var(--color-teal);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.15s ease;
+
+    &:hover {
+      border-color: var(--color-teal);
+    }
+  }
+}
+
+// ---------------------------------------------------------------
+// Section scaffolding (shared by "Core contributors" / "Community
+// contributors" etc.)
+// ---------------------------------------------------------------
+
+.contribute-section {
+  margin-bottom: 3.5rem;
+
+  &:last-of-type {
+    margin-bottom: 2.5rem;
+  }
+
+  h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    margin: 0 0 0.35rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--color-grey) 35%, transparent);
+  }
+}
+
+.contribute-section__intro {
+  color: var(--color-grey);
+  font-size: 0.88rem;
+  margin: 0.6rem 0 1.4rem;
+}
+
+.contributors-empty {
+  color: var(--color-grey);
+  font-size: 0.9rem;
+  font-style: italic;
+}
+
+// ---------------------------------------------------------------
+// Shared avatar treatment (used by both the chip wall and the
+// spotlight cards, so the two stay visually consistent)
+// ---------------------------------------------------------------
+
+%avatar-circle {
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--color-grey);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+%avatar-initials {
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+// ---------------------------------------------------------------
+// Community contributor wall (chips)
+// ---------------------------------------------------------------
+
+.contributors-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.contributor-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--color-grey);
+  border-radius: 999px;
+  background: transparent;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-teal);
+    transform: translateY(-1px);
+  }
+}
+
+.contributor-chip__avatar {
+  @extend %avatar-circle;
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.contributor-chip__initials {
+  @extend %avatar-initials;
+  font-size: 0.8rem;
+}
+
+.contributor-chip__meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; // allow ellipsis on long names
+}
+
+.contributor-chip__name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  a& ,
+  &:is(a) {
+    color: var(--color-teal);
+  }
+}
+
+.contributor-chip__affiliation {
+  font-size: 0.78rem;
+  color: var(--color-grey);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// ---------------------------------------------------------------
+// Core contributor spotlight (cards)
+// ---------------------------------------------------------------
+
+.member-spotlight-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.member-spotlight-card {
+  display: flex;
+  gap: 0.9rem;
+  padding: 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--color-grey) 35%, transparent);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--color-teal) 4%, transparent);
+  transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    border-color: var(--color-teal);
+    background: color-mix(in srgb, var(--color-teal) 7%, transparent);
+    transform: translateY(-1px);
+  }
+}
+
+.member-spotlight-card__avatar {
+  @extend %avatar-circle;
+  width: 3.25rem;
+  height: 3.25rem;
+}
+
+.member-spotlight-card__initials {
+  @extend %avatar-initials;
+  font-size: 1.1rem;
+}
+
+.member-spotlight-card__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.member-spotlight-card__name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: inherit;
+  text-decoration: none;
+
+  &:is(a) {
+    color: var(--color-teal);
+  }
+}
+
+.member-spotlight-card__affiliation {
+  font-size: 0.8rem;
+  color: var(--color-grey);
+  margin-top: 0.1rem;
+}
+
+.member-spotlight-card__note {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: inherit;
+  margin: 0.5rem 0 0;
+}
+
+// ---------------------------------------------------------------
+
+.contribute-cta {
+  margin-top: 3rem;
+  text-align: center;
+  color: var(--color-grey);
+  font-size: 0.95rem;
+
+  a {
+    color: var(--color-teal);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

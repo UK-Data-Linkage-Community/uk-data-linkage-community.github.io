@@ -1,0 +1,55 @@
+{%- comment -%}
+  Renders the contributor "thank you wall".
+  Usage: {% include contributors-list.html %}
+
+  Avatars: no uploaded images. If `github` is set, we use GitHub's own
+  hosted avatar (https://github.com/{username}.png) -- just an <img>
+  request, nothing stored or built locally. Falls back to initials
+  when no `github` is given, or if the GitHub avatar request 404s.
+
+  Link target: `url` if set, else github profile if `github` is set,
+  else no link (plain text name).
+{%- endcomment -%}
+
+<!-- DEBUG contributors-list: site.data.people = {{ site.data.people | jsonify }} -->
+{%- assign raw = site.data.people.contributors -%}
+{%- if raw and raw.size > 0 -%}
+  {%- assign wall = raw | sort: "name" -%}
+<ul class="contributors-grid">
+  {%- for person in wall -%}
+    {%- assign link_url = person.url | default: nil -%}
+    {%- if link_url == nil and person.github -%}
+      {%- assign link_url = "https://github.com/" | append: person.github -%}
+    {%- endif -%}
+    {%- assign initials = person.name | slice: 0, 1 | append: (person.name | split: " " | last | slice: 0, 1) -%}
+
+  <li class="contributor-chip" id="{{ person.id }}">
+    <span class="contributor-chip__avatar">
+      {%- if person.github -%}
+      <img
+        src="https://github.com/{{ person.github }}.png?size=64"
+        alt="{{ person.name }}"
+        loading="lazy"
+        width="36" height="36"
+        onerror="this.replaceWith(Object.assign(document.createElement('span'), {className: 'contributor-chip__initials', textContent: '{{ initials }}'}))">
+      {%- else -%}
+      <span class="contributor-chip__initials">{{ initials }}</span>
+      {%- endif -%}
+    </span>
+
+    <span class="contributor-chip__meta">
+      {%- if link_url -%}
+      <a class="contributor-chip__name" href="{{ link_url }}" target="_blank" rel="noopener">{{ person.name }}</a>
+      {%- else -%}
+      <span class="contributor-chip__name">{{ person.name }}</span>
+      {%- endif -%}
+      {%- if person.affiliation -%}
+      <span class="contributor-chip__affiliation">{{ person.affiliation }}</span>
+      {%- endif -%}
+    </span>
+  </li>
+  {%- endfor -%}
+</ul>
+{%- else -%}
+<p class="contributors-empty">No community contributions logged yet — be the first!</p>
+{%- endif -%}

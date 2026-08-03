@@ -1,0 +1,60 @@
+{%- comment -%}
+  Renders the curated "core contributors" spotlight section.
+  Usage: {% include members-list.html %}
+
+  Distinct from contributors-list.html: this is for a short, curated
+  set of people who get a photo/avatar, affiliation, and a sentence of
+  specific thanks — not just a chip. Pulls from site.data.people.members.
+
+  Avatar priority: `image` (local) > `github` avatar > initials fallback.
+  Link target: `url` if set, else github profile if `github` is set,
+  else no link (plain text name).
+{%- endcomment -%}
+
+<!-- DEBUG members-list: site.data.people = {{ site.data.people | jsonify }} -->
+{%- assign spotlighted = site.data.people.members -%}
+{%- if spotlighted and spotlighted.size > 0 -%}
+<ul class="member-spotlight-grid">
+  {%- for person in spotlighted -%}
+    {%- assign link_url = person.url | default: nil -%}
+    {%- if link_url == nil and person.github -%}
+      {%- assign link_url = "https://github.com/" | append: person.github -%}
+    {%- endif -%}
+
+  <li class="member-spotlight-card" id="{{ person.id }}">
+    <span class="member-spotlight-card__avatar">
+      {%- if person.image -%}
+      <img src="{{ person.image | relative_url }}" alt="{{ person.name }}" loading="lazy" width="56" height="56">
+      {%- elsif person.github -%}
+      <img
+        src="https://github.com/{{ person.github }}.png?size=112"
+        alt="{{ person.name }}"
+        loading="lazy"
+        width="56" height="56"
+        onerror="this.replaceWith(Object.assign(document.createElement('span'), {className: 'member-spotlight-card__initials', textContent: '{{ person.name | slice: 0, 1 }}{{ person.name | split: " " | last | slice: 0, 1 }}'}))">
+      {%- else -%}
+      <span class="member-spotlight-card__initials">
+        {{ person.name | slice: 0, 1 }}{{ person.name | split: " " | last | slice: 0, 1 }}
+      </span>
+      {%- endif -%}
+    </span>
+
+    <span class="member-spotlight-card__body">
+      {%- if link_url -%}
+      <a class="member-spotlight-card__name" href="{{ link_url }}" target="_blank" rel="noopener">{{ person.name }}</a>
+      {%- else -%}
+      <span class="member-spotlight-card__name">{{ person.name }}</span>
+      {%- endif -%}
+
+      {%- if person.affiliation -%}
+      <span class="member-spotlight-card__affiliation">{{ person.affiliation }}</span>
+      {%- endif -%}
+
+      {%- if person.content -%}
+      <p class="member-spotlight-card__note">{{ person.content }}</p>
+      {%- endif -%}
+    </span>
+  </li>
+  {%- endfor -%}
+</ul>
+{%- endif -%}

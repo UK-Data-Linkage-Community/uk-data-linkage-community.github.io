@@ -9,6 +9,8 @@ main:
         url: /about/
       - title: "Members"
         url: /people/
+      - title: "Acknowledgements"
+        url: /acknowledgements/
 
   - title: "Blog"
     url: /blog/
