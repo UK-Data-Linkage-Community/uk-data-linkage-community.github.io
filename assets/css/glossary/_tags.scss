@@ -1,0 +1,134 @@
+// =============================================================================
+// TAG CHIPS  (shared across central panel and term list)
+// =============================================================================
+.tag-chip {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 500;         // pale hues read better bolded
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tag-chip:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.glossary-term .tag-chip {
+  padding: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  font-size: 0;
+  line-height: 0;
+  opacity: 0.55;
+  transition: opacity 0.1s ease;
+}
+
+.glossary-term:hover .tag-chip { opacity: 1; }
+
+
+// =============================================================================
+// TAG FILTERS  (now live in the left "browse" drawer)
+// =============================================================================
+.tag-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tag-filter {
+  padding: 0.2rem 0.65rem;
+  font-size: 0.75rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tag-filter:hover { background: rgba(0, 0, 0, 0.04); }
+
+.tag-filter.active {
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 500;
+}
+
+.tag-count {
+  background: rgba(0, 0, 0, 0.07);
+  color: #777;
+  border-radius: 999px;
+  padding: 0 0.4rem;
+  font-size: 0.68rem;
+}
+
+
+// =============================================================================
+// TAG COLOR SYSTEM — expandable, generated from a single ordered list
+// =============================================================================
+// To add a new tag: just append its name to $tag-list. It gets a hue that's
+// maximally distinct from every existing tag (golden-angle spacing) — no
+// manual color picks needed.
+
+$tag-list: (
+  datatype, evaluation, python, deterministic, tool, visualisation,
+  metric, core, method, probabilistic, model, comparison
+);
+
+$tag-golden-angle: 137.508;
+$tag-light-bands: 24%, 38%, 52%;  // wider spread than before — adjacent
+                                   // hues now read as genuinely different
+                                   // colors, not just different-but-equally-
+                                   // dark smudges
+$tag-sat-bands: 88%, 100%;        // pushed up again — still reading dull
+                                   // at 82/96
+
+@for $i from 1 through length($tag-list) {
+  $name: nth($tag-list, $i);
+  $index: $i - 1;
+
+  // do the modulo in plain numbers, add 'deg' only at the end
+  $raw-hue: $index * $tag-golden-angle;
+  $hue: ($raw-hue - floor($raw-hue / 360) * 360) * 1deg;
+
+  $light: nth($tag-light-bands, ($index % 3) + 1);
+  $sat: nth($tag-sat-bands, ($index % 2) + 1);
+
+  // HSL isn't perceptually uniform: yellow/green hues (~40°–200°) look
+  // noticeably lighter/washed-out than blues or purples at the same L/S.
+  // Pull those down a touch so every tag reads with similar punch.
+  @if $hue >= 40deg and $hue <= 200deg {
+    $light: $light - 6%;
+  }
+
+  .tag-chip--#{$name} {
+    color: hsl($hue, $sat, $light);
+    border-color: hsl($hue, $sat, $light);
+    border-width: 1px;
+  }
+
+  // dark outline ring — thicker and more opaque so the dot reads as its
+  // own color at 5px instead of a generic dark smudge
+  .glossary-term .tag-chip--#{$name} {
+    background: hsl($hue, $sat, $light);
+    border-color: hsl($hue, $sat, $light);
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.7);
+  }
+
+  .tag-filter--#{$name} {
+    color: hsl($hue, $sat, $light);
+    border-color: hsl($hue, $sat, $light);
+    border-width: 2px;
+  }
+
+  .tag-filter--#{$name}.active {
+    border-color: var(--color-teal);
+    border-width: 3px;
+  }
+}

@@ -1,0 +1,49 @@
+// =============================================================================
+// ANALOGY  (expandable pill, or always-inline per display preference)
+// =============================================================================
+.analogy-pill {
+  display: inline-block;
+  margin: 0.3rem 0.4rem 0 0;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid #e07b39;
+  background: #fdf1e7;
+  color: #b45309;
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-radius 0.2s ease, padding 0.2s ease;
+}
+
+.analogy-pill:hover,
+.analogy-pill.open {
+  background: #e07b39;
+  color: #fff;
+}
+
+.analogy-pill.open {
+  border-radius: 8px;
+  padding: 0.55rem 0.22rem;
+  writing-mode: vertical-lr;
+  text-orientation: sideways;
+}
+
+.analogy-text {
+  display: block;
+  flex: 1 0 100%;
+  margin: 0.5rem 0 0.15rem;
+  padding: 0.6rem 0.8rem;
+  background: #fdf1e7;
+  border-left: 3px solid #e07b39;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.85rem;
+  color: #444;
+  line-height: 1.45;
+  max-width: 60ch;
+}
+
+// When shown inline (display preference), no click needed, so drop the
+// pointer/hover cues that imply interactivity
+.analogy-text--inline {
+  margin-top: 0.4rem;
+}
