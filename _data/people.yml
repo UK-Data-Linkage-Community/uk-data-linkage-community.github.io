@@ -60,6 +60,27 @@ members:
     linkedin: "mike-edwards-65006634"
     content: "Leading the development of record linkage solutions and methodologies."
 
+  - id: jo-lam
+    name: "Jo Lam"
+    github: Jo-Lam
+    affiliation: "University College London"
+    orchid: "0000-0003-1888-4660"
+    linkedin: "josephlamphd"
+
+  - id: lena-kan
+    name: "Lena Kan"
+    affiliation: "University College London"
+
+  - id: sean-scully
+    name: "Sean Scully"
+    github: "SeanScully"
+    affiliation: "SeRP UK, Swansea University"
+
+#  - id: anahita-zamani
+#    name: "Anahita Zamani"
+#    github: "Anahita-zmn"
+#    affiliation: "SeRP UK, Swansea University"
+
 contributors:
   # id:          required, stable key / anchor
   # name:        required
