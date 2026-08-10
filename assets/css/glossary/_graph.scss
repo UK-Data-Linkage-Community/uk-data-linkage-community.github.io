@@ -148,53 +148,53 @@
 }
 
 // =============================================================================
-// RELATION TYPES — single source of truth for the color, shape, and line
-// style used to mark "selected" / "broader" / "narrower" / "related",
-// shared by the rel-label pills (in the concept detail) and the legend
-// swatches (below the graph).
-//
-// Shape/line-style — not just color — carries the meaning here:
-//   - broader / narrower are mirror-image triangles (up vs down), so the
-//     direction is legible even for colorblind users or if these hex
-//     values ever drift from whatever the graph's own JS is drawing.
-//   - related is a dashed, unfilled circle — visually "lighter weight"
-//     since it's the least specific relationship.
-//   - selected is a plain filled circle — it's the anchor point, not a
-//     relation, so it deliberately doesn't share the broader/narrower
-//     triangle language.
+// RELATION TYPES — single source of truth for the shape/line-style used to
+// mark "selected" / "broader" / "narrower" / "related", shared by the
+// rel-label pills (in the concept detail) and the legend swatches (below
+// the graph). This mirrors exactly what the graph canvas draws (see
+// graph.js PALETTE/RELATED_DASH): a solid arrow for broader/narrower —
+// direction shows which way the hierarchy runs — and a dashed line with
+// no arrowhead for related, since it has no direction. Colour is not used
+// to distinguish relation type, only to mark the selected/focused node.
 // =============================================================================
 $rel-selected: var(--color-teal-dark);
+$rel-ink: #334155;
 
-$relations: (
-  broader:  ( color: #b45309, style: solid,  shape: polygon(50% 0%, 0% 100%, 100% 100%)   ),  // triangle up
-  narrower: ( color: #1d4ed8, style: solid,  shape: polygon(50% 100%, 0% 0%, 100% 0%)      ),  // triangle down
-  related:  ( color: #6b7280, style: dashed )
-);
+.legend-center::before {
+  background: $rel-selected;
+  border-radius: 50%;
+}
 
-.legend-center::before { background: $rel-selected; }
+.legend-item::before,
+.rel-label::before {
+  width: 14px;
+  height: 8px;
+  background: none;
+}
 
-@each $name, $props in $relations {
-  $color: map-get($props, color);
-  $style: map-get($props, style);
-  $shape: map-get($props, shape);
+// Arrow shaft + head as a single clipped shape, mirrored for the two
+// directions — same trick the graph uses (marker points parent → child).
+.legend-narrower::before,
+.rel-label.narrower-label::before {
+  background: $rel-ink;
+  clip-path: polygon(0% 35%, 55% 35%, 55% 10%, 100% 50%, 55% 90%, 55% 65%, 0% 65%);
+}
 
-  .legend-#{$name}::before,
-  .rel-label.#{$name}-label::before {
-    @if $style == dashed {
-      background: transparent;
-      border: 1.5px dashed $color;
-      border-radius: 50%;
-    } @else {
-      background: $color;
-      border-radius: 0;
-      clip-path: $shape;
-    }
-  }
+.legend-broader::before,
+.rel-label.broader-label::before {
+  background: $rel-ink;
+  clip-path: polygon(100% 35%, 45% 35%, 45% 10%, 0% 50%, 45% 90%, 45% 65%, 100% 65%);
+}
 
-  .rel-label.#{$name}-label {
-    background: mix($color, white, 15%);
-    color: $color;
-  }
+.legend-related::before,
+.rel-label.related-label::before {
+  height: 0;
+  border-top: 2px dashed $rel-ink;
+}
+
+.rel-label {
+  background: rgba(51, 65, 85, 0.08);
+  color: $rel-ink;
 }
 
 // =============================================================================
