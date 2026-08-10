@@ -271,17 +271,23 @@ export class ConceptGraphManager {
       .force("link",
         d3.forceLink(this.links)
           .id(d => d.id)
-          .distance(90)
-          .strength(0.55)
+          .distance(70)
+          .strength(1)
       )
-      .force("charge", d3.forceManyBody().strength(-200).distanceMax(260))
+      .force("charge",
+        d3.forceManyBody()
+          .strength(-100)
+          .distanceMax(180)
+      )
       .force("center", d3.forceCenter(W / 2, H / 2))
-      .force("x", d3.forceX(W / 2).strength(0.045))
-      .force("y", d3.forceY(H / 2).strength(0.045))
-      .force("collide", d3.forceCollide(d => Math.hypot(d.pillW / 2, d.pillH / 2) + 6).iterations(3))
+      .force("collide",
+        d3.forceCollide(
+          d => Math.hypot(d.pillW / 2, d.pillH / 2) + 16
+        ).iterations(3)
+      )
       .on("tick", () => this._updatePositions())
       .stop();
-    for (let i = 0; i < 300; i++) this._sim.tick();
+    for (let i = 0; i < 180; i++) this._sim.tick();
     this._updatePositions();
 
     this._sim.alphaTarget(0).restart();
@@ -320,9 +326,26 @@ export class ConceptGraphManager {
     container.appendChild(ctrl);
   }
 
-  setFocus(id, selected = true) {
-    this.focusId = id;
-    const dist   = this._bfs(id);
+  // Reorder the SVG DOM so paint order matches relevance to the focused
+  // term: farthest/"ghost" nodes and links are pushed to the back, and the
+  // focused node plus its direct chain (dist <= 1) end up painted last, i.e.
+  // visually on top, no matter what order they were created in.
+  _raiseFocusChain(dist) {
+    const byDistDesc = (a, b) => (dist.get(b.id) ?? 99) - (dist.get(a.id) ?? 99);
+    this._nodeG = this._nodeG.sort(byDistDesc);
+
+    const linkDist = l => {
+      const srcId = typeof l.source === "object" ? l.source.id : l.source;
+      const tgtId = typeof l.target === "object" ? l.target.id : l.target;
+      return Math.max(dist.get(srcId) ?? 99, dist.get(tgtId) ?? 99);
+    };
+    this._linkSel = this._linkSel.sort((a, b) => linkDist(b) - linkDist(a));
+  }
+
+    setFocus(id, selected = true) {
+      this.focusId = id;
+      const dist = this._bfs(id);
+      this._focusDist = dist;
 
     const T = 380;
 

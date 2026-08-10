@@ -85,14 +85,18 @@ layout: default
         </div>
 
         <div class="drawer-section">
-          <div class="drawer-label">Display options</div>
-          <label class="toggle-row">
-            <span>Show analogies inline</span>
-            <span class="toggle-switch">
-              <input type="checkbox" id="pref-show-analogies" />
-              <span class="toggle-slider"></span>
-            </span>
-          </label>
+          <div class="drawer-label">Analogy options</div>
+          <div class="analogy-display-options" id="analogy-display-options">
+            <button class="analogy-display-btn active" data-analogy-display="expanded" type="button">
+              Full
+            </button>
+            <button class="analogy-display-btn" data-analogy-display="pill" type="button">
+              Collapsed
+            </button>
+            <button class="analogy-display-btn" data-analogy-display="hidden" type="button">
+              Off
+            </button>
+          </div>
         </div>
       </div>
     </div>
