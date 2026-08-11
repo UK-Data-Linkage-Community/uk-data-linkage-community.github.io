@@ -317,3 +317,20 @@ $rel-ink: #334155;
 }
 
 .graph-link:hover svg { color: var(--color-teal); }
+
+
+.legend-item::before,
+.rel-label::before {
+  width: 14px;
+  height: 8px;
+  background: none;
+}
+
+// Selected-term dot must win over the shared reset above regardless of
+// source order, since it shares the .legend-item class.
+.legend-item.legend-center::before {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: $rel-selected;
+}
