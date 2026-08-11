@@ -1,0 +1,319 @@
+// =============================================================================
+// CONCEPT GRAPH — collapsible
+// =============================================================================
+.graph-section {
+  // Always sits at the bottom of a term's own detail now (never as a
+  // standalone page section), so it needs margin above to separate it
+  // from the relations/tags content it follows instead of touching it.
+  margin-top: 1.1rem;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.graph-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #333;
+  transition: background 0.15s ease;
+
+  &:hover { background: var(--color-teal-light); }
+  &.open .graph-chevron { transform: rotate(180deg); }
+}
+
+.graph-chevron {
+  color: #999;
+  font-size: 0.85em;
+  transition: transform 0.2s ease;
+}
+
+
+.graph-body {
+  padding: 0 1rem 1rem;
+  border-top: 1px solid #eee;
+}
+
+.graph-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  border: 1px dashed #ddd;
+  border-radius: 6px;
+  background: #fafafa;
+  color: #bbb;
+  margin-top: 1.2rem;
+}
+
+.empty-inner {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:.5rem;
+
+    p {margin:0; font-size:.9rem;}
+    svg {opacity:.4;}
+}
+
+#concept-graph-container {
+  position: relative;
+  margin-top: 1.2rem;
+}
+
+#concept-graph {
+  width: 100%;
+  height: 420px;
+  display: block;
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+}
+
+.graph-node rect { transition: fill-opacity 0.15s ease; }
+
+.def-link {
+  color: var(--color-teal);
+  cursor: pointer;
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.def-link:hover { color: #1f5fcc; }
+
+.graph-controls {
+  position: absolute;
+  top: 1.75rem;
+  right: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  z-index: 10;
+}
+
+.graph-ctrl-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  color: #555;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.graph-ctrl-btn:hover {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.22);
+  color: #222;
+}
+
+.graph-legend {
+  display: flex;
+  gap: 1.25rem;
+  margin: 0.5rem 0 0.75rem;
+  font-size: 0.78rem;
+  color: #666;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.legend-item::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+// =============================================================================
+// RELATION TYPES — single source of truth for the color, shape, and line
+// style used to mark "selected" / "broader" / "narrower" / "related",
+// shared by the rel-label pills (in the concept detail) and the legend
+// swatches (below the graph).
+//
+// Shape/line-style — not just color — carries the meaning here:
+//   - broader / narrower are mirror-image triangles (up vs down), so the
+//     direction is legible even for colorblind users or if these hex
+//     values ever drift from whatever the graph's own JS is drawing.
+//   - related is a dashed, unfilled circle — visually "lighter weight"
+//     since it's the least specific relationship.
+//   - selected is a plain filled circle — it's the anchor point, not a
+//     relation, so it deliberately doesn't share the broader/narrower
+//     triangle language.
+// =============================================================================
+$rel-selected: var(--color-teal-dark);
+
+$relations: (
+  broader:  ( color: #b45309, style: solid,  shape: polygon(50% 0%, 0% 100%, 100% 100%)   ),  // triangle up
+  narrower: ( color: #1d4ed8, style: solid,  shape: polygon(50% 100%, 0% 0%, 100% 0%)      ),  // triangle down
+  related:  ( color: #6b7280, style: dashed )
+);
+
+.legend-center::before { background: $rel-selected; }
+
+@each $name, $props in $relations {
+  $color: map-get($props, color);
+  $style: map-get($props, style);
+  $shape: map-get($props, shape);
+
+  .legend-#{$name}::before,
+  .rel-label.#{$name}-label::before {
+    @if $style == dashed {
+      background: transparent;
+      border: 1.5px dashed $color;
+      border-radius: 50%;
+    } @else {
+      background: $color;
+      border-radius: 0;
+      clip-path: $shape;
+    }
+  }
+
+  .rel-label.#{$name}-label {
+    background: mix($color, white, 15%);
+    color: $color;
+  }
+}
+
+// =============================================================================
+// CONCEPT DETAIL  (rendered into the central panel)
+// =============================================================================
+.concept-detail-inner {
+  padding: 0;
+}
+
+.concept-detail-header h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.alt-label {
+  font-size: 0.72rem;
+  background: #f0f0f0;
+  color: #666;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  font-weight: 400;
+}
+
+.concept-def {
+  font-size: 0.9rem;
+  color: #444;
+  line-height: 1.55;
+  margin: 0 0 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.concept-relations {
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.relation-row {
+  font-size: 0.83rem;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.35rem;
+}
+
+.rel-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.1rem 0.45rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.rel-label::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+}
+
+.rel-link {
+  color: var(--color-teal);
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+}
+
+.rel-link:hover { text-decoration-style: solid; }
+
+.concept-tag-chips {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.concept-detail-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #eee;
+}
+
+.graph-link {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 999px;
+  color: #666;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.graph-link svg { color: #999; transition: color 0.15s ease; }
+
+.graph-link:hover {
+  border-color: var(--color-teal);
+  color: var(--color-teal-dark);
+  background: var(--color-teal-light);
+}
+
+.graph-link:hover svg { color: var(--color-teal); }
