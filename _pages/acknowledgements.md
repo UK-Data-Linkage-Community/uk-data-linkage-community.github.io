@@ -14,26 +14,26 @@ permalink: /acknowledgements/
   </p>
 
   <section class="contribute-section" aria-labelledby="core-contributors-heading">
-    <h2 id="core-contributors-heading">Core contributors</h2>
+    <h2 id="core-contributors-heading">Community Members</h2>
     <p class="contribute-section__intro">
-      A handful of people who've gone well beyond a one-off contribution.
+      Frequent or foundational contributors that have made significant or consistent additions to the community.
     </p>
     {% include members-list.html %}
   </section>
 
   <section class="contribute-section" aria-labelledby="community-contributors-heading">
-    <h2 id="community-contributors-heading">Community contributors</h2>
+    <h2 id="community-contributors-heading">Community Contributors</h2>
     <p class="contribute-section__intro">
-      Everyone who's opened a PR, filed an issue, or otherwise pitched in.
+      All members and contributors who have added to this project.
     </p>
     {% include contributors-list.html %}
   </section>
 
   <p class="contribute-cta">
-    Contributed and don't see your name?
-    <a href="https://github.com/YOUR-ORG/YOUR-REPO/edit/main/_data/people.yml" target="_blank" rel="noopener">
-      Add yourself here
-    </a>.
+    Contributed and don't see your name? Please visit our 
+    <a href="https://github.com/UK-Data-Linkage-Community/uk-data-linkage-community.github.io" target="_blank" rel="noopener">
+      GitHub repository 
+    </a> to submit a request.
   </p>
 
 </div>
