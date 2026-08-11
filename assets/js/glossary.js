@@ -158,6 +158,39 @@ document.addEventListener("DOMContentLoaded", function () {
   graphContainer.style.display = "none";
 
   // ═══════════════════════════════════════════════════════════════════
+  // CONCEPT GRAPH — lives at the bottom of whichever term is currently
+  // open, rather than as its own always-visible section. It's a single
+  // DOM node (so the D3 graph inside it is only ever built once); we
+  // move that same node into and out of the detail panel as the person
+  // navigates, the same reparenting trick used for the pipeline panel
+  // above. It's always moved OUT before content.innerHTML runs (which
+  // would otherwise destroy it) and back IN afterward if a concept is
+  // showing.
+  // ═══════════════════════════════════════════════════════════════════
+  const graphSection = graphToggle.closest(".graph-section") || graphBody.parentElement;
+
+  // Unlike the pipeline panel, the graph has no legitimate "page" home —
+  // it only ever makes sense attached to one specific term. So instead of
+  // parking it back at its original spot in the markup (which made it
+  // appear as a standalone, term-less section whenever no concept was
+  // active), it's parked in a detached, hidden holder whenever it isn't
+  // mounted inside a concept's own detail view.
+  const graphSectionHolder = document.createElement("div");
+  graphSectionHolder.style.display = "none";
+  graphSectionHolder.appendChild(graphSection);
+  document.body.appendChild(graphSectionHolder);
+
+  function homeGraphSection() {
+    if (graphSection.parentElement !== graphSectionHolder) {
+      graphSectionHolder.appendChild(graphSection);
+    }
+  }
+
+  function mountGraphSectionInto(container) {
+    if (container) container.appendChild(graphSection);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
   // DISPLAY PREFERENCES
   // ═══════════════════════════════════════════════════════════════════
   let defMode      = "technical"; // "technical" | "plain"
@@ -211,11 +244,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Definition text + an analogy, shown inline or as an expandable pill
-  // depending on the "Show analogies inline" preference.
-  function renderDefinitionBlock(c) {
+  // depending on the "Show analogies inline" preference. Pass
+  // allowAnalogy=false to suppress the analogy entirely (used for the
+  // pipeline section overview, where the term list is dense and the
+  // analogy pill is reserved for the fuller concept-detail view).
+  function renderDefinitionBlock(c, allowAnalogy = true) {
     const defHtml = linkifyDefinition(getDefinitionText(c));
 
-    if (!c.analogy) {
+    if (!allowAnalogy || !c.analogy) {
       return `<span class="panel-def">${defHtml}</span>`;
     }
 
@@ -271,6 +307,11 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderSection(section) {
+    // Not a single-term view — the graph dropdown only belongs at the
+    // bottom of a concept's own detail, so park it back at its home
+    // spot in the page rather than leaving it orphaned mid-innerHTML-swap.
+    homeGraphSection();
+
     activeSection   = section;
     activeConceptId = null;
 
@@ -290,7 +331,7 @@ document.addEventListener("DOMContentLoaded", function () {
             <p class="panel-concept">
               <strong class="concept-link" data-id="${c.id}">${c.prefLabel}</strong>
               <span class="panel-tags">${tagHtml}</span>
-              ${renderDefinitionBlock(c)}
+              ${renderDefinitionBlock(c, false)}
             </p>`;
         });
       } else {
@@ -307,6 +348,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderConceptDetail(conceptId) {
     const concept = conceptMap[conceptId];
     if (!concept) return;
+
+    // Detach the graph section BEFORE wiping content — it may currently
+    // be sitting inside content (from the previously-viewed concept),
+    // and innerHTML would silently destroy it otherwise.
+    homeGraphSection();
 
     activeConceptId = conceptId;
     activeSection    = null;
@@ -343,20 +389,20 @@ document.addEventListener("DOMContentLoaded", function () {
           : ""}
         <div class="concept-detail-footer">
           <div class="concept-tag-chips">${tagHtml}</div>
-          <button class="graph-link" type="button" data-graph-for="${concept.id}">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <circle cx="5" cy="12" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="19" cy="19" r="2"/>
-              <line x1="7" y1="11" x2="17" y2="6"/><line x1="7" y1="13" x2="17" y2="18"/>
-            </svg>
-            View in concept graph
-          </button>
         </div>
       </div>`;
+
+    // The graph section (with its own toggle header) is reparented in
+    // here, at the very bottom, so it reads as this term's own
+    // "concept graph" dropdown rather than a separate page section.
+    mountGraphSectionInto(content.querySelector(".concept-detail-inner"));
 
     attachContentLinkHandlers();
   }
 
   function showEmptyDetail() {
+    homeGraphSection();
+
     activeSection   = null;
     activeConceptId = null;
     content.innerHTML = `<p class="detail-empty">Select a stage from the pipeline panel, or a term from the browse list, to see its definition here.</p>`;
@@ -366,13 +412,6 @@ document.addEventListener("DOMContentLoaded", function () {
   function attachContentLinkHandlers() {
     content.querySelectorAll(".concept-link, .def-link, .rel-link").forEach(el => {
       el.addEventListener("click", () => selectGlossaryConcept(el.dataset.id, false));
-    });
-    content.querySelectorAll(".graph-link").forEach(el => {
-      el.addEventListener("click", () => {
-        expandGraphSection();
-        document.querySelector(".graph-section")
-          ?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
     });
   }
 
@@ -576,6 +615,68 @@ document.addEventListener("DOMContentLoaded", function () {
     link:     "#c8d0da",
   };
 
+  // ─── Pill-node sizing ─────────────────────────────────────────────
+  // Nodes render as rounded "pills" with the label wrapped inside
+  // rather than a dot with text underneath. Sizes below are approximate
+  // (based on an average character width for the label font) rather
+  // than measured, which is fine here since it only needs to be close
+  // enough for the pill to visually contain its text.
+  const PILL_FONT        = 10.5;   // px, label font-size at rest
+  const PILL_LINE_HEIGHT = 13;     // px, distance between wrapped lines
+  const PILL_PAD_X       = 18;     // px, total horizontal padding
+  const PILL_PAD_Y       = 12;     // px, total vertical padding
+  const PILL_MIN_WIDTH   = 56;     // px
+  const PILL_MAX_WIDTH   = 100;    // px, wrap threshold
+  const PILL_CHAR_WIDTH  = 5.6;    // px, rough average glyph width at PILL_FONT
+  const PILL_MAX_LINES   = 2;
+
+  // Greedily wraps `label` into at most PILL_MAX_LINES lines that each
+  // fit within PILL_MAX_WIDTH, ellipsizing whatever's left over.
+  function wrapPillLabel(label) {
+    const maxChars = Math.max(4, Math.floor((PILL_MAX_WIDTH - PILL_PAD_X) / PILL_CHAR_WIDTH));
+    const words = label.split(/\s+/);
+    const lines = [];
+    let current = "";
+
+    words.forEach(word => {
+      const candidate = current ? `${current} ${word}` : word;
+      if (candidate.length <= maxChars || !current) {
+        current = candidate;
+      } else {
+        lines.push(current);
+        current = word;
+      }
+    });
+    if (current) lines.push(current);
+
+    if (lines.length > PILL_MAX_LINES) {
+      const kept = lines.slice(0, PILL_MAX_LINES);
+      let last = kept[PILL_MAX_LINES - 1];
+      while (last.length > maxChars - 1 && last.length > 1) last = last.slice(0, -1);
+      kept[PILL_MAX_LINES - 1] = last.replace(/\s+$/, "") + "…";
+      return kept;
+    }
+    return lines;
+  }
+
+  // Given a node with x/y/pillW/pillH (and current _scale), returns the
+  // point where a straight line toward (tx, ty) crosses the pill's
+  // rounded-rect boundary — so links touch the edge of the pill nearest
+  // the node it's connecting to, rather than all converging on one
+  // center point.
+  function pillEdgePoint(node, tx, ty) {
+    const dx = tx - node.x;
+    const dy = ty - node.y;
+    if (!dx && !dy) return { x: node.x, y: node.y };
+    const scale = node._scale || 1;
+    const hw = (node.pillW * scale) / 2;
+    const hh = (node.pillH * scale) / 2;
+    const sx = dx !== 0 ? hw / Math.abs(dx) : Infinity;
+    const sy = dy !== 0 ? hh / Math.abs(dy) : Infinity;
+    const t  = Math.min(sx, sy);
+    return { x: node.x + dx * t, y: node.y + dy * t };
+  }
+
   class ConceptGraphManager {
 
     constructor(svgEl, conceptMap, onNodeClick) {
@@ -593,9 +694,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     _buildData() {
-      this.nodes = Object.values(this.conceptMap).map(c => ({
-        id: c.id, label: c.prefLabel, tags: c.tags || []
-      }));
+      this.nodes = Object.values(this.conceptMap).map(c => {
+        const lines   = wrapPillLabel(c.prefLabel);
+        const longest = Math.max(...lines.map(l => l.length));
+        const pillW   = Math.max(PILL_MIN_WIDTH, Math.min(PILL_MAX_WIDTH, longest * PILL_CHAR_WIDTH + PILL_PAD_X));
+        const pillH   = lines.length * PILL_LINE_HEIGHT + PILL_PAD_Y;
+        return {
+          id: c.id, label: c.prefLabel, tags: c.tags || [],
+          lines, pillW, pillH, _scale: 1
+        };
+      });
 
       this.adj = new Map(this.nodes.map(n => [n.id, new Set()]));
 
@@ -649,11 +757,27 @@ document.addEventListener("DOMContentLoaded", function () {
          .attr("height",   this.H);
 
       const defs = svg.append("defs");
+
+      // Soft, tight drop-shadow so pills read as small floating cards
+      // rather than flat translucent blobs — this is what actually sells
+      // the "pill" silhouette at a glance, more than the border-radius does.
+      const shadow = defs.append("filter")
+        .attr("id", "cgm-pill-shadow")
+        .attr("x", "-40%").attr("y", "-40%")
+        .attr("width", "180%").attr("height", "180%");
+      shadow.append("feDropShadow")
+        .attr("dx", 0).attr("dy", 1)
+        .attr("stdDeviation", 1.6)
+        .attr("flood-color", "#1e293b")
+        .attr("flood-opacity", 0.22);
+
+      // refX is centered (5, not 6) since these sit at the midpoint of
+      // a path via marker-mid rather than at a line's end via marker-end.
       ["broader", "narrower", "related"].forEach(t => {
         defs.append("marker")
           .attr("id",           `cgm-arrow-${t}`)
           .attr("viewBox",      "0 -5 10 10")
-          .attr("refX",         18).attr("refY", 0)
+          .attr("refX",         5).attr("refY", 0)
           .attr("markerWidth",  5).attr("markerHeight", 5)
           .attr("orient",       "auto")
           .append("path")
@@ -669,10 +793,15 @@ document.addEventListener("DOMContentLoaded", function () {
         .on("zoom", e => this._g.attr("transform", e.transform));
       svg.call(this._zoom);
 
+      // Links are <path> elements (not <line>) purely so a marker-mid
+      // arrowhead has a real interior vertex to anchor to — the path is
+      // still just two straight segments through the same start/mid/end
+      // points a line would use.
       this._linkSel = this._g.append("g").attr("class", "cgm-links")
-        .selectAll("line")
+        .selectAll("path")
         .data(this.links)
-        .join("line")
+        .join("path")
+          .attr("fill",           "none")
           .attr("stroke",         PALETTE.link)
           .attr("stroke-width",   0.8)
           .attr("stroke-opacity", 0.28);
@@ -684,39 +813,63 @@ document.addEventListener("DOMContentLoaded", function () {
           .attr("class",  "graph-node")
           .style("cursor", "pointer");
 
-      nodeG.append("circle")
+      // Everything visual (glow, pill, label) lives in a nested group so
+      // setFocus() can scale it with a simple transform instead of having
+      // to resize/re-wrap the pill and text individually.
+      const nodeInner = nodeG.append("g").attr("class", "node-inner");
+
+      nodeInner.append("rect")
         .attr("class",        "node-glow")
-        .attr("r",            0)
+        .attr("x",            d => -d.pillW / 2 - 6)
+        .attr("y",            d => -d.pillH / 2 - 6)
+        .attr("width",        d => d.pillW + 12)
+        .attr("height",       d => d.pillH + 12)
+        .attr("rx",           d => (d.pillH + 12) / 2)
         .attr("fill",         PALETTE.center)
-        .attr("fill-opacity", 0.12)
+        .attr("fill-opacity", 0)
         .attr("stroke",       "none");
 
-      nodeG.append("circle")
-        .attr("class",          "node-circle")
-        .attr("r",              5)
-        .attr("fill",           PALETTE.ghost)
-        .attr("fill-opacity",   0.55)
+      nodeInner.append("rect")
+        .attr("class",          "node-pill")
+        .attr("x",              d => -d.pillW / 2)
+        .attr("y",              d => -d.pillH / 2)
+        .attr("width",          d => d.pillW)
+        .attr("height",         d => d.pillH)
+        .attr("rx",             d => d.pillH / 2)
+        .attr("fill",           "#fff")
+        .attr("fill-opacity",   0.96)
         .attr("stroke",         PALETTE.ghost)
-        .attr("stroke-width",   1.2)
-        .attr("stroke-opacity", 0.3);
+        .attr("stroke-width",   1.4)
+        .attr("stroke-opacity", 0.5)
+        .attr("filter",         "url(#cgm-pill-shadow)");
 
-      nodeG.append("text")
-        .attr("class",        "node-label")
-        .text(d => d.label.length > 20 ? d.label.slice(0, 18) + "…" : d.label)
-        .attr("text-anchor",  "middle")
-        .attr("dy",           15)
-        .attr("font-size",    "10.5px")
-        .attr("fill",         "#222")
-        .attr("fill-opacity", 0.75)
-        .style("pointer-events", "none")
-        .style("user-select",    "none");
+      nodeInner.each(function (d) {
+        const label = d3.select(this).append("text")
+          .attr("class",        "node-label")
+          .attr("text-anchor",  "middle")
+          .attr("font-size",    `${PILL_FONT}px`)
+          .attr("font-weight",  600)
+          .attr("fill",         "#1e293b")
+          .attr("fill-opacity", 0.88)
+          .style("pointer-events", "none")
+          .style("user-select",    "none");
+
+        const startY = -((d.lines.length - 1) * PILL_LINE_HEIGHT) / 2;
+        d.lines.forEach((line, i) => {
+          label.append("tspan")
+            .attr("x",  0)
+            .attr("y",  startY + i * PILL_LINE_HEIGHT)
+            .attr("dy", "0.32em")
+            .text(line);
+        });
+      });
 
       nodeG
         .on("mouseenter", function () {
-          d3.select(this).select(".node-circle").attr("stroke-width", 2.4);
+          d3.select(this).select(".node-pill").attr("stroke-width", 2.4);
         })
         .on("mouseleave", function () {
-          d3.select(this).select(".node-circle").attr("stroke-width", 1.2);
+          d3.select(this).select(".node-pill").attr("stroke-width", 1.2);
         })
         .on("click", (e, d) => {
           e.stopPropagation();
@@ -736,7 +889,8 @@ document.addEventListener("DOMContentLoaded", function () {
           })
       );
 
-      this._nodeG = nodeG;
+      this._nodeG     = nodeG;
+      this._nodeInner = nodeInner;
     }
 
     _startSimulation() {
@@ -746,18 +900,53 @@ document.addEventListener("DOMContentLoaded", function () {
         .force("link",
           d3.forceLink(this.links)
             .id(d => d.id)
-            .distance(110)
-            .strength(0.35)
+            .distance(90)
+            .strength(0.55)
         )
-        .force("charge",  d3.forceManyBody().strength(-220))
-        .force("center",  d3.forceCenter(W / 2, H / 2))
-        .force("collide", d3.forceCollide(20))
-        .on("tick", () => {
-          this._linkSel
-            .attr("x1", d => d.source.x).attr("y1", d => d.source.y)
-            .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
-          this._nodeG.attr("transform", d => `translate(${d.x ?? 0},${d.y ?? 0})`);
-        });
+        // distanceMax keeps far-apart nodes from exerting a long-range
+        // shove on each other, which is what caused the initial layout
+        // to feel erratic — repulsion now only acts locally, so neighbor
+        // spacing settles evenly instead of a few nodes flying outward.
+        .force("charge", d3.forceManyBody().strength(-200).distanceMax(260))
+        .force("center", d3.forceCenter(W / 2, H / 2))
+        // Weak, constant pull toward the center on both axes so the
+        // whole layout stays put instead of slowly drifting off-frame
+        // once alpha cools — this is what makes it feel "stable" at rest.
+        .force("x", d3.forceX(W / 2).strength(0.045))
+        .force("y", d3.forceY(H / 2).strength(0.045))
+        // Collision radius uses each pill's half-diagonal instead of a
+        // fixed dot radius, since pills vary in width/height with label
+        // length — otherwise longer labels would overlap their neighbors.
+        // A couple of extra iterations spread neighbors more evenly
+        // around each node rather than settling for the first
+        // non-overlapping arrangement it finds.
+        .force("collide", d3.forceCollide(d => Math.hypot(d.pillW / 2, d.pillH / 2) + 6).iterations(3))
+        .on("tick", () => this._updatePositions())
+        .stop();
+
+      // Warm-start: run the simulation to a near-settled state silently
+      // before it's ever painted, so the graph opens calm and in place
+      // instead of visibly flinging nodes around for the first second.
+      for (let i = 0; i < 300; i++) this._sim.tick();
+      this._updatePositions();
+
+      this._sim.alphaTarget(0).restart();
+    }
+
+    // Positions node groups and draws links so they touch each pill's
+    // edge (in the direction of the node at the other end) rather than
+    // its center. Called on every simulation tick, and also once after
+    // setFocus() finishes resizing pills, since a settled simulation
+    // won't otherwise re-tick to reflect the new sizes.
+    _updatePositions() {
+      this._nodeG.attr("transform", d => `translate(${d.x ?? 0},${d.y ?? 0})`);
+      this._linkSel.attr("d", d => {
+        const p1 = pillEdgePoint(d.source, d.target.x, d.target.y);
+        const p2 = pillEdgePoint(d.target, d.source.x, d.source.y);
+        const mx = (p1.x + p2.x) / 2;
+        const my = (p1.y + p2.y) / 2;
+        return `M${p1.x},${p1.y}L${mx},${my}L${p2.x},${p2.y}`;
+      });
     }
 
     _attachControls() {
@@ -782,60 +971,82 @@ document.addEventListener("DOMContentLoaded", function () {
       container.appendChild(ctrl);
     }
 
-    setFocus(id) {
+    // `selected` controls whether the focus node renders as the teal
+    // "Selected" pill. Pass false for an ambient/default focus (e.g.
+    // panning near a starting concept when the graph is opened without
+    // an explicit term choice) so the view centers there without
+    // claiming anything is actually selected.
+    setFocus(id, selected = true) {
       this.focusId = id;
       const dist   = this._bfs(id);
 
-      this._nodeG.each((d, i, nodes) => {
-        const g    = d3.select(nodes[i]);
-        const circ = g.select(".node-circle");
-        const glow = g.select(".node-glow");
-        const lbl  = g.select(".node-label");
-        const dv   = dist.get(d.id) ?? 99;
-        const isCenter = d.id === id;
+      const T = 380;
 
-        let r, fill, fillOp, strokeOp, glowR, fontSize, fontOp;
+      this._nodeG.each((d, i, nodes) => {
+        const g     = d3.select(nodes[i]);
+        const inner = g.select(".node-inner");
+        const pill  = g.select(".node-pill");
+        const glow  = g.select(".node-glow");
+        const lbl   = g.select(".node-label");
+        const dv    = dist.get(d.id) ?? 99;
+        const isCenter = selected && d.id === id;
+
+        // `border` is the relation-tinted ring color; the pill's own
+        // fill stays a constant white card and only its opacity fades
+        // with distance, so hue no longer has to do double duty for
+        // both "what kind of relation" and "how far away" at once.
+        let scale, border, fillOp, strokeOp, glowOp, fontOp;
 
         if (isCenter) {
-          r = 13; fill = PALETTE.center;
-          fillOp = 1; strokeOp = 0.7;
-          glowR = 22; fontSize = "13px"; fontOp = 1;
-        } else if (dv === 1) {
-          const t = this._relType(id, d.id);
-          r = 8.5; fill = PALETTE[t] || PALETTE.ghost;
-          fillOp = 0.85; strokeOp = 0.55;
-          glowR = 0; fontSize = "11px"; fontOp = 0.92;
+          scale = 1.3; border = PALETTE.center;
+          fillOp = 0.98; strokeOp = 0.9; glowOp = 0.16; fontOp = 1;
+        } else if (dv === 0 || dv === 1) {
+          // dv === 0 here only happens when selected=false (the focus
+          // node itself, rendered like a near neighbor rather than the
+          // highlighted center).
+          border = dv === 1 ? (PALETTE[this._relType(id, d.id)] || PALETTE.ghost) : PALETTE.ghost;
+          scale = 1.05; fillOp = 0.94; strokeOp = 0.65; glowOp = 0; fontOp = 0.92;
         } else if (dv === 2) {
-          r = 6; fill = PALETTE.ghost;
-          fillOp = 0.42; strokeOp = 0.22;
-          glowR = 0; fontSize = "9.5px"; fontOp = 0.5;
+          scale = 0.85; border = PALETTE.ghost;
+          fillOp = 0.6; strokeOp = 0.3; glowOp = 0; fontOp = 0.5;
         } else if (dv === 3) {
-          r = 4.5; fill = PALETTE.ghost;
-          fillOp = 0.22; strokeOp = 0.1;
-          glowR = 0; fontSize = "7.5px"; fontOp = 0.25;
+          scale = 0.7; border = PALETTE.ghost;
+          fillOp = 0.32; strokeOp = 0.15; glowOp = 0; fontOp = 0.25;
         } else {
-          r = 3; fill = PALETTE.ghost;
-          fillOp = 0.09; strokeOp = 0.05;
-          glowR = 0; fontSize = "0px"; fontOp = 0;
+          scale = 0.6; border = PALETTE.ghost;
+          fillOp = 0.12; strokeOp = 0.06; glowOp = 0; fontOp = 0;
         }
 
-        const T = 380;
-        circ.transition().duration(T)
-          .attr("r",              r)
-          .attr("fill",           fill)
+        // Link endpoints are recalculated from d._scale once the
+        // transitions below finish (see the setTimeout after this loop),
+        // so keep it in sync with whatever scale we're animating to.
+        d._scale = scale;
+
+        inner.transition().duration(T).attr("transform", `scale(${scale})`);
+
+        pill.transition().duration(T)
+          .attr("fill",           "#fff")
           .attr("fill-opacity",   fillOp)
-          .attr("stroke",         fill)
+          .attr("stroke",         border)
+          .attr("stroke-width",   isCenter ? 2 : 1.4)
           .attr("stroke-opacity", strokeOp);
 
         glow.transition().duration(T)
-          .attr("r",    glowR)
-          .attr("fill", isCenter ? PALETTE.center : fill);
+          .attr("fill",         isCenter ? PALETTE.center : border)
+          .attr("fill-opacity", glowOp);
 
-        lbl.transition().duration(T)
-          .attr("dy",           r + 8)
-          .attr("font-size",    fontSize)
-          .attr("fill-opacity", fontOp);
+        lbl.transition().duration(T).attr("fill-opacity", fontOp);
       });
+
+      // Pills resizing doesn't itself re-tick the (possibly settled)
+      // simulation, so nudge link endpoints to follow along over the
+      // same transition duration instead of jumping once at the end.
+      const start = performance.now();
+      const animateLinks = (now) => {
+        this._updatePositions();
+        if (now - start < T) requestAnimationFrame(animateLinks);
+      };
+      requestAnimationFrame(animateLinks);
 
       this._linkSel.each((l, i, links) => {
         const srcId = typeof l.source === "object" ? l.source.id : l.source;
@@ -848,29 +1059,35 @@ document.addEventListener("DOMContentLoaded", function () {
         const lk = d3.select(links[i]);
 
         if (minD === 0 && maxD === 1) {
+          // Color (and arrow) from the FOCUSED node's point of view, not
+          // the edge's stored/absolute type — otherwise a link up to a
+          // broader term shows blue instead of matching that term's
+          // orange border whenever the focus is the narrower side.
+          const neighborId = srcId === id ? tgtId : srcId;
+          const relType     = this._relType(id, neighborId);
           lk.transition().duration(380)
-            .attr("stroke",       PALETTE[l.type] || PALETTE.related)
+            .attr("stroke",       PALETTE[relType] || PALETTE.related)
             .attr("stroke-width", 1.9)
             .attr("stroke-opacity", 0.62)
-            .attr("marker-end",   `url(#cgm-arrow-${l.type})`);
+            .attr("marker-mid",   `url(#cgm-arrow-${relType})`);
         } else if (minD <= 1 && maxD === 2) {
           lk.transition().duration(380)
             .attr("stroke",         PALETTE.link)
             .attr("stroke-width",   1)
             .attr("stroke-opacity", 0.18)
-            .attr("marker-end",     null);
+            .attr("marker-mid",     null);
         } else if (minD <= 2 && maxD <= 3) {
           lk.transition().duration(380)
             .attr("stroke",         PALETTE.link)
             .attr("stroke-width",   0.7)
             .attr("stroke-opacity", 0.08)
-            .attr("marker-end",     null);
+            .attr("marker-mid",     null);
         } else {
           lk.transition().duration(380)
             .attr("stroke",         PALETTE.link)
             .attr("stroke-width",   0.5)
             .attr("stroke-opacity", 0.03)
-            .attr("marker-end",     null);
+            .attr("marker-mid",     null);
         }
       });
 
@@ -912,6 +1129,20 @@ document.addEventListener("DOMContentLoaded", function () {
   // ═══════════════════════════════════════════════════════════════════
   let graphManager = null;
 
+  // When the graph is opened cold (no term already selected), pan it
+  // near this concept as an ambient starting point rather than leaving
+  // it centered on nothing — but don't mark anything as "Selected".
+  const DEFAULT_GRAPH_FOCUS_ID = "entity-resolution";
+
+  function focusGraphOnCurrentOrDefault() {
+    if (!graphManager) return;
+    if (activeConceptId) {
+      graphManager.setFocus(activeConceptId);
+    } else if (conceptMap[DEFAULT_GRAPH_FOCUS_ID]) {
+      graphManager.setFocus(DEFAULT_GRAPH_FOCUS_ID, false);
+    }
+  }
+
   function initConceptGraph() {
     const svgEl = document.getElementById("concept-graph");
     if (!svgEl || graphManager) return;
@@ -925,7 +1156,7 @@ document.addEventListener("DOMContentLoaded", function () {
         conceptMap,
         id => selectGlossaryConcept(id, false)
       );
-      if (activeConceptId) graphManager.setFocus(activeConceptId);
+      focusGraphOnCurrentOrDefault();
     });
   }
 
@@ -936,14 +1167,17 @@ document.addEventListener("DOMContentLoaded", function () {
       graphToggle.classList.add("open");
     }
     initConceptGraph(); // no-op after the first call; always (re-)focuses below
-    if (graphManager && activeConceptId) graphManager.setFocus(activeConceptId);
+    focusGraphOnCurrentOrDefault();
   }
 
   graphToggle.addEventListener("click", () => {
     const isOpen = graphBody.style.display === "block";
-    graphBody.style.display = isOpen ? "none" : "block";
-    graphToggle.classList.toggle("open", !isOpen);
-    if (!isOpen) initConceptGraph(); // no-op after the first call
+    if (isOpen) {
+      graphBody.style.display = "none";
+      graphToggle.classList.remove("open");
+      return;
+    }
+    expandGraphSection();
   });
 
   // ═══════════════════════════════════════════════════════════════════

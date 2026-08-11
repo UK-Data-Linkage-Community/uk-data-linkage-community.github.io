@@ -814,8 +814,8 @@
 
 .glossary-term .tag-chip {
   padding: 0;
-  width: 8px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   font-size: 0;
   line-height: 0;
@@ -939,9 +939,10 @@
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.42rem 0.5rem;
+  padding: 0.3rem 0.5rem;
   cursor: pointer;
-  font-size: 0.88rem;
+  font-size: 0.78rem;
+  line-height: 1.3;
   border-left: 3px solid transparent;
   border-radius: 4px;
   transition: background 0.1s ease;
@@ -966,8 +967,17 @@
 .term-tags-inline {
   flex-shrink: 0;
   display: flex;
-  gap: 0.25rem;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-content: flex-end;
   align-items: center;
+  gap: 0.15rem;
+  max-height: 15px; // ~2 dots per column before wrapping into a new one
+}
+
+.glossary-list-empty {
+  color: #999;
+  font-size: 0.8rem;
 }
 
 .glossary-list-empty {
@@ -980,6 +990,10 @@
 // CONCEPT GRAPH — collapsible
 // =============================================================================
 .graph-section {
+  // Always sits at the bottom of a term's own detail now (never as a
+  // standalone page section), so it needs margin above to separate it
+  // from the relations/tags content it follows instead of touching it.
+  margin-top: 1.1rem;
   border: 1px solid #e8e8e8;
   border-radius: 6px;
   background: #fff;
@@ -991,11 +1005,11 @@
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 1rem 1.4rem;
+  padding: 0.6rem 0.9rem;
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.8rem;
   font-weight: 600;
   color: #333;
   transition: background 0.15s ease;
@@ -1005,13 +1019,14 @@
 
 .graph-chevron {
   color: #999;
+  font-size: 0.85em;
   transition: transform 0.2s ease;
 }
 
 .graph-toggle.open .graph-chevron { transform: rotate(180deg); }
 
 .graph-body {
-  padding: 0 1.4rem 1.4rem;
+  padding: 0 1rem 1rem;
   border-top: 1px solid #eee;
 }
 
@@ -1051,7 +1066,7 @@
   border-radius: 6px;
 }
 
-.graph-node circle { transition: fill-opacity 0.15s ease; }
+.graph-node rect { transition: fill-opacity 0.15s ease; }
 
 .def-link {
   color: var(--color-teal);
@@ -1277,6 +1292,17 @@
   // width (rail).
   .content-row { flex-direction: column; }
 
+  // In column-direction flex, width is otherwise "shrink-to-fit" rather
+  // than filling the row — usually invisible, but the concept graph's
+  // SVG carries a fixed intrinsic aspect ratio (its viewBox is sized from
+  // a one-time clientWidth measurement in glossary.js), and that ratio
+  // was feeding into the shrink-to-fit calculation and pulling this
+  // column narrower than .pipeline-panel below it, which has its own
+  // explicit width override for the same reason.
+  .detail-column {
+    width: 100%;
+  }
+
   .pipeline-panel {
     position: static;
     max-height: none;
@@ -1303,9 +1329,6 @@
     writing-mode: horizontal-tb;
     transform: none;
   }
-
-  .pipeline-panel:not(.open) .pipeline-panel-toggle-chevron { transform: rotate(90deg); }
-  .pipeline-panel.open .pipeline-panel-toggle-chevron { transform: rotate(270deg); }
 
   .pipeline-panel-body { max-height: 340px; }
 
@@ -1402,4 +1425,16 @@
     font-size: 0.76rem;
     padding: 0.5rem 0.3rem;
   }
+}
+
+
+.pipeline-panel-toggle svg {
+    transition:
+        transform 0.32s cubic-bezier(.22,1,.36,1),
+        opacity 0.2s ease;
+    transform-origin: center;
+}
+
+.pipeline-panel.open .pipeline-panel-toggle svg {
+    transform: rotate(135deg) scale(1.05);
 }
