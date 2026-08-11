@@ -598,6 +598,42 @@
   }
 }
 
+.concept-detail-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #eee;
+}
+
+.graph-link {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 999px;
+  color: #666;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.graph-link svg { color: #999; transition: color 0.15s ease; }
+
+.graph-link:hover {
+  border-color: var(--color-teal);
+  color: var(--color-teal-dark);
+  background: var(--color-teal-light);
+}
+
+.graph-link:hover svg { color: var(--color-teal); }
+
 
 // =============================================================================
 // NARROW-PHONE FINE-TUNING
