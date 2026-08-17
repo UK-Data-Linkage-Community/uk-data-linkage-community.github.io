@@ -1,16 +1,3 @@
-{%- comment -%}
-  Renders the contributor "thank you wall".
-  Usage: {% include contributors-list.html %}
-
-  Avatars: no uploaded images. If `github` is set, we use GitHub's own
-  hosted avatar (https://github.com/{username}.png) -- just an <img>
-  request, nothing stored or built locally. Falls back to initials
-  when no `github` is given, or if the GitHub avatar request 404s.
-
-  Link target: github profile if `github` is set, else `url` (personal
-  page) as a fallback, else no link (plain text name).
-{%- endcomment -%}
-
 {%- assign raw = site.data.people.contributors -%}
 {%- if raw and raw.size > 0 -%}
   {%- assign wall = raw | sort: "name" -%}
@@ -22,41 +9,105 @@
     {%- elsif person.url -%}
       {%- assign link_url = person.url -%}
     {%- endif -%}
-    {%- assign initials = person.name | slice: 0, 1 | append: (person.name | split: " " | last | slice: 0, 1) -%}
 
-  <li id="{{ person.id }}">
-    {%- if link_url -%}
-    <a class="contributor-chip" href="{{ link_url }}" target="_blank" rel="noopener" aria-label="{{ person.name }}{% if person.affiliation %}, {{ person.affiliation }}{% endif %}">
-    {%- else -%}
-    <div class="contributor-chip">
+    {%- assign name_parts = person.name | split: " " -%}
+    {%- assign name_suffixes = "Jr.,Jr,Sr.,Sr,II,III,IV" | split: "," -%}
+    {%- if name_parts.size > 1 and name_suffixes contains name_parts.last -%}
+      {%- assign keep_count = name_parts.size | minus: 1 -%}
+      {%- assign name_parts = name_parts | slice: 0, keep_count -%}
     {%- endif -%}
+    {%- assign first_initial = name_parts.first | slice: 0, 1 -%}
+    {%- assign last_initial = name_parts.last | slice: 0, 1 -%}
+    {%- if name_parts.size > 1 -%}
+      {%- assign initials = first_initial | append: last_initial -%}
+    {%- else -%}
+      {%- assign initials = person.name | slice: 0, 2 -%}
+    {%- endif -%}
+
+  <li class="contributor-chip{% if person.content %} contributor-chip--has-bio{% endif %}" id="{{ person.id }}">
+    <span class="contributor-chip__row">
       <span class="contributor-chip__avatar">
-        {%- if person.github -%}
+        {%- if person.force_initials -%}
+        <span class="contributor-chip__initials">{{ initials }}</span>
+        {%- elsif person.github -%}
         <img
           src="https://github.com/{{ person.github }}.png?size=64"
           alt=""
           loading="lazy"
-          width="36" height="36"
+          width="30" height="30"
           onerror="this.replaceWith(Object.assign(document.createElement('span'), {className: 'contributor-chip__initials', textContent: '{{ initials }}'}))">
         {%- else -%}
         <span class="contributor-chip__initials">{{ initials }}</span>
         {%- endif -%}
       </span>
 
-      <span class="contributor-chip__meta">
-        <span class="contributor-chip__name">{{ person.name }}</span>
-        {%- if person.affiliation -%}
-        <span class="contributor-chip__affiliation">{{ person.affiliation }}</span>
-        {%- endif -%}
-      </span>
-    {%- if link_url -%}
-    </a>
-    {%- else -%}
+      {%- if link_url -%}
+      <a class="contributor-chip__name" href="{{ link_url }}" target="_blank" rel="noopener" title="{{ person.name }}" aria-label="{{ person.name }}{% if person.affiliation %}, {{ person.affiliation }}{% endif %}">{{ person.name }}</a>
+      {%- else -%}
+      <span class="contributor-chip__name" title="{{ person.name }}">{{ person.name }}</span>
+      {%- endif -%}
+
+      {%- if person.affiliation -%}
+      <span class="contributor-chip__affiliation" title="{{ person.affiliation }}">{{ person.affiliation }}</span>
+      {%- endif -%}
+
+      {%- if person.content -%}
+      <button type="button" class="contributor-chip__toggle">More</button>
+      {%- endif -%}
+    </span>
+
+    {%- if person.content -%}
+    <div class="contributor-chip__popover">
+      <span class="contributor-chip__popover-name">{{ person.name }}</span>
+      {%- if person.affiliation -%}
+      <span class="contributor-chip__popover-affiliation">{{ person.affiliation }}</span>
+      {%- endif -%}
+      <p class="contributor-chip__note">{{ person.content }}</p>
     </div>
     {%- endif -%}
   </li>
   {%- endfor -%}
 </ul>
+<script>
+  (function () {
+    if (window.__contributorChipToggleBound) return;
+    window.__contributorChipToggleBound = true;
+
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('.contributor-chip__toggle');
+      var openChip = document.querySelector('.contributor-chip.is-expanded');
+
+      if (btn) {
+        var chip = btn.closest('.contributor-chip');
+        var wasOpen = chip.classList.contains('is-expanded');
+        if (openChip && openChip !== chip) {
+          openChip.classList.remove('is-expanded');
+          var openBtn = openChip.querySelector('.contributor-chip__toggle');
+          if (openBtn) openBtn.textContent = 'More';
+        }
+        chip.classList.toggle('is-expanded', !wasOpen);
+        btn.textContent = wasOpen ? 'More' : 'Less';
+        return;
+      }
+
+      // Click outside any chip closes the open popover
+      if (openChip && !e.target.closest('.contributor-chip')) {
+        openChip.classList.remove('is-expanded');
+        var openBtn2 = openChip.querySelector('.contributor-chip__toggle');
+        if (openBtn2) openBtn2.textContent = 'More';
+      }
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      var openChip = document.querySelector('.contributor-chip.is-expanded');
+      if (!openChip) return;
+      openChip.classList.remove('is-expanded');
+      var openBtn = openChip.querySelector('.contributor-chip__toggle');
+      if (openBtn) openBtn.textContent = 'More';
+    });
+  })();
+</script>
 {%- else -%}
 <p class="contributors-empty">No community contributions logged yet — be the first!</p>
 {%- endif -%}

@@ -1,31 +1,4 @@
-{%- comment -%}
-  Renders the curated "core contributors" spotlight section.
-  Usage: {% include members-list.html %}
-
-  Distinct from contributors-list.html: this is for a short, curated
-  set of people who get a photo/avatar, affiliation, and a sentence of
-  specific thanks — not just a chip. Pulls from site.data.people.members.
-
-  Layout: avatar + name + role + affiliation are grouped into a single
-  fixed "top" block so that part of the card lines up across tiles
-  regardless of whether a note is present. The optional note sits in
-  the middle, and the icon-link row is pinned to the bottom of the
-  card (via margin-top: auto) with a divider, so links line up across
-  a row of cards too, even when note length differs.
-
-  Avatar priority: `image` (local) > `github` avatar > initials fallback.
-  Primary name link: github profile if set, else `url` (personal site).
-
-  Icon row: auto-detected from which fields are present — no manual
-  icon selection needed. Supported: github, linkedin, orcid, scholar,
-  url (personal site). `github`/`linkedin`/`orcid`/`scholar` accept
-  either a bare username/ID or a full URL. `extra_links` is a generic
-  fallback for anything else (Mastodon, a paper, etc.) — each item is
-  `{label, url}` and optionally `icon` (a Font Awesome class), defaulting
-  to a plain link icon if omitted.
-{%- endcomment -%}
-
-{%- assign spotlighted = site.data.people.members -%}
+{%- assign spotlighted = site.data.people.members | sort: "name" -%}
 {%- if spotlighted and spotlighted.size > 0 -%}
 <ul class="member-spotlight-grid">
   {%- for person in spotlighted -%}
@@ -39,12 +12,32 @@
     {%- if person.github or person.linkedin or person.orcid or person.scholar or person.url or person.extra_links -%}
       {%- assign has_links = true -%}
     {%- endif -%}
+    {%- assign has_details = false -%}
+    {%- if person.role or person.content -%}
+      {%- assign has_details = true -%}
+    {%- endif -%}
+
+    {%- assign name_parts = person.name | split: " " -%}
+    {%- assign name_suffixes = "Jr.,Jr,Sr.,Sr,II,III,IV" | split: "," -%}
+    {%- if name_parts.size > 1 and name_suffixes contains name_parts.last -%}
+      {%- assign keep_count = name_parts.size | minus: 1 -%}
+      {%- assign name_parts = name_parts | slice: 0, keep_count -%}
+    {%- endif -%}
+    {%- assign first_initial = name_parts.first | slice: 0, 1 -%}
+    {%- assign last_initial = name_parts.last | slice: 0, 1 -%}
+    {%- if name_parts.size > 1 -%}
+      {%- assign initials = first_initial | append: last_initial -%}
+    {%- else -%}
+      {%- assign initials = person.name | slice: 0, 2 -%}
+    {%- endif -%}
 
   <li class="member-spotlight-card{% if has_links %} member-spotlight-card--has-links{% endif %}" id="{{ person.id }}">
 
     <span class="member-spotlight-card__top">
       <span class="member-spotlight-card__avatar">
-        {%- if person.image -%}
+        {%- if person.force_initials -%}
+        <span class="member-spotlight-card__initials">{{ initials }}</span>
+        {%- elsif person.image -%}
         <img src="{{ person.image | relative_url }}" alt="{{ person.name }}" loading="lazy" width="44" height="44">
         {%- elsif person.github -%}
         <img
@@ -52,11 +45,9 @@
           alt="{{ person.name }}"
           loading="lazy"
           width="44" height="44"
-          onerror="this.replaceWith(Object.assign(document.createElement('span'), {className: 'member-spotlight-card__initials', textContent: '{{ person.name | slice: 0, 1 }}{{ person.name | split: " " | last | slice: 0, 1 }}'}))">
+          onerror="this.replaceWith(Object.assign(document.createElement('span'), {className: 'member-spotlight-card__initials', textContent: '{{ initials }}'}))">
         {%- else -%}
-        <span class="member-spotlight-card__initials">
-          {{ person.name | slice: 0, 1 }}{{ person.name | split: " " | last | slice: 0, 1 }}
-        </span>
+        <span class="member-spotlight-card__initials">{{ initials }}</span>
         {%- endif -%}
       </span>
 
@@ -67,26 +58,28 @@
         <span class="member-spotlight-card__name">{{ person.name }}</span>
         {%- endif -%}
 
-        {%- if person.role -%}
-        <span class="member-spotlight-card__role" title="{{ person.role }}">{{ person.role }}</span>
-        {%- endif -%}
-
         {%- if person.affiliation -%}
         <span class="member-spotlight-card__affiliation">{{ person.affiliation }}</span>
         {%- endif -%}
       </span>
     </span>
 
-    {%- if person.content -%}
-      {%- assign note_is_long = false -%}
-      {%- if person.content.size > 220 -%}
-        {%- assign note_is_long = true -%}
+    {%- if has_details -%}
+    <div class="member-spotlight-card__details">
+      {%- if person.role -%}
+      <span class="member-spotlight-card__role" title="{{ person.role }}">{{ person.role }}</span>
       {%- endif -%}
-    <p class="member-spotlight-card__note{% if note_is_long %} member-spotlight-card__note--clamped{% endif %}">{{ person.content }}</p>
-      {%- if note_is_long -%}
-    <button type="button" class="member-spotlight-card__toggle">Read more</button>
+      {%- if person.content -%}
+      <p class="member-spotlight-card__note">{{ person.content }}</p>
       {%- endif -%}
+    </div>
     {%- endif -%}
+
+    <div class="member-spotlight-card__toggle-row">
+      {%- if has_details -%}
+      <button type="button" class="member-spotlight-card__toggle">More</button>
+      {%- endif -%}
+    </div>
 
     {%- if has_links -%}
     <span class="member-spotlight-card__icon-links">
@@ -153,7 +146,7 @@
       if (!btn) return;
       var card = btn.closest('.member-spotlight-card');
       var expanded = card.classList.toggle('is-expanded');
-      btn.textContent = expanded ? 'Read less' : 'Read more';
+      btn.textContent = expanded ? 'Less' : 'More';
     });
   })();
 </script>

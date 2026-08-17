@@ -81,6 +81,82 @@ members:
 #    github: "Anahita-zmn"
 #    affiliation: "SeRP UK, Swansea University"
 
+## Test Data:
+
+  - id: m-priya-anand
+    name: Priya Anand
+    role: Project Lead
+    affiliation: University of Edinburgh
+    github: priyaanand
+    orcid: 0000-0002-1825-0097
+    content: >
+      Priya has driven the UKDLC glossary from a rough spreadsheet into
+      a proper knowledge base, chairing monthly reviews and chasing down
+      terminology disputes with more patience than anyone deserves.
+
+  - id: m-oliver
+    name: Oliver
+    role: Data Curator
+    affiliation: SeRP
+    force_initials: true
+    content: Goes by one name only. Keeps the taxonomy honest.
+
+  - id: m-fatima-al-sayed
+    name: Fatima Al-Sayed
+    role: Statistical Disclosure Control Lead
+    affiliation: Office for National Statistics
+    linkedin: fatima-al-sayed-example
+    scholar: exampleScholarId123
+    content: >
+      Fatima wrote the original SDC guidance that the glossary's "plain
+      language" definitions are built around, and has reviewed almost
+      every technical entry for accuracy since. Her reviews are long,
+      thorough, and occasionally terrifying, but the glossary is far
+      better for them — this note is intentionally long to test the
+      clamp/expand behaviour on the card.
+
+  - id: m-jean-luc-bertrand-fontaine
+    name: Jean-Luc Bertrand-Fontaine
+    role: Research Software Engineer
+    affiliation: Institut National de la Statistique et des Études Économiques
+    github: jlbertrandfontaine
+    url: https://jlbf.example.org
+
+  - id: m-wei
+    name: Wei
+    role: Community Manager
+    github: weidoesdata
+
+  - id: m-anonymous-reviewer
+    name: Anonymous Reviewer
+    role: External Reviewer
+
+  - id: m-siobhan-ni-chonghaile
+    name: Siobhán Ní Chonghaile
+    role: PhD Researcher
+    affiliation: University of St Andrews
+    github: siobhannichonghaile
+    orcid: 0000-0001-9999-4321
+    linkedin: siobhan-ni-chonghaile
+    scholar: exampleScholarId456
+    url: https://siobhan.example.org
+    extra_links:
+      - label: Mastodon
+        url: https://fosstodon.org/@siobhan
+        icon: fa-brands fa-mastodon
+      - label: Bluesky
+        url: https://bsky.app/profile/siobhan.example
+        icon: fa-brands fa-bluesky
+    content: >
+      Testing a person with every optional link populated at once, to
+      see how crowded the icon-link footer gets.
+
+  - id: m-a
+    name: A
+    role: Placeholder
+    force_initials: true
+    content: Single-character name edge case.
+
 contributors:
   # id:          required, stable key / anchor
   # name:        required
@@ -98,3 +174,43 @@ contributors:
     name: "Alex Park"
     affiliation: "Independent"
     url: "https://alexpark.dev"
+
+## Test Data
+
+  - { id: c-01, name: "Tom Baker",        affiliation: "University of Leeds",     github: tombaker0 }
+  - id: c-02
+    name: "Mei"
+    github: meidata
+    content: >
+      Mei spotted a batch of inconsistent term IDs across the glossary
+      and submitted the PR that fixed them all in one pass.
+  - id: c-03
+    name: "Grzegorz Kowalczyk"
+    affiliation: "Statistics Poland"
+    github: gkowalczyk
+    content: >
+      Contributed the Polish-language cross-references for several core
+        terms and flagged a translation ambiguity that led to a clearer
+        English definition too — this bio is intentionally long to test
+        the chip's "More" toggle at a smaller scale than the member cards.
+  - { id: c-04, name: "Aoife Ní Bhroin",  affiliation: "Trinity College Dublin",  url: "https://aoife.example.org" }
+  - { id: c-05, name: "Ben" }
+  - { id: c-06, name: "Chidinma Okafor",  affiliation: "Public Health Scotland",  github: chidinmaokafor }
+  - { id: c-07, name: "Sam Lee",          github: samlee-data }
+  - { id: c-08, name: "Ingrid Bergström-Nilsson", affiliation: "Statistics Sweden" }
+  - { id: c-09, name: "Marcus" }
+  - { id: c-10, name: "Layla Haddad",     affiliation: "Cardiff University",      github: laylahaddad }
+  - { id: c-11, name: "Zhang Wei",        github: zhangwei-stats }
+  - { id: c-12, name: "Órlaith Duffy",    url: "https://orlaith.example.net" }
+  - { id: c-13, name: "Rasheed" }
+  - { id: c-14, name: "Nikolai Volkov",   affiliation: "Alan Turing Institute",   github: nvolkov }
+  - { id: c-15, name: "Freya Johansen",   github: freyajohansen }
+  - { id: c-16, name: "Diego Fernández",  affiliation: "Instituto Nacional de Estadística", url: "https://diego.example.es" }
+  - { id: c-17, name: "Hana" }
+  - { id: c-18, name: "William Ashworth-Grey", affiliation: "Newcastle University", github: wag }
+  - { id: c-19, name: "Sunita Rao",       github: sunitarao }
+  - { id: c-20, name: "Kofi Mensah",      affiliation: "SeRP" }
+  - { id: c-21, name: "Élise" }
+  - { id: c-22, name: "Bartholomew Fitzwilliam-Smythe", affiliation: "A Very Long Affiliation Name That Should Truncate With An Ellipsis", github: bfs }
+  - { id: c-23, name: "Yuki Tanaka",      github: yukitanaka }
+  - { id: c-24, name: "Ravi" }

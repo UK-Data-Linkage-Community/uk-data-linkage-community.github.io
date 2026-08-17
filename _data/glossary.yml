@@ -1,7 +1,3 @@
-#pipeline:
-#  title: "Glossary (coming soon)"
-#  description: "End-to-end conceptual pipeline for record linkage."
-
 sections:
   - id: scoping
     title: "Scoping"
