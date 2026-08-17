@@ -564,6 +564,13 @@
 }
 .jk-tag--person:hover { background: #dbeafe; }
 
+/* Base/fallback look for any topic tag. Per-tag colour (matched on
+   data-tag-value, e.g. .jk-tag--topic[data-tag-value="python"]) is
+   generated in _tags.scss from the shared $tag-list — that's also what
+   colours the glossary tag-chips, so the same tag name reads the same
+   colour everywhere on the site. A tag not yet added to $tag-list just
+   falls back to this neutral grey. Make sure _tags.scss is compiled
+   alongside this file. */
 .jk-tag--topic {
   background: var(--jk-surface);
   color: var(--jk-text-muted);

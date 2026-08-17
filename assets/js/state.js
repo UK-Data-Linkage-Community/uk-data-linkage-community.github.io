@@ -7,7 +7,11 @@ export const allTerms = [];
 // properties directly (ES module bindings keep everyone in sync).
 export const state = {
   defMode: "technical",
-  showAnalogies: false,
+  // Replaces the old `showAnalogies` boolean. Three states:
+  //   "expanded" (default) — analogy text always shown, no pill needed
+  //   "pill"               — collapsed to a small clickable pill
+  //   "hidden"             — analogy is not rendered at all
+  analogyDisplay: "expanded",
   activeSection: null,
   activeConceptId: null,
   activeFilter: null,
@@ -69,11 +73,16 @@ export function renderDefinitionBlock(c, allowAnalogy = true) {
     return `<span class="panel-def">${defHtml}</span>`;
   }
 
-  if (state.showAnalogies) {
+  if (state.analogyDisplay === "hidden") {
+    return `<span class="panel-def">${defHtml}</span>`;
+  }
+
+  if (state.analogyDisplay === "expanded") {
     return `<span class="panel-def">${defHtml}</span>
             <span class="analogy-text analogy-text--inline">${c.analogy}</span>`;
   }
 
+  // "pill" — collapsed by default, click-to-expand.
   return `<span class="panel-def">${defHtml}</span>
           <button class="analogy-pill" data-analogy-for="${c.id}" type="button">Analogy</button>
           <span class="analogy-text" id="analogy-${c.id}" style="display:none">${c.analogy}</span>`;

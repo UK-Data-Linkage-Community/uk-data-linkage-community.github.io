@@ -35,9 +35,16 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  prefShowAnalogies.addEventListener("change", () => {
-    state.showAnalogies = prefShowAnalogies.checked;
-    rerenderActiveView();
+  document.querySelectorAll(".analogy-display-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.analogyDisplay = btn.dataset.analogyDisplay;
+
+      document.querySelectorAll(".analogy-display-btn").forEach(b => {
+        b.classList.toggle("active", b === btn);
+      });
+
+      rerenderActiveView();
+    });
   });
 
   // --- Content rendering --------------------------------------------
