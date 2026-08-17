@@ -105,7 +105,7 @@
   display: flex;
   align-items: center;
   min-width: 0;
-  min-height: 3rem;
+  height: 2.8rem;
   padding: 0.45rem 0.75rem;
   border: 1px solid var(--color-grey);
   border-radius: 12px;
@@ -121,11 +121,19 @@
   &:hover .contributor-chip__name {
     color: var(--color-teal);
   }
+
+  // Disabling ALL transitions while expanded stops any inherited
+  // global transition rule from animating the popover's background
+  // in from transparent on the opening frames.
+  &.is-expanded {
+    transition: none;
+    transform: none;
+  }
 }
 
-// Everything sits on one line: avatar, name, affiliation, toggle.
-// min-width: 0 lets the row shrink inside the fixed grid column
-// instead of forcing the chip wider.
+// Everything sits on one line: avatar, name, toggle. min-width: 0
+// lets the row shrink inside the fixed grid column instead of
+// forcing the chip wider.
 .contributor-chip__row {
   display: flex;
   align-items: center;
@@ -146,9 +154,8 @@
 }
 
 .contributor-chip__name {
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   min-width: 0;
-  max-width: 55%;
   font-size: 0.8rem;
   font-weight: 600;
   color: inherit;
@@ -156,22 +163,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-// A small dot separates name from affiliation, both truncating
-// independently so a long one never crowds the other off the row.
-.contributor-chip__affiliation {
-  flex: 1 1 auto;
-  min-width: 0;
-  font-size: 0.66rem;
-  color: var(--color-grey);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  &::before {
-    content: "\00b7\0020";
-  }
 }
 
 .contributor-chip__toggle {
@@ -193,6 +184,8 @@
 // The pop-out card: absolutely positioned, so an open bio floats
 // above the grid instead of pushing the row (and everything below
 // it) down. Closed by default; only the active chip's popover shows.
+// Holds the full name + affiliation (kept off the main row to keep
+// the chip slim) plus the bio, if there is one.
 .contributor-chip__popover {
   display: none;
   position: absolute;
@@ -207,6 +200,8 @@
   border-radius: 12px;
   background: var(--color-bg, #fff);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  transition: none;
+  opacity: 1;
 
   .contributor-chip.is-expanded & {
     display: flex;
@@ -250,7 +245,8 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 0.85rem 0.9rem 0.7rem;
+  height: 9.1rem;
+  padding: 0.85rem 0.9rem 2.5rem;
   border: 1px solid var(--color-grey);
   border-radius: 0.65rem;
   background: transparent;
@@ -260,16 +256,14 @@
     border-color: var(--color-teal);
     transform: translateY(-1px);
   }
-}
 
-// Reserve room at the bottom of the card for the icon-link footer,
-// which is positioned absolutely (see below) rather than pushed down
-// by flex/margin auto — that way a long role, a wrapped name, or a
-// long note can never knock the links out of alignment with the
-// links on neighbouring cards. They're always pinned to the same
-// spot, independent of how tall the content above them gets.
-.member-spotlight-card--has-links {
-  padding-bottom: 2.5rem;
+  // Disabling ALL transitions while expanded (not just transform)
+  // stops any inherited/global transition rule from animating the
+  // popover's background in from transparent on the opening frames.
+  &.is-expanded {
+    transition: none;
+    transform: none;
+  }
 }
 
 // The avatar/name/role/affiliation block. Kept as one fixed unit at
@@ -329,6 +323,7 @@ a.member-spotlight-card__name {
 // because of it.
 .member-spotlight-card__role {
   display: inline-block;
+  align-self: flex-start;
   font-size: 0.64rem;
   font-weight: 600;
   letter-spacing: 0.03em;
@@ -354,21 +349,49 @@ a.member-spotlight-card__name {
   line-height: 0.86rem;
 }
 
-// role + content sit here, hidden until the card is expanded
-.member-spotlight-card__details {
+// role + full name/affiliation + note live in a pop-out popover,
+// not inline — expanding never changes the card's own height or
+// pushes the grid around.
+.member-spotlight-card__popover {
   display: none;
-  margin-top: 0.6rem;
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  z-index: 20;
+  width: max-content;
+  min-width: 240px;
+  max-width: min(340px, 90vw);
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--color-grey);
+  border-radius: 12px;
+  background: var(--color-bg, #fff);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+  transition: none;
+  opacity: 1;
 
   .member-spotlight-card.is-expanded & {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
   }
+}
+
+.member-spotlight-card__popover-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.member-spotlight-card__popover-affiliation {
+  font-size: 0.72rem;
+  color: var(--color-grey);
+  margin-bottom: 0.15rem;
 }
 
 .member-spotlight-card__note {
   font-size: 0.82rem;
   line-height: 1.45;
   color: inherit;
-  margin: 0.5rem 0 0;
+  margin: 0;
 }
 
 // Always rendered (even empty) so the toggle sits at the same

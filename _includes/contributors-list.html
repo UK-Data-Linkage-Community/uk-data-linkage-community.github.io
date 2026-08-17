@@ -24,7 +24,12 @@
       {%- assign initials = person.name | slice: 0, 2 -%}
     {%- endif -%}
 
-  <li class="contributor-chip{% if person.content %} contributor-chip--has-bio{% endif %}" id="{{ person.id }}">
+    {%- assign has_popover = false -%}
+    {%- if person.content or person.affiliation -%}
+      {%- assign has_popover = true -%}
+    {%- endif -%}
+
+  <li class="contributor-chip" id="{{ person.id }}">
     <span class="contributor-chip__row">
       <span class="contributor-chip__avatar">
         {%- if person.force_initials -%}
@@ -47,22 +52,20 @@
       <span class="contributor-chip__name" title="{{ person.name }}">{{ person.name }}</span>
       {%- endif -%}
 
-      {%- if person.affiliation -%}
-      <span class="contributor-chip__affiliation" title="{{ person.affiliation }}">{{ person.affiliation }}</span>
-      {%- endif -%}
-
-      {%- if person.content -%}
+      {%- if has_popover -%}
       <button type="button" class="contributor-chip__toggle">More</button>
       {%- endif -%}
     </span>
 
-    {%- if person.content -%}
+    {%- if has_popover -%}
     <div class="contributor-chip__popover">
       <span class="contributor-chip__popover-name">{{ person.name }}</span>
       {%- if person.affiliation -%}
       <span class="contributor-chip__popover-affiliation">{{ person.affiliation }}</span>
       {%- endif -%}
+      {%- if person.content -%}
       <p class="contributor-chip__note">{{ person.content }}</p>
+      {%- endif -%}
     </div>
     {%- endif -%}
   </li>
