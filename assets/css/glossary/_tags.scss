@@ -1,0 +1,190 @@
+// =============================================================================
+// TAG CHIPS  (shared across central panel and term list)
+// =============================================================================
+.tag-chip {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 500;         // pale hues read better bolded
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.05);
+  color: #666;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tag-chip:hover {
+  background: rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.glossary-term .tag-chip {
+  position: relative;
+  padding: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  font-size: 0;
+  line-height: 0;
+  opacity: 0.75;
+  transition: opacity 0.1s ease, transform 0.1s ease;
+}
+
+// Invisible hit-area — the visible dot stays small and tidy in the list,
+// but the actual clickable/tappable region is ~24px so it's usable with a
+// mouse or a finger, not just precise pointer users.
+.glossary-term .tag-chip::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+}
+
+.glossary-term:hover .tag-chip,
+.glossary-term .tag-chip:hover,
+.glossary-term .tag-chip:focus-visible {
+  opacity: 1;
+  transform: scale(1.35);
+}
+
+.glossary-term .tag-chip:focus-visible {
+  outline: 2px solid var(--jk-text, #333);
+  outline-offset: 3px;
+}
+
+
+// =============================================================================
+// TAG FILTERS  (now live in the left "browse" drawer)
+// =============================================================================
+.tag-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tag-filter {
+  padding: 0.2rem 0.65rem;
+  font-size: 0.75rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  background: transparent;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tag-filter:hover { background: rgba(0, 0, 0, 0.04); }
+
+.tag-filter.active {
+  background: rgba(0, 0, 0, 0.05);
+  font-weight: 500;
+}
+
+.tag-count {
+  background: rgba(0, 0, 0, 0.07);
+  color: #777;
+  border-radius: 999px;
+  padding: 0 0.4rem;
+  font-size: 0.68rem;
+}
+
+
+// =============================================================================
+// TAG COLOR SYSTEM — one master list, shared site-wide
+// =============================================================================
+// This is the single source of truth for "what colour is tag X" everywhere
+// on the site: glossary tag-chips, filter pills, AND the topic tags on the
+// materials cards (/resources/materials/, see _card.scss's .jk-tag--topic
+// + cards.js's data-tag-value). Same name → same colour, wherever it's used.
+//
+// To add a new tag: append its name to $tag-list below. It gets a hue
+// that's maximally distinct from every existing tag (golden-angle spacing)
+// — no manual colour picks needed. IMPORTANT: if a tag is used anywhere in
+// your Jekyll data (a `tags:` field in materials.yml, people.yml, etc.) it
+// needs an entry here too, or it'll render as neutral grey (see the
+// fallback rule for .jk-tag--topic in _card.scss) instead of a real colour.
+
+$tag-list: (
+  datatype, evaluation, python, deterministic, tool, visualisation,
+  metric, core, method, probabilistic, model, comparison
+);
+
+$tag-golden-angle: 137.508;
+
+// oklch() instead of hsl(): its lightness channel is perceptually uniform
+// across hues, so "the same lightness" actually looks the same lightness
+// whether the hue is yellow or blue — hsl() famously doesn't have this
+// property (50% yellow reads much lighter than 50% blue), which is why the
+// old version needed manual per-band darkening hacks.
+$tag-lightness: 0.6;   // base OKLCH lightness (0–1)
+$tag-chroma:    0.185; // base OKLCH chroma (~0–0.4 is the practical range;
+                        // pushed up from 0.135 for more saturated colour —
+                        // some hues (blue/purple band below) go higher
+                        // still, others quietly clip to the sRGB gamut
+                        // edge, which is fine, just means "as vivid as a
+                        // screen can show"
+
+@for $i from 1 through length($tag-list) {
+  $name: nth($tag-list, $i);
+  $index: $i - 1;
+
+  $raw-hue: $index * $tag-golden-angle;
+  $hue: $raw-hue - floor($raw-hue / 360) * 360;
+
+  // Colourblind-friendliness: hues in ~40°–200° (yellow → green → teal) are
+  // the band protanopia/deuteranopia collapse together most. Rather than
+  // just darkening that whole band (which still leaves neighbouring tags
+  // *inside* the band looking alike), swing lightness continuously with
+  // the hue itself. Two tags that read as "the same hue" to a red-green
+  // colourblind viewer will then still usually differ in light/dark, which
+  // most forms of colour blindness leave intact.
+  $light: $tag-lightness;
+  @if $hue >= 40 and $hue <= 200 {
+    $swing: (($hue - 40) / 160) * 0.24 - 0.12; // -0.12 … +0.12
+    $light: $tag-lightness + $swing;
+  }
+
+  // Blues/purples read a bit muddier than warm hues at equal chroma —
+  // nudge them up slightly so every tag carries similar visual "punch".
+  $chroma: $tag-chroma;
+  @if $hue >= 220 and $hue <= 300 {
+    $chroma: $tag-chroma + 0.04;
+  }
+
+  $tag-color: oklch($light $chroma ($hue * 1deg));
+
+  // Glossary chips + filter pills (existing site-wide usage)
+  .tag-chip--#{$name} {
+    color: $tag-color;
+    border-color: $tag-color;
+    border-width: 0.5px;
+  }
+
+  // dark outline ring — just enough to separate the dot from the page
+  // background, thin so it doesn't compete with the dot's own colour
+  .glossary-term .tag-chip--#{$name} {
+    background: $tag-color;
+    border-color: $tag-color;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+  }
+
+  .tag-filter--#{$name} {
+    color: $tag-color;
+    border-color: $tag-color;
+    border-width: 1px;
+  }
+
+  .tag-filter--#{$name}.active {
+    border-color: var(--color-teal);
+    border-width: 2px;
+  }
+
+  // Materials-page topic tags (_card.scss's .jk-tag--topic, rendered by
+  // cards.js with data-tag-value="<tag name>"). Class+attribute beats the
+  // plain .jk-tag--topic rule in _card.scss on specificity, so listed tags
+  // get their colour and everything else keeps the neutral fallback.
+  .jk-tag--topic[data-tag-value="#{$name}"] {
+    color: $tag-color;
+    border-color: $tag-color;
+  }
+}
