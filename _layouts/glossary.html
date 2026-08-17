@@ -85,14 +85,18 @@ layout: default
         </div>
 
         <div class="drawer-section">
-          <div class="drawer-label">Display options</div>
-          <label class="toggle-row">
-            <span>Show analogies inline</span>
-            <span class="toggle-switch">
-              <input type="checkbox" id="pref-show-analogies" />
-              <span class="toggle-slider"></span>
-            </span>
-          </label>
+          <div class="drawer-label">Analogy options</div>
+          <div class="analogy-display-options" id="analogy-display-options">
+            <button class="analogy-display-btn active" data-analogy-display="expanded" type="button">
+              Full
+            </button>
+            <button class="analogy-display-btn" data-analogy-display="pill" type="button">
+              Collapsed
+            </button>
+            <button class="analogy-display-btn" data-analogy-display="hidden" type="button">
+              Off
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -167,12 +171,50 @@ layout: default
           <div id="concept-graph-container">
             <svg id="concept-graph"></svg>
 
-            <div class="graph-legend">
-              <span class="legend-item legend-center">Selected</span>
-              <span class="legend-item legend-broader">Broader</span>
-              <span class="legend-item legend-narrower">Narrower</span>
-              <span class="legend-item legend-related">Related</span>
-            </div>
+            <svg width="0" height="0" style="position:absolute">
+            <defs>
+              <marker id="legend-arrow" viewBox="0 -5 10 10" refX="7" refY="0"
+                      markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M0,-5L10,0L0,5" fill="#334155"/>
+              </marker>
+            </defs>
+          </svg>
+
+          <div class="graph-legend">
+            <span class="legend-item">
+              <svg class="legend-icon" width="20" height="14" viewBox="0 0 20 14" aria-hidden="true">
+                <rect x="1" y="2" width="18" height="10" rx="5" fill="var(--color-teal-dark)"/>
+              </svg>
+              Selected
+            </span>
+
+            <span class="legend-item">
+              <svg class="legend-icon" width="54" height="14" viewBox="0 0 54 14" aria-hidden="true">
+                <rect x="1" y="2" width="16" height="10" rx="5" fill="var(--color-teal-dark)"/>
+                <line x1="34" y1="7" x2="19" y2="7" stroke="#334155" stroke-width="1.6" marker-end="url(#legend-arrow)"/>
+                <rect x="37" y="2" width="16" height="10" rx="5" fill="#fff" stroke="#94a3b8" stroke-width="1.4"/>
+              </svg>
+              Broader
+            </span>
+
+            <span class="legend-item">
+              <svg class="legend-icon" width="54" height="14" viewBox="0 0 54 14" aria-hidden="true">
+                <rect x="1" y="2" width="16" height="10" rx="5" fill="var(--color-teal-dark)"/>
+                <line x1="19" y1="7" x2="34" y2="7" stroke="#334155" stroke-width="1.6" marker-end="url(#legend-arrow)"/>
+                <rect x="37" y="2" width="16" height="10" rx="5" fill="#fff" stroke="#94a3b8" stroke-width="1.4"/>
+              </svg>
+              Narrower
+            </span>
+
+            <span class="legend-item">
+              <svg class="legend-icon" width="54" height="14" viewBox="0 0 54 14" aria-hidden="true">
+                <rect x="1" y="2" width="16" height="10" rx="5" fill="var(--color-teal-dark)"/>
+                <line x1="19" y1="7" x2="34" y2="7" stroke="#334155" stroke-width="1.6" stroke-dasharray="3,3"/>
+                <rect x="37" y="2" width="16" height="10" rx="5" fill="#fff" stroke="#94a3b8" stroke-width="1.4"/>
+              </svg>
+              Related
+            </span>
+          </div>
           </div>
 
         </div>

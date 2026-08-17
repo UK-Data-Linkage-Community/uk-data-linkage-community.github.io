@@ -1,13 +1,16 @@
 import { conceptMap, state } from "./state.js";
 
+// Colour is now only an accent for the focused node — relation type is
+// carried by line style instead (solid+arrow for broader/narrower, dotted
+// for related), so it doesn't compete with the tag-chip colour coding.
 export const PALETTE = {
-  center:   "#2a9d8f",
-  broader:  "#e07b39",
-  narrower: "#4a7fc1",
-  related:  "#9b8ea8",
-  ghost:    "#94a3b8",
-  link:     "#c8d0da",
+  center: "#2a9d8f",
+  ink:    "#334155",
+  ghost:  "#94a3b8",
+  link:   "#c8d0da",
 };
+
+const RELATED_DASH = "3,3";
 
 const PILL_FONT        = 10.5;
 const PILL_LINE_HEIGHT = 13;
@@ -147,18 +150,20 @@ export class ConceptGraphManager {
       .attr("stdDeviation", 1.6)
       .attr("flood-color", "#1e293b")
       .attr("flood-opacity", 0.22);
-    ["broader", "narrower", "related"].forEach(t => {
-      defs.append("marker")
-        .attr("id",           `cgm-arrow-${t}`)
-        .attr("viewBox",      "0 -5 10 10")
-        .attr("refX",         5).attr("refY", 0)
-        .attr("markerWidth",  5).attr("markerHeight", 5)
-        .attr("orient",       "auto")
-        .append("path")
-          .attr("d",       "M0,-5L10,0L0,5")
-          .attr("fill",    PALETTE[t])
-          .attr("opacity", 0.55);
-    });
+    // One neutral arrow marker, reused for every broader/narrower edge.
+    // Edges are built parent→child (see addEdge in _buildData), so the
+    // arrow's direction alone shows which end is broader vs narrower —
+    // no colour needed.
+    defs.append("marker")
+      .attr("id",           "cgm-arrow")
+      .attr("viewBox",      "0 -5 10 10")
+      .attr("refX",         6).attr("refY", 0)
+      .attr("markerWidth",  6.5).attr("markerHeight", 6.5)
+      .attr("orient",       "auto")
+      .append("path")
+        .attr("d",       "M0,-5L10,0L0,5")
+        .attr("fill",    PALETTE.ink)
+        .attr("opacity", 0.85);
 
     this._g = svg.append("g").attr("class", "cgm-root");
 
@@ -170,10 +175,11 @@ export class ConceptGraphManager {
       .selectAll("path")
       .data(this.links)
       .join("path")
-        .attr("fill",           "none")
-        .attr("stroke",         PALETTE.link)
-        .attr("stroke-width",   0.8)
-        .attr("stroke-opacity", 0.28);
+        .attr("fill",             "none")
+        .attr("stroke",           PALETTE.link)
+        .attr("stroke-width",     0.8)
+        .attr("stroke-dasharray", d => d.type === "related" ? RELATED_DASH : null)
+        .attr("stroke-opacity",   0.28);
 
     const nodeG = this._g.append("g").attr("class", "cgm-nodes")
       .selectAll("g")
@@ -265,17 +271,23 @@ export class ConceptGraphManager {
       .force("link",
         d3.forceLink(this.links)
           .id(d => d.id)
-          .distance(90)
-          .strength(0.55)
+          .distance(70)
+          .strength(1)
       )
-      .force("charge", d3.forceManyBody().strength(-200).distanceMax(260))
+      .force("charge",
+        d3.forceManyBody()
+          .strength(-100)
+          .distanceMax(180)
+      )
       .force("center", d3.forceCenter(W / 2, H / 2))
-      .force("x", d3.forceX(W / 2).strength(0.045))
-      .force("y", d3.forceY(H / 2).strength(0.045))
-      .force("collide", d3.forceCollide(d => Math.hypot(d.pillW / 2, d.pillH / 2) + 6).iterations(3))
+      .force("collide",
+        d3.forceCollide(
+          d => Math.hypot(d.pillW / 2, d.pillH / 2) + 16
+        ).iterations(3)
+      )
       .on("tick", () => this._updatePositions())
       .stop();
-    for (let i = 0; i < 300; i++) this._sim.tick();
+    for (let i = 0; i < 180; i++) this._sim.tick();
     this._updatePositions();
 
     this._sim.alphaTarget(0).restart();
@@ -314,9 +326,26 @@ export class ConceptGraphManager {
     container.appendChild(ctrl);
   }
 
-  setFocus(id, selected = true) {
-    this.focusId = id;
-    const dist   = this._bfs(id);
+  // Reorder the SVG DOM so paint order matches relevance to the focused
+  // term: farthest/"ghost" nodes and links are pushed to the back, and the
+  // focused node plus its direct chain (dist <= 1) end up painted last, i.e.
+  // visually on top, no matter what order they were created in.
+  _raiseFocusChain(dist) {
+    const byDistDesc = (a, b) => (dist.get(b.id) ?? 99) - (dist.get(a.id) ?? 99);
+    this._nodeG = this._nodeG.sort(byDistDesc);
+
+    const linkDist = l => {
+      const srcId = typeof l.source === "object" ? l.source.id : l.source;
+      const tgtId = typeof l.target === "object" ? l.target.id : l.target;
+      return Math.max(dist.get(srcId) ?? 99, dist.get(tgtId) ?? 99);
+    };
+    this._linkSel = this._linkSel.sort((a, b) => linkDist(b) - linkDist(a));
+  }
+
+    setFocus(id, selected = true) {
+      this.focusId = id;
+      const dist = this._bfs(id);
+      this._focusDist = dist;
 
     const T = 380;
 
@@ -334,7 +363,7 @@ export class ConceptGraphManager {
         scale = 1.3; border = PALETTE.center;
         fillOp = 0.98; strokeOp = 0.9; glowOp = 0.16; fontOp = 1;
       } else if (dv === 0 || dv === 1) {
-        border = dv === 1 ? (PALETTE[this._relType(id, d.id)] || PALETTE.ghost) : PALETTE.ghost;
+        border = dv === 1 ? PALETTE.ink : PALETTE.ghost;
         scale = 1.05; fillOp = 0.94; strokeOp = 0.65; glowOp = 0; fontOp = 0.92;
       } else if (dv === 2) {
         scale = 0.85; border = PALETTE.ghost;
@@ -383,42 +412,77 @@ export class ConceptGraphManager {
       if (minD === 0 && maxD === 1) {
         const neighborId = srcId === id ? tgtId : srcId;
         const relType     = this._relType(id, neighborId);
+        const isRelated   = relType === "related";
         lk.transition().duration(380)
-          .attr("stroke",       PALETTE[relType] || PALETTE.related)
-          .attr("stroke-width", 1.9)
-          .attr("stroke-opacity", 0.62)
-          .attr("marker-mid",   `url(#cgm-arrow-${relType})`);
+          .attr("stroke",           PALETTE.ink)
+          .attr("stroke-width",     isRelated ? 1.7 : 2.4)
+          .attr("stroke-dasharray", isRelated ? RELATED_DASH : null)
+          .attr("stroke-opacity",   0.6)
+          .attr("marker-mid",       isRelated ? null : "url(#cgm-arrow)");
       } else if (minD <= 1 && maxD === 2) {
         lk.transition().duration(380)
-          .attr("stroke",         PALETTE.link)
-          .attr("stroke-width",   1)
-          .attr("stroke-opacity", 0.18)
-          .attr("marker-mid",     null);
+          .attr("stroke",           PALETTE.link)
+          .attr("stroke-width",     1)
+          .attr("stroke-dasharray", null)
+          .attr("stroke-opacity",   0.18)
+          .attr("marker-mid",       null);
       } else if (minD <= 2 && maxD <= 3) {
         lk.transition().duration(380)
-          .attr("stroke",         PALETTE.link)
-          .attr("stroke-width",   0.7)
-          .attr("stroke-opacity", 0.08)
-          .attr("marker-mid",     null);
+          .attr("stroke",           PALETTE.link)
+          .attr("stroke-width",     0.7)
+          .attr("stroke-dasharray", null)
+          .attr("stroke-opacity",   0.08)
+          .attr("marker-mid",       null);
       } else {
         lk.transition().duration(380)
-          .attr("stroke",         PALETTE.link)
-          .attr("stroke-width",   0.5)
-          .attr("stroke-opacity", 0.03)
-          .attr("marker-mid",     null);
+          .attr("stroke",           PALETTE.link)
+          .attr("stroke-width",     0.5)
+          .attr("stroke-dasharray", null)
+          .attr("stroke-opacity",   0.03)
+          .attr("marker-mid",       null);
       }
     });
 
     const node = this.nodes.find(n => n.id === id);
     if (node?.x != null) {
-      this._panTo(node.x, node.y);
+      this._focusView(id, dist);
     } else {
       const check = setInterval(() => {
         const n = this.nodes.find(n => n.id === id);
-        if (n?.x != null) { this._panTo(n.x, n.y); clearInterval(check); }
+        if (n?.x != null) { this._focusView(id, dist); clearInterval(check); }
       }, 80);
       setTimeout(() => clearInterval(check), 3000);
     }
+  }
+
+  // Fit the view to the focused node plus its immediate (distance <= 1)
+  // neighbours, rather than just centering on the single node — so the
+  // "neighbourhood" the styling highlights is actually the bit in frame.
+  _focusView(id, dist) {
+    const included = this.nodes.filter(n => (dist.get(n.id) ?? 99) <= 1);
+    if (!included.length) return;
+
+    const pad = 30;
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    included.forEach(n => {
+      const hw = n.pillW / 2 + pad;
+      const hh = n.pillH / 2 + pad;
+      minX = Math.min(minX, n.x - hw); maxX = Math.max(maxX, n.x + hw);
+      minY = Math.min(minY, n.y - hh); maxY = Math.max(maxY, n.y + hh);
+    });
+
+    const boxW = Math.max(1, maxX - minX);
+    const boxH = Math.max(1, maxY - minY);
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+
+    // Always zoom in at least a little (never settle back near the resting
+    // scale of 1, or the pan reads as "nothing happened"), but don't let a
+    // single isolated node zoom in absurdly far either.
+    const fitScale = Math.min(this.W / boxW, this.H / boxH);
+    const scale = Math.min(Math.max(fitScale, 1.15), 1.7);
+
+    this._panTo(cx, cy, scale);
   }
 
   _panTo(nx, ny, scale = 1.35) {
