@@ -1,4 +1,18 @@
 function makePopover(triggerEl, cardEl, closeEl) {
+  document.body.appendChild(cardEl);
+  const originalParent = cardEl.parentElement;
+  const originalNextSibling = cardEl.nextSibling;
+  const mobileQuery = window.matchMedia("(max-width: 900px)"); // match $bp-nav
+
+  function syncParent(e) {
+    if (e.matches) {
+      document.body.appendChild(cardEl);
+    } else {
+      originalParent.insertBefore(cardEl, originalNextSibling);
+    }
+  }
+  syncParent(mobileQuery);
+  mobileQuery.addEventListener("change", syncParent);
   function open() {
     document.querySelectorAll(".popover-open").forEach(el => {
       if (el !== cardEl) el.classList.remove("popover-open");
