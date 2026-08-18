@@ -17,6 +17,9 @@ The UK Data Linkage Community (UK DLC) is an open membership community focused o
 
 ### Guides for contributing to the UK Data Linkage Community website:
 
+
+>[Building the site locally](contributing_guidelines/building_guide.md)
+
 - [Contributing to blog posts](contributing_guidelines/contributing_blog.md)
 - [Contributing to events](contributing_guidelines/contributing_events.md)
 - [Contributing useful links](contributing_guidelines/contributing_useful_links.md)
