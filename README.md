@@ -15,6 +15,12 @@ The UK Data Linkage Community (UK DLC) is an open membership community focused o
 
 >[Code of Conduct](contributing_guidelines/code_of_conduct.md) - Please read before contributing to ensure a positive and inclusive environment for all.
 
+
+### Building the site locally:
+
+>[Follow this guide](contributing_guidelines/building_guide.md) to build and run the website using Docker.
+
+
 ### Guides for contributing to the UK Data Linkage Community website:
 
 - [Contributing to blog posts](contributing_guidelines/contributing_blog.md)
