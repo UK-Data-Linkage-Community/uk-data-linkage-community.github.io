@@ -32,16 +32,17 @@ function buildConceptMap() {
   });
 }
 
-export const labelIndex = new Map(); // normalized label -> concept id
+export const labelIndex = new Map(); // normalized label -> array of concept ids
 
 function buildLabelIndex() {
   Object.values(conceptMap).forEach(c => {
     const add = label => {
       const key = label.toLowerCase();
-      if (labelIndex.has(key) && labelIndex.get(key) !== c.id) {
-        console.warn(`Duplicate label "${label}" on ${c.id} and ${labelIndex.get(key)}`);
+      const existing = labelIndex.get(key) || [];
+      if (existing.length && !existing.includes(c.id)) {
+        console.warn(`"${label}" is shared by: ${[...existing, c.id].join(", ")}`);
       }
-      labelIndex.set(key, c.id);
+      labelIndex.set(key, [...existing, c.id]);
     };
     add(c.prefLabel);
     (c.altLabel || []).forEach(add);
@@ -64,9 +65,9 @@ export function getDefinitionText(concept) {
 
 export function linkifyDefinition(text) {
   return text.replace(/\{\{(.*?)\}\}(\w*)/g, (_, term, suffix) => {
-    const id = labelIndex.get(term.toLowerCase());
-    if (!id) return term + suffix;
-    return `<span class="def-link" data-id="${id}">${term + suffix}</span>`;
+    const ids = labelIndex.get(term.toLowerCase());
+    if (!ids?.length) return term + suffix;
+    return `<span class="def-link" data-id="${ids[0]}">${term + suffix}</span>`;
   });
 }
 

@@ -170,13 +170,17 @@ document.addEventListener("DOMContentLoaded", function () {
       .slice(0, 6);
 
     matches.forEach(m => {
+      const owner = conceptMap[m.id];
+      const isPref = m.term.toLowerCase() === owner.prefLabel.toLowerCase();
       const div = document.createElement("div");
       div.className = "suggestion";
-      div.textContent = m.term;
+      div.innerHTML = isPref
+        ? m.term
+        : `${m.term} <span class="suggestion-owner">→ ${owner.prefLabel}</span>`;
       div.addEventListener("click", () => {
         searchInput.value = m.term;
         suggestions.style.display = "none";
-        runSearch();
+        selectGlossaryConcept(m.id, true); // go straight to the concept the user clicked, not runSearch
       });
       suggestions.appendChild(div);
     });
@@ -187,17 +191,44 @@ document.addEventListener("DOMContentLoaded", function () {
     const q = searchInput.value.trim().toLowerCase();
     if (!q) return;
 
-    const match =
-      allTerms.find(t => t.term.toLowerCase() === q) ||
-      allTerms.find(t => t.term.toLowerCase().includes(q));
+    const exact = allTerms.filter(t => t.term.toLowerCase() === q);
 
-    if (match) {
+    if (exact.length === 1) {
       message.textContent = "";
       viewSettingsPopover.close();
-      selectGlossaryConcept(match.id, true);
+      selectGlossaryConcept(exact[0].id, true);
+      return;
+    }
+
+    if (exact.length > 1) {
+      showDisambiguation(exact);
+      return;
+    }
+
+    const partial = allTerms.find(t => t.term.toLowerCase().includes(q));
+    if (partial) {
+      message.textContent = "";
+      viewSettingsPopover.close();
+      selectGlossaryConcept(partial.id, true);
     } else {
       message.textContent = "No match found in glossary.";
     }
+  }
+
+  function showDisambiguation(matches) {
+    message.textContent = `"${searchInput.value.trim()}" means different things depending on context — pick one:`;
+    suggestions.innerHTML = matches.map(m => {
+      const owner = conceptMap[m.id];
+      return `<div class="suggestion" data-id="${m.id}">${owner.prefLabel}</div>`;
+    }).join("");
+    suggestions.style.display = "block";
+    suggestions.querySelectorAll(".suggestion").forEach(el => {
+      el.addEventListener("click", () => {
+        suggestions.style.display = "none";
+        message.textContent = "";
+        selectGlossaryConcept(el.dataset.id, true);
+      });
+    });
   }
 
   searchBtn.addEventListener("click", runSearch);

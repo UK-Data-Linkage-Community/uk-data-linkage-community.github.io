@@ -802,6 +802,12 @@
   color: var(--color-text-secondary, #475569);
 }
 
+.suggestion-owner {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #64748b);
+  margin-left: 0.3rem;
+}
+
 // Settings Select
 @import "../glossary/settings";
 
