@@ -32,6 +32,22 @@ function buildConceptMap() {
   });
 }
 
+export const labelIndex = new Map(); // normalized label -> concept id
+
+function buildLabelIndex() {
+  Object.values(conceptMap).forEach(c => {
+    const add = label => {
+      const key = label.toLowerCase();
+      if (labelIndex.has(key) && labelIndex.get(key) !== c.id) {
+        console.warn(`Duplicate label "${label}" on ${c.id} and ${labelIndex.get(key)}`);
+      }
+      labelIndex.set(key, c.id);
+    };
+    add(c.prefLabel);
+    (c.altLabel || []).forEach(add);
+  });
+}
+
 function buildSearchIndex() {
   data.sections.forEach(section => {
     section.methods.forEach(method => {
@@ -56,13 +72,9 @@ export function getDefinitionText(concept) {
 
 export function linkifyDefinition(text) {
   return text.replace(/\{\{(.*?)\}\}(\w*)/g, (_, term, suffix) => {
-    const concept = Object.values(conceptMap)
-      .find(c => c.prefLabel.toLowerCase() === term.toLowerCase());
-
-    if (!concept) return term + suffix;
-
-    const fullWord = term + suffix;
-    return `<span class="def-link" data-id="${concept.id}">${fullWord}</span>`;
+    const id = labelIndex.get(term.toLowerCase());
+    if (!id) return term + suffix;
+    return `<span class="def-link" data-id="${id}">${term + suffix}</span>`;
   });
 }
 
@@ -92,6 +104,7 @@ export function renderDefinitionBlock(c, allowAnalogy = true) {
 export function initState() {
   if (!data) { console.error("Glossary data not loaded"); return false; }
   buildConceptMap();
+  buildLabelIndex();
   buildSearchIndex();
   return true;
 }

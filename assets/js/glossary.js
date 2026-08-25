@@ -1,6 +1,5 @@
 import { data, state, initState, conceptMap, allTerms, renderDefinitionBlock } from "./state.js";
-import { initPopovers, viewSettingsPopover, filterPopover } from "./popovers.js";
-import { initSidebar } from "./sidebar.js";
+import { initPopovers, viewSettingsPopover, filterPopover, initAkaPopover } from "./popovers.js";import { initSidebar } from "./sidebar.js";
 import { initPipelinePanel, clearPipelineActive } from "./pipeline-panel.js";
 import { initGraphSection, homeGraphSection, mountGraphSectionInto, focusGraph } from "./graph.js";
 
@@ -16,6 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const prefShowAnalogies  = document.getElementById("pref-show-analogies");
 
   initPopovers();
+  initAkaPopover();
   initSidebar();
   initGraphSection(id => selectGlossaryConcept(id, false));
 
@@ -103,9 +103,14 @@ document.addEventListener("DOMContentLoaded", function () {
     if (concept.narrower?.length) relationRows.push(`<span class="rel-label narrower-label">Narrower</span> ${makeLinks(concept.narrower)}`);
     if (concept.related?.length)  relationRows.push(`<span class="rel-label related-label">Related</span> ${makeLinks(concept.related)}`);
 
-    const altHtml = (concept.altLabel || [])
-      .map(a => `<span class="alt-label">${a}</span>`)
-      .join("");
+    const altList = concept.altLabel || [];
+    const altHtml = altList.length
+      ? `<button class="aka-trigger" type="button"
+           data-alt-list='${JSON.stringify(altList).replace(/'/g, "&#39;")}'>
+           <span class="aka-trigger-count">${altList.length}</span>
+           synonym${altList.length > 1 ? "s" : ""}
+         </button>`
+      : "";
 
     const tagHtml = (concept.tags || [])
       .map(t => `<span class="tag-chip tag-chip--${t}" data-tag="${t}">${t}</span>`)
@@ -114,8 +119,9 @@ document.addEventListener("DOMContentLoaded", function () {
     content.innerHTML = `
       <div class="concept-detail-inner">
         <div class="concept-detail-header">
-          <h3>${concept.prefLabel} ${altHtml}</h3>
-        </div>
+        <h3>${concept.prefLabel}</h3>
+        ${altHtml}
+      </div>
         <p class="concept-def">${renderDefinitionBlock(concept)}</p>
         ${relationRows.length
           ? `<div class="concept-relations">
@@ -302,6 +308,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const isOpen = text.style.display !== "none";
     text.style.display = isOpen ? "none" : "block";
     pill.classList.toggle("open", !isOpen);
+  });
+
+  document.addEventListener("click", e => {
+    const toggle = e.target.closest(".aka-toggle");
+    if (!toggle) return;
+    const container = toggle.closest(".also-known-as");
+    container.classList.toggle("aka-expanded");
   });
 
   function initGlossary() {

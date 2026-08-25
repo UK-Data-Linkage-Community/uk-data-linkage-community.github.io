@@ -51,6 +51,8 @@ export function initPopovers() {
     document.getElementById("view-settings-close")
   );
 
+
+
   filterPopover = makePopover(
     document.getElementById("filter-toggle"),
     document.getElementById("filter-popover"),
@@ -62,4 +64,55 @@ export function initPopovers() {
     if (viewSettingsPopover.isOpen()) viewSettingsPopover.close();
     if (filterPopover.isOpen()) filterPopover.close();
   });
+}
+
+export let akaPopover;
+
+export function initAkaPopover() {
+  const cardEl = document.createElement("div");
+  cardEl.className = "aka-popover";
+  document.body.appendChild(cardEl);
+
+  function close() {
+    cardEl.classList.remove("popover-open");
+    document.querySelectorAll(".aka-trigger.active")
+      .forEach(el => el.classList.remove("active"));
+  }
+
+  function position(triggerEl) {
+    const rect = triggerEl.getBoundingClientRect();
+    cardEl.style.top   = `${rect.bottom + 6}px`;
+    cardEl.style.right = `${window.innerWidth - rect.right}px`;
+    cardEl.style.left  = "auto";
+  }
+
+  function open(triggerEl, altList) {
+    document.querySelectorAll(".popover-open").forEach(el => el.classList.remove("popover-open"));
+    cardEl.innerHTML = altList.map(a => `<span class="aka-chip">${a}</span>`).join("");
+    cardEl.classList.add("popover-open");
+    triggerEl.classList.add("active");
+    position(triggerEl);
+  }
+
+  const isOpen = () => cardEl.classList.contains("popover-open");
+
+  document.addEventListener("click", e => {
+    const trigger = e.target.closest(".aka-trigger");
+    if (trigger) {
+      e.stopPropagation();
+      if (isOpen() && trigger.classList.contains("active")) { close(); return; }
+      open(trigger, JSON.parse(trigger.dataset.altList || "[]"));
+      return;
+    }
+    if (isOpen() && !cardEl.contains(e.target)) close();
+  });
+
+  window.addEventListener("resize", () => { if (isOpen()) close(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && isOpen()) close(); });
+
+  akaPopover = { open, close, isOpen };
+
+  window.addEventListener("scroll", () => {
+    if (isOpen()) close();
+  }, true); // capture:true catches scroll on nested containers too, e.g. your detail panel
 }
