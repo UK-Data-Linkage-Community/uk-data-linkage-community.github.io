@@ -655,6 +655,159 @@
     transform: rotate(135deg) scale(1.05);
 }
 
+.also-known-as {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.4rem;
+}
+
+.aka-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-text-muted, #94a3b8);
+  margin-right: 0.15rem;
+}
+
+.aka-chip {
+  font-size: 0.78rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--color-surface-alt, #f1f5f9);
+  color: var(--color-text-secondary, #475569);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.aka-chip--extra {
+  opacity: 0;
+  transform: translateX(-2px) scale(0.96);
+  width: 0;
+  padding-left: 0;
+  padding-right: 0;
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.also-known-as.aka-expanded .aka-chip--extra {
+  opacity: 1;
+  transform: none;
+  width: auto;
+  padding: 0.15rem 0.6rem;
+  margin: 0;
+}
+
+.aka-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-teal-dark, #0f766e);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--color-surface-alt, #f1f5f9);
+  }
+}
+
+.aka-chevron {
+  transition: transform 0.15s ease;
+}
+
+.aka-expanded .aka-chevron {
+  transform: rotate(180deg);
+}
+
+.concept-detail-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.concept-detail-header h3 {
+  margin: 0;
+}
+
+.also-known-as {
+  margin-top: 0;
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.concept-detail-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.concept-detail-header h3 { margin: 0; }
+
+.aka-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: var(--color-surface-alt, #f1f5f9);
+  color: var(--color-text-secondary, #475569);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover, &.active {
+    background: var(--color-teal-dark, #0f766e);
+    color: #fff;
+  }
+}
+
+.aka-trigger-count {
+  font-weight: 700;
+}
+
+.aka-popover {
+  display: none;
+  position: fixed;
+  z-index: 50;
+  max-width: 260px;
+  padding: 0.5rem;
+  border-radius: 0.6rem;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  border: 1px solid var(--color-border, #e2e8f0);
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+.aka-popover.popover-open { display: flex; }
+
+.aka-popover .aka-chip {
+  font-size: 0.78rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--color-surface-alt, #f1f5f9);
+  color: var(--color-text-secondary, #475569);
+}
+
+.suggestion-owner {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #64748b);
+  margin-left: 0.3rem;
+}
+
 // Settings Select
 @import "../glossary/settings";
 
