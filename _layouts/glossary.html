@@ -9,6 +9,8 @@ layout: default
     <!-- ═══ SIDEBAR — always-visible term browser ═══════════════════ -->
     <aside class="glossary-sidebar" id="glossary-sidebar">
 
+      <div class="sidebar-brand">{{ page.title }}</div>
+
       <button id="sidebar-toggle" class="sidebar-toggle" type="button">
         <span>Browse linkage terms</span>
         <span class="sidebar-toggle-chevron">&#9662;</span>
@@ -62,8 +64,9 @@ layout: default
          sidebar, not just when the two happen to be side by side ═══ -->
     <div class="top-section">
       <div class="top-section-text">
-        <h1>{{ page.title }}</h1>
-        {{ content }}
+        <div class="clamp-block" id="page-desc-clamp">
+          <div class="clamp-content">{{ content }}</div>
+        </div>
       </div>
 
       <button id="view-settings-btn" class="view-settings-btn" type="button" aria-haspopup="true">
@@ -122,6 +125,12 @@ layout: default
 
         <aside class="pipeline-panel" id="pipeline-panel">
           <button id="pipeline-panel-toggle" class="pipeline-panel-toggle" type="button">
+            <span class="pipeline-panel-toggle-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="5" cy="6" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="5" cy="18" r="2"/>
+                <path d="M9 6h10M9 12h10M9 18h10"/>
+              </svg>
+            </span>
             <span class="pipeline-panel-toggle-label">Pipeline stages</span>
             <span class="pipeline-panel-toggle-chevron">&#9656;</span>
           </button>

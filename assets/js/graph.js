@@ -69,7 +69,7 @@ export class ConceptGraphManager {
     this.onNodeClick = onNodeClick;
     this.focusId     = null;
     this.W = svgEl.clientWidth  || 560;
-    this.H = 420;
+    this.H = svgEl.clientHeight || 280;
 
     this._buildData();
     this._initSVG();
@@ -138,7 +138,7 @@ export class ConceptGraphManager {
     const svg = d3.select(this.svgEl);
     svg.selectAll("*").remove();
     svg.attr("viewBox", `0 0 ${this.W} ${this.H}`)
-       .attr("height",   this.H);
+       .attr("preserveAspectRatio", "xMidYMid meet");
 
     const defs = svg.append("defs");
     const shadow = defs.append("filter")
@@ -539,8 +539,7 @@ function initConceptGraph(onNodeClick) {
   const svgEl = document.getElementById("concept-graph");
   if (!svgEl || state.graphManager) return;
 
-  graphEmptyState.style.display = "none";
-  graphContainer.style.display  = "block";
+  graphBody.classList.add("graph-initialized");
 
   requestAnimationFrame(() => {
     state.graphManager = new ConceptGraphManager(svgEl, conceptMap, id => onNodeClick(id));
@@ -549,11 +548,7 @@ function initConceptGraph(onNodeClick) {
 }
 
 function expandGraphSection(onNodeClick) {
-  const isOpen = graphBody.style.display === "block";
-  if (!isOpen) {
-    graphBody.style.display = "block";
-    graphToggle.classList.add("open");
-  }
+  graphToggle.classList.add("open");
   initConceptGraph(onNodeClick);
   focusGraph(state.activeConceptId);
 }
@@ -566,19 +561,15 @@ export function initGraphSection(onNodeClick) {
   graphEmptyState = document.getElementById("graph-empty-state");
   graphContainer  = document.getElementById("concept-graph-container");
 
-  graphBody.style.display      = "none";
-  graphContainer.style.display = "none";
-
   graphSection = graphToggle.closest(".graph-section") || graphBody.parentElement;
+
   graphSectionHolder = document.createElement("div");
   graphSectionHolder.style.display = "none";
   graphSectionHolder.appendChild(graphSection);
   document.body.appendChild(graphSectionHolder);
 
   graphToggle.addEventListener("click", () => {
-    const isOpen = graphBody.style.display === "block";
-    if (isOpen) {
-      graphBody.style.display = "none";
+    if (graphToggle.classList.contains("open")) {
       graphToggle.classList.remove("open");
       return;
     }

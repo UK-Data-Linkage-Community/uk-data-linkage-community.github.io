@@ -19,6 +19,14 @@ document.addEventListener("DOMContentLoaded", function () {
   initSidebar();
   initGraphSection(id => selectGlossaryConcept(id, false));
 
+  function syncDashboardOffset() {
+    const header = document.querySelector("header"); // swap for your real site header selector
+    const h = header ? header.getBoundingClientRect().height : 0;
+    document.documentElement.style.setProperty("--dashboard-offset", `${h}px`);
+  }
+
+  syncDashboardOffset();
+  window.addEventListener("resize", syncDashboardOffset);
   function rerenderActiveView() {
     if (state.activeConceptId)    renderConceptDetail(state.activeConceptId);
     else if (state.activeSection) renderSection(state.activeSection);
@@ -136,21 +144,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
     content.innerHTML = `
       <div class="concept-detail-inner">
-        <div class="concept-detail-header">
-          <h3>${concept.prefLabel} ${altHtml}</h3>
-        </div>
-        <div class="clamp-block" id="def-clamp">
-          <p class="concept-def clamp-content">${renderDefinitionBlock(concept)}</p>
-        </div>
-        ${relationRows.length
-          ? `<div class="clamp-block" id="rel-clamp">
-               <div class="concept-relations clamp-content">
-                 ${relationRows.map(r => `<div class="relation-row">${r}</div>`).join("")}
-               </div>
-             </div>`
-          : ""}
-        <div class="concept-detail-footer">
-          <div class="concept-tag-chips">${tagHtml}</div>
+        <div class="concept-detail-body">
+          <div class="concept-detail-header">
+            <h3>${concept.prefLabel} ${altHtml}</h3>
+          </div>
+          <div class="clamp-block" id="def-clamp">
+            <p class="concept-def clamp-content">${renderDefinitionBlock(concept)}</p>
+          </div>
+          ${relationRows.length
+            ? `<div class="clamp-block" id="rel-clamp">
+                 <div class="concept-relations clamp-content">
+                   ${relationRows.map(r => `<div class="relation-row">${r}</div>`).join("")}
+                 </div>
+               </div>`
+            : ""}
+          <div class="concept-detail-footer">
+            <div class="concept-tag-chips">${tagHtml}</div>
+          </div>
         </div>
       </div>`;
     mountGraphSectionInto(content.querySelector(".concept-detail-inner"));
@@ -343,5 +353,6 @@ document.addEventListener("DOMContentLoaded", function () {
     renderGlossaryList();
   }
 
+  initClamp(document.getElementById("page-desc-clamp"), 1);
   requestAnimationFrame(initGlossary);
 });

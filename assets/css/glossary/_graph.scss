@@ -38,15 +38,25 @@
 
 
 .graph-body {
-  padding: 0 1rem 1rem;
+  display: none;
+  height: 34vh;
+  padding: 0 0.75rem 0.5rem;
   border-top: 1px solid #eee;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
+
+.graph-toggle.open + .graph-body { display: flex; }
+
+.graph-body.graph-initialized .graph-empty-state { display: none; }
 
 .graph-empty-state {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 300px;
+  flex: 1;
+  min-height: 0;
   border: 1px dashed #ddd;
   border-radius: 6px;
   background: #fafafa;
@@ -65,18 +75,29 @@
 }
 
 #concept-graph-container {
+  display: none;
   position: relative;
   margin-top: 1.2rem;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
 }
+
+.graph-body.graph-initialized #concept-graph-container { display: flex; }
 
 #concept-graph {
   width: 100%;
-  height: 280px;
+  flex: 1;
+  min-height: 0;
+  height: auto;
   display: block;
   background: #fafafa;
   border: 1px solid #e8e8e8;
   border-radius: 6px;
 }
+
+.graph-legend { flex-shrink: 0; }
 
 .graph-node rect { transition: fill-opacity 0.15s ease; }
 
@@ -125,11 +146,14 @@
 
 .graph-legend {
   display: flex;
-  gap: 1.25rem;
-  margin: 0.5rem 0 0.75rem;
-  font-size: 0.78rem;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.9rem;
+  margin: 0.35rem 0 0.4rem;
+  font-size: 0.7rem;
   color: #666;
 }
+
+.legend-icon { transform: scale(0.85); transform-origin: left center; }
 
 .legend-item {
   display: flex;
@@ -202,6 +226,18 @@ $rel-ink: #334155;
 // =============================================================================
 .concept-detail-inner {
   padding: 0;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.concept-detail-body {
+  min-height: 300px; // tune so the graph's top edge lands at a consistent y — raise/lower to taste
+  padding-right: 200px; // clears the closed pipeline pill
+  transition: padding-right 0.25s ease;
+}
+
+.content-row:has(.pipeline-panel.open) .concept-detail-body {
+  padding-right: 300px; // clears the open drawer
 }
 
 .concept-detail-header h3 {
@@ -335,29 +371,38 @@ $rel-ink: #334155;
   background: $rel-selected;
 }
 
-.glossary-main > .graph-section {
-  flex-shrink: 0;
-  max-height: 42vh;
-  display: flex;
-  flex-direction: column;
-}
-
-.glossary-main > .graph-section .graph-body {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-}
-
 #detail-content .graph-section {
   flex-shrink: 0;
   margin-top: 1.1rem;
-  max-height: 38vh;
-  display: flex;
-  flex-direction: column;
+  padding-right: 0; // full width by default
+  transition: padding-right 0.25s ease;
 }
 
-#detail-content .graph-section .graph-body {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
+.content-row:has(.pipeline-panel.open) #detail-content .graph-section {
+  padding-right: 300px; // shrinks in step with the drawer
+}
+
+.concept-def,
+.relation-row,
+.clamp-content {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: $bp-nav) {
+  .graph-body {
+    height: auto;
+    overflow: visible;
+    padding-bottom: 1rem;
+  }
+
+  .graph-body.graph-initialized #concept-graph-container {
+    flex: none;
+  }
+
+  #concept-graph {
+    flex: none;
+    height: 380px;
+  }
+
+  .graph-empty-state { flex: none; height: 240px; }
 }
