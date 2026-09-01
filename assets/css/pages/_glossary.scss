@@ -18,6 +18,8 @@
   max-width: 1550px;
   margin: 0 auto;
   padding: 1rem;
+  height: 100vh; // if a site nav sits above this page, change to
+  overflow: hidden; // calc(100vh - <nav-height>)
 }
 
 
@@ -33,16 +35,24 @@
 .glossary-layout {
   display: grid;
   grid-template-columns: 320px 1fr;
+  grid-template-rows: auto 1fr;
   grid-template-areas:
     "top     top"
     "sidebar main";
   gap: 1.75rem;
-  align-items: start;
+  height: 100%;
+  min-height: 0;
 }
 
 .top-section       { grid-area: top; }
 .glossary-sidebar   { grid-area: sidebar; }
-.glossary-main      { grid-area: main; min-width: 0; }
+.glossary-main      {
+  grid-area: main;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
 
 
 // =============================================================================
@@ -71,9 +81,8 @@
   border-radius: 10px;
   background: #fff;
   overflow: hidden;
-  position: sticky;
-  top: 1rem;
-  max-height: calc(100vh - 2rem);
+  height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -311,14 +320,18 @@
 // =============================================================================
 .content-row {
   display: flex;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 1.25rem;
+  flex: 1;
+  min-height: 0;
   margin: 1rem 0 1.5rem;
 }
 
 .detail-column {
   flex: 1;
   min-width: 0;
+  min-height: 0;
+  display: flex;
 }
 
 // =============================================================================
@@ -330,14 +343,19 @@
   padding: 1.4rem 1.6rem;
   background: #fff;
   box-shadow: 0 4px 18px rgba(20, 22, 28, 0.05);
-  min-height: 240px;
-  margin-bottom: 1.5rem;
-  position: sticky;
-  top: 1rem;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-@media (max-width: $bp-nav) {
-  #detail-panel { position: static; }
+#detail-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .detail-empty {
@@ -381,6 +399,35 @@
 .panel-tags { display: flex; gap: 0.2rem; }
 
 .panel-def { flex: 1 0 100%; color: #555; }
+
+
+
+
+// Read-more
+
+.clamp-block { position: relative; }
+
+.clamp-block[data-clamped="true"] .clamp-content {
+  display: -webkit-box;
+  -webkit-line-clamp: var(--clamp-lines, 3);
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.clamp-toggle {
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-teal);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.clamp-toggle:hover { color: var(--color-teal-dark); }
+
 
 
 // =============================================================================
@@ -451,6 +498,15 @@
 // itself collapses at).
 // =============================================================================
 @media (max-width: $bp-nav) {
+
+  .glossary-page   { height: auto; overflow: visible; }
+  .glossary-layout { height: auto; }
+  .glossary-sidebar,
+  .glossary-main   { height: auto; }
+  .content-row     { flex: none; }
+  #detail-panel    { height: auto; overflow: visible; }
+  #detail-content  { overflow: visible; }
+
   .glossary-page { padding: 0.75rem; }
 
   .glossary-layout {

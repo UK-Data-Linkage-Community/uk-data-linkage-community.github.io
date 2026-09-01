@@ -84,6 +84,29 @@ document.addEventListener("DOMContentLoaded", function () {
     attachContentLinkHandlers();
   }
 
+  function initClamp(el, lines = 3) {
+    if (!el) return;
+    const content = el.querySelector(".clamp-content");
+    if (!content) return;
+    el.style.setProperty("--clamp-lines", lines);
+
+    requestAnimationFrame(() => {
+      if (content.scrollHeight <= content.clientHeight + 2) return;
+
+      el.dataset.clamped = "true";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "clamp-toggle";
+      btn.textContent = "Read more";
+      btn.addEventListener("click", () => {
+        const clamped = el.dataset.clamped === "true";
+        el.dataset.clamped = clamped ? "false" : "true";
+        btn.textContent = clamped ? "Show less" : "Read more";
+      });
+      el.appendChild(btn);
+    });
+  }
+
   function renderConceptDetail(conceptId) {
     const concept = conceptMap[conceptId];
     if (!concept) return;
@@ -116,10 +139,14 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="concept-detail-header">
           <h3>${concept.prefLabel} ${altHtml}</h3>
         </div>
-        <p class="concept-def">${renderDefinitionBlock(concept)}</p>
+        <div class="clamp-block" id="def-clamp">
+          <p class="concept-def clamp-content">${renderDefinitionBlock(concept)}</p>
+        </div>
         ${relationRows.length
-          ? `<div class="concept-relations">
-               ${relationRows.map(r => `<div class="relation-row">${r}</div>`).join("")}
+          ? `<div class="clamp-block" id="rel-clamp">
+               <div class="concept-relations clamp-content">
+                 ${relationRows.map(r => `<div class="relation-row">${r}</div>`).join("")}
+               </div>
              </div>`
           : ""}
         <div class="concept-detail-footer">
@@ -129,6 +156,8 @@ document.addEventListener("DOMContentLoaded", function () {
     mountGraphSectionInto(content.querySelector(".concept-detail-inner"));
 
     attachContentLinkHandlers();
+    initClamp(content.querySelector("#def-clamp"), 4);
+    initClamp(content.querySelector("#rel-clamp"), 3);
   }
 
   function showEmptyDetail() {
@@ -280,13 +309,18 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  function isCompactLayout() {
+    const toggle = document.querySelector(".sidebar-toggle");
+    return !!toggle && getComputedStyle(toggle).display !== "none";
+  }
+
   function selectGlossaryConcept(id, scrollToTop) {
     state.activeConceptId = id;
     renderConceptDetail(id);
     renderGlossaryList();
     focusGraph(id);
 
-    if (scrollToTop) {
+    if (scrollToTop && isCompactLayout()) {
       document.querySelector("#detail-panel")
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
