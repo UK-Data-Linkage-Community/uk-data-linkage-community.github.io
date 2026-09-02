@@ -12,6 +12,16 @@ export const PALETTE = {
 
 const RELATED_DASH = "3,3";
 
+const MIN_FILL_OP   = 0.34;
+const MIN_STROKE_OP = 0.16;
+const MIN_FONT_OP   = 0.42;
+const MIN_LINK_OP   = 0.08;
+
+const GRAPH_PULL_BASE   = 0.025;
+// >1 flattens the resting layout (extra vertical pull), <1 stretches it
+// taller, 1 = neutral. Raise this as vertical space shrinks.
+const GRAPH_ASPECT_BIAS = 1.6;
+
 const PILL_FONT        = 10.5;
 const PILL_LINE_HEIGHT = 13;
 const PILL_PAD_X       = 18;
@@ -69,7 +79,7 @@ export class ConceptGraphManager {
     this.onNodeClick = onNodeClick;
     this.focusId     = null;
     this.W = svgEl.clientWidth  || 560;
-    this.H = 420;
+    this.H = svgEl.clientHeight || 280;
 
     this._buildData();
     this._initSVG();
@@ -280,6 +290,8 @@ export class ConceptGraphManager {
           .distanceMax(180)
       )
       .force("center", d3.forceCenter(W / 2, H / 2))
+      .force("x", d3.forceX(W / 2).strength(GRAPH_PULL_BASE))
+      .force("y", d3.forceY(H / 2).strength(GRAPH_PULL_BASE * GRAPH_ASPECT_BIAS))
       .force("collide",
         d3.forceCollide(
           d => Math.hypot(d.pillW / 2, d.pillH / 2) + 16
@@ -375,6 +387,10 @@ export class ConceptGraphManager {
         scale = 0.6; border = PALETTE.ghost;
         fillOp = 0.12; strokeOp = 0.06; glowOp = 0; fontOp = 0;
       }
+      fillOp   = Math.max(fillOp, MIN_FILL_OP);
+      strokeOp = Math.max(strokeOp, MIN_STROKE_OP);
+      fontOp   = Math.max(fontOp, MIN_FONT_OP);
+      d._scale = scale;
       d._scale = scale;
 
       inner.transition().duration(T).attr("transform", `scale(${scale})`);
@@ -438,7 +454,7 @@ export class ConceptGraphManager {
           .attr("stroke",           PALETTE.link)
           .attr("stroke-width",     0.5)
           .attr("stroke-dasharray", null)
-          .attr("stroke-opacity",   0.03)
+          .attr("stroke-opacity",   MIN_LINK_OP)
           .attr("marker-mid",       null);
       }
     });
