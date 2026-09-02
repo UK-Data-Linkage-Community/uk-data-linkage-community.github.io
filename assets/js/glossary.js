@@ -24,6 +24,10 @@ document.addEventListener("DOMContentLoaded", function () {
     else if (state.activeSection) renderSection(state.activeSection);
   }
 
+  function isCompactMode() {
+    return getComputedStyle(document.getElementById("sidebar-tabs")).display !== "none";
+  }
+
   modeToggle.querySelectorAll(".mode-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       if (btn.dataset.mode === state.defMode) return;
@@ -154,9 +158,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // --- Search ---------------------------------------------------------
 
+  let activeSuggestionIndex = -1;
+
   searchInput.addEventListener("input", () => {
     const q = searchInput.value.toLowerCase();
     suggestions.innerHTML = "";
+    activeSuggestionIndex = -1;
     if (!q) { suggestions.style.display = "none"; return; }
 
     const matches = allTerms
@@ -177,6 +184,19 @@ document.addEventListener("DOMContentLoaded", function () {
     suggestions.style.display = matches.length ? "block" : "none";
   });
 
+  function getSuggestionEls() {
+    return [...suggestions.querySelectorAll(".suggestion")];
+  }
+
+  function setActiveSuggestion(index) {
+    const items = getSuggestionEls();
+    if (!items.length) return;
+    // wrap around in both directions
+    activeSuggestionIndex = (index + items.length) % items.length;
+    items.forEach((el, i) => el.classList.toggle("active", i === activeSuggestionIndex));
+    items[activeSuggestionIndex].scrollIntoView({ block: "nearest" });
+  }
+
   function runSearch() {
     const q = searchInput.value.trim().toLowerCase();
     if (!q) return;
@@ -196,7 +216,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
   searchBtn.addEventListener("click", runSearch);
   searchInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") { e.preventDefault(); runSearch(); }
+    const items = getSuggestionEls();
+    const suggestionsOpen = suggestions.style.display === "block" && items.length;
+
+    if (e.key === "ArrowDown" && suggestionsOpen) {
+      e.preventDefault();
+      setActiveSuggestion(activeSuggestionIndex + 1);
+    } else if (e.key === "ArrowUp" && suggestionsOpen) {
+      e.preventDefault();
+      setActiveSuggestion(activeSuggestionIndex - 1);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (suggestionsOpen && activeSuggestionIndex >= 0) items[activeSuggestionIndex].click();
+      else runSearch();
+    } else if (e.key === "Escape") {
+      suggestions.style.display = "none";
+      activeSuggestionIndex = -1;
+    }
   });
 
   // --- Tag filters + glossary list ------------------------------------
@@ -286,7 +322,7 @@ document.addEventListener("DOMContentLoaded", function () {
     renderGlossaryList();
     focusGraph(id);
 
-    if (scrollToTop) {
+    if (scrollToTop && isCompactMode()) {
       document.querySelector("#detail-panel")
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
