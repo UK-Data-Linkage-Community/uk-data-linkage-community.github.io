@@ -24,6 +24,10 @@ document.addEventListener("DOMContentLoaded", function () {
     else if (state.activeSection) renderSection(state.activeSection);
   }
 
+  function isCompactMode() {
+    return getComputedStyle(document.getElementById("sidebar-tabs")).display !== "none";
+  }
+
   modeToggle.querySelectorAll(".mode-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       if (btn.dataset.mode === state.defMode) return;
@@ -286,7 +290,7 @@ document.addEventListener("DOMContentLoaded", function () {
     renderGlossaryList();
     focusGraph(id);
 
-    if (scrollToTop) {
+    if (scrollToTop && isCompactMode()) {
       document.querySelector("#detail-panel")
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
