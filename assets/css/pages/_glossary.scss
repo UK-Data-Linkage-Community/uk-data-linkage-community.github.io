@@ -330,7 +330,7 @@
   padding: 1.4rem 1.6rem;
   background: #fff;
   box-shadow: 0 4px 18px rgba(20, 22, 28, 0.05);
-  min-height: 240px;
+  min-height: calc(100vh - 2rem);
   margin-bottom: 1.5rem;
   position: sticky;
   top: 1rem;
@@ -374,6 +374,28 @@
   color: var(--color-teal);
   text-decoration: underline;
   text-decoration-style: dotted;
+}
+
+#detail-panel {
+  border: 1px solid #e4e4e4;
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(20, 22, 28, 0.05);
+  margin-bottom: 1.5rem;
+
+  position: sticky;
+  top: 1rem;
+  height: calc(100vh - 2rem);
+  overflow-y: auto;
+  overflow-anchor: none;
+}
+@media (max-width: $bp-nav) {
+  #detail-panel {
+    position: static;
+    height: auto;
+    overflow: visible;
+  }
 }
 
 .concept-link:hover { text-decoration-style: solid; }
@@ -669,3 +691,13 @@
 
 /// Concept graph
 @import "../glossary/graph";
+
+
+.glossary-page { overflow-anchor: none; }
+
+.suggestion:hover,
+.suggestion.active {
+  border-color: var(--color-teal);
+  color: var(--color-teal-dark);
+  background: var(--color-teal-light);
+}
