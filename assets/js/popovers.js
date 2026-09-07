@@ -51,7 +51,8 @@ export function initPopovers() {
   viewSettingsPopover = makePopover(
     document.getElementById("view-settings-btn"),
     document.getElementById("view-settings-card"),
-    document.getElementById("view-settings-close")
+    document.getElementById("view-settings-close"),
+    false   // bottom-sheet on mobile is positioned via CSS, not inline coords
   );
 
   filterPopover = makePopover(
