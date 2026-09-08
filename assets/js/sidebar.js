@@ -38,7 +38,5 @@ export function initSidebar() {
 
     sidebarToggle.classList.add("open");
     sidebarBody.classList.add("open");
-    document.getElementById("glossary-sidebar")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 }
