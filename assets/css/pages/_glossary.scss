@@ -9,15 +9,25 @@
   --bp-stack:          #{$bp-nav};
 }
 
+// The site header is shrunk to a compact strip on this page (see
+// _header.scss's `body.layout--glossary .site-header` override). This
+// feeds that same height back into the vh calc below so the dashboard
+// box stops just below the header instead of overshooting the viewport
+// — the overshoot was what forced the whole page to scroll just to
+// reach the theme's footer/copyright strip underneath.
+body.layout--glossary {
+  --dashboard-offset: 56px;
+}
+
 
 // =============================================================================
 // PAGE SHELL
 // =============================================================================
 .glossary-page {
   position: relative;
-  max-width: 1550px;
-  margin: 0 auto;
-  padding: 0 1rem 1rem;
+  max-width: none;
+  margin: 0;
+  padding: 0 0.75rem 0.6rem;
   height: calc(100vh - var(--dashboard-offset, 0px));
   overflow: hidden;
 }
@@ -358,6 +368,7 @@
 // CENTRAL DETAIL PANEL  (shared by pipeline sections AND single concepts)
 // =============================================================================
 #detail-panel {
+  position: relative; // anchors the floating concept-graph pill/tray (see _graph.scss)
   padding: 1.4rem 1.6rem;
   height: 100%;
   min-height: 0;
@@ -416,7 +427,13 @@
 
 .panel-tags { display: flex; gap: 0.2rem; }
 
-.panel-def { flex: 1 0 100%; color: #555; }
+// flex-shrink was 0 here, so this refused to shrink to the row's
+// available width and rendered at its natural full-line (no-wrap)
+// width instead — overflowing rightward, under the rail, rather
+// than wrapping. min-width:0 is needed alongside shrink:1 since a
+// flex item's default min-width:auto has the same effect as shrink:0
+// once the content itself can't be broken any smaller.
+.panel-def { flex: 1 1 100%; min-width: 0; color: #555; }
 
 
 
@@ -565,28 +582,6 @@
     flex-basis: auto;
   }
 
-  // These need to match (or beat) the specificity of the collapsed-rail
-  // rules above (.pipeline-panel:not(.open) .pipeline-panel-toggle /
-  // -toggle-label), or the rail styling keeps winning here whenever the
-  // panel happens to be collapsed — which is exactly what was causing
-  // the vertical, rotated-text tray to still show up in compact mode.
-  .pipeline-panel .pipeline-panel-toggle,
-  .pipeline-panel:not(.open) .pipeline-panel-toggle {
-    flex-direction: row;
-    height: auto;
-    padding: 0.85rem 1rem;
-    border-bottom: 1px solid #eee;
-    gap: 0;
-  }
-
-  .pipeline-panel .pipeline-panel-toggle-label,
-  .pipeline-panel:not(.open) .pipeline-panel-toggle-label {
-    writing-mode: horizontal-tb;
-    transform: none;
-  }
-
-  .pipeline-panel-body { max-height: 340px; }
-
   // Terms/Pipeline switcher becomes a real tab control, and JS reparents
   // #pipeline-panel into the Pipeline tab panel — same breakpoint as
   // everything else above, so the panel is never mid-transition between
@@ -716,17 +711,6 @@
     font-size: 0.76rem;
     padding: 0.5rem 0.3rem;
   }
-}
-
-.pipeline-panel-toggle svg {
-    transition:
-        transform 0.32s cubic-bezier(.22,1,.36,1),
-        opacity 0.2s ease;
-    transform-origin: center;
-}
-
-.pipeline-panel.open .pipeline-panel-toggle svg {
-    transform: rotate(135deg) scale(1.05);
 }
 
 // Settings Select

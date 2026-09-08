@@ -12,13 +12,16 @@ export const PALETTE = {
 
 const RELATED_DASH = "3,3";
 
-const PILL_FONT        = 10.5;
-const PILL_LINE_HEIGHT = 13;
-const PILL_PAD_X       = 18;
-const PILL_PAD_Y       = 12;
-const PILL_MIN_WIDTH   = 56;
-const PILL_MAX_WIDTH   = 100;
-const PILL_CHAR_WIDTH  = 5.6;
+// Sized up from the original 10.5px now that the graph tab has a lot
+// more room to work with — this roughly matches the site's own small-UI
+// text size (~0.8rem) instead of reading as a separate, tinier system.
+const PILL_FONT        = 12.5;
+const PILL_LINE_HEIGHT = 16;
+const PILL_PAD_X       = 21;
+const PILL_PAD_Y       = 14;
+const PILL_MIN_WIDTH   = 64;
+const PILL_MAX_WIDTH   = 115;
+const PILL_CHAR_WIDTH  = 6.6;
 const PILL_MAX_LINES   = 2;
 
 function wrapPillLabel(label) {
@@ -478,9 +481,13 @@ export class ConceptGraphManager {
 
     // Always zoom in at least a little (never settle back near the resting
     // scale of 1, or the pan reads as "nothing happened"), but don't let a
-    // single isolated node zoom in absurdly far either.
+    // single isolated node zoom in absurdly far either. The graph tab is
+    // much bigger than it used to be, and fitScale grows with it (same
+    // neighbourhood, bigger box to fill) — so the ceiling here is lower
+    // than it would need to be for a small container, to keep the extra
+    // space reading as "more zoomed out" rather than "more zoomed in".
     const fitScale = Math.min(this.W / boxW, this.H / boxH);
-    const scale = Math.min(Math.max(fitScale, 1.15), 1.7);
+    const scale = Math.min(Math.max(fitScale, 0.9), 1.3);
 
     this._panTo(cx, cy, scale);
   }
@@ -522,17 +529,17 @@ export function mountGraphSectionInto(container) {
   if (container) container.appendChild(graphSection);
 }
 
-const DEFAULT_GRAPH_FOCUS_ID = "entity-resolution";
-
-// Focus the graph on a concept, falling back to the default concept when
-// none is given (e.g. on first expand with nothing selected yet).
+// No conceptId (nothing selected yet, or a pipeline section is showing
+// instead of a term) used to fall back to a hardcoded default concept —
+// that's what read as an "empty square" once the graph tab was big
+// enough to make an unfocused graph look like a mistake rather than a
+// resting state. For now it just shows the "pick a term" prompt instead
+// (see .graph-empty in _graph.scss); a proper zoomed-out "whole graph"
+// resting view is a reasonable follow-up.
 export function focusGraph(conceptId) {
-  if (!state.graphManager) return;
-  if (conceptId) {
-    state.graphManager.setFocus(conceptId);
-  } else if (conceptMap[DEFAULT_GRAPH_FOCUS_ID]) {
-    state.graphManager.setFocus(DEFAULT_GRAPH_FOCUS_ID, false);
-  }
+  if (graphBody) graphBody.classList.toggle("graph-empty", !conceptId);
+  if (!conceptId || !state.graphManager) return;
+  state.graphManager.setFocus(conceptId);
 }
 
 function initConceptGraph(onNodeClick) {

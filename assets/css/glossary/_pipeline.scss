@@ -1,14 +1,16 @@
 // =============================================================================
-// PIPELINE PANEL  —  collapsible right-hand rail housing the vertical
-// pipeline. Collapses to a narrow labelled rail so it stops competing
-// with the definition for space.
+// SHARED RAIL  —  Pipeline and Graph as two tabs over one right-hand
+// drawer, rather than each having its own separate collapsed pill.
+// Collapsed, it's a small two-segment tab strip; open, its width depends
+// on which tab is active — the graph gets a much bigger, roughly square
+// area to work with, since it's the one people actually navigate.
 // =============================================================================
 .pipeline-panel {
   position: absolute;
   top: 0;
   right: 0;
   z-index: 6;
-  width: 180px;
+  width: 232px;
   height: 46px;
   display: flex;
   flex-direction: column;
@@ -21,90 +23,90 @@
 }
 
 .pipeline-panel.open {
-  width: 280px;
   height: 100%;
   box-shadow: -4px 0 16px rgba(20, 22, 28, 0.1);
 }
 
+.pipeline-panel.open[data-active-tab="pipeline"] { width: 300px; }
 
-.pipeline-panel-toggle {
+// Wide and tall on purpose — this is the "large, roughly square" area
+// asked for, sized off the row itself (not a fixed px value) so it
+// scales with the viewport instead of overwhelming a narrow one.
+.pipeline-panel.open[data-active-tab="graph"] { width: min(58%, 640px); }
+
+// No term selected yet — a big empty canvas just to show a one-line
+// prompt looked like a bug, so this shrinks back down to a plain,
+// modest-height tray instead (see .graph-empty in _graph.scss).
+.pipeline-panel.open[data-active-tab="graph"]:has(.graph-body.graph-empty) {
+  width: 320px;
+  height: auto;
+}
+
+.panel-tabbar {
+  display: flex;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.panel-tab {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  flex-shrink: 0;
-  padding: 0.55rem 0.9rem;
-  width: 100%;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.5rem;
   background: none;
   border: none;
   outline: none;
   cursor: pointer;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 600;
-  color: var(--color-teal-dark);
+  color: #888;
   white-space: nowrap;
-  transition: background 0.15s ease, padding 0.22s ease;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:not(:first-child) { border-left: 1px solid #eee; }
+  &:hover { background: var(--color-teal-light); color: var(--color-teal-dark); }
+  &.active { background: var(--color-teal-light); color: var(--color-teal-dark); }
 }
 
-.pipeline-panel-toggle:hover { background: var(--color-teal-light); }
-
-.pipeline-panel-toggle {
-  border-radius: 0;
-}
-
-.pipeline-panel-toggle:hover,
-.pipeline-panel-toggle:focus-visible {
-  box-shadow: inset 0 0 0 2px var(--color-teal);
-}
-
-.pipeline-panel:not(.open) .pipeline-panel-toggle {
-  height: 100%;
-}
-
-.pipeline-panel.open .pipeline-panel-toggle {
-  justify-content: space-between;
-  width: 100%;
-  padding: 0.85rem 1rem;
+.pipeline-panel.open .panel-tabbar {
+  height: auto;
+  padding: 0.6rem 0.4rem;
   border-bottom: 1px solid #eee;
-  color: #333;
 }
 
-.pipeline-panel-toggle-icon {
-  display: flex;
-  flex-shrink: 0;
-  color: var(--color-teal-dark);
+.pipeline-panel.open .panel-tab {
+  flex: 0 0 auto;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  border-left: none !important;
 }
 
-.pipeline-panel-toggle-chevron {
-  flex-shrink: 0;
-  color: #999;
-  font-size: 0.8em;
-  transition: transform 0.2s ease;
-}
-
-.pipeline-panel.open .pipeline-panel-toggle-chevron { transform: rotate(180deg); }
-
-
-.pipeline-panel-body {
+.panel-tab-body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding: 0.9rem;
   display: none;
 }
 
-.pipeline-panel.open .pipeline-panel-body { display: block; }
+.pipeline-panel.open[data-active-tab="pipeline"] #pipeline-panel-body { display: block; }
+.pipeline-panel.open[data-active-tab="graph"]    #graph-panel-body    { display: flex; flex-direction: column; }
+
+#pipeline-panel-body { padding: 0.9rem; }
+#graph-panel-body { min-height: 0; }
 
 // Applied by JS when the panel is living inside the sidebar's Pipeline
-// tab (mobile) instead of its normal rail position in .content-row.
-// The tab switch already controls visibility, so the panel's own
-// open/collapse toggle is redundant here and gets hidden.
+// tab (mobile) instead of its normal rail position in .content-row. The
+// tab bar/graph tab don't apply there — see the mobile fallback in
+// _graph.scss, where the graph goes back to living inline instead.
 //
 // The .open compound selector is repeated here (matching .pipeline-panel
 // .open's own specificity) because the panel always carries the "open"
-// class while embedded, and .pipeline-panel.open's fixed 280px width
-// otherwise wins on specificity over the plain .pipeline-panel--embedded
-// rule below — which is what was locking the mobile pipeline tray to a
-// narrow fixed-width box instead of filling the sidebar.
+// class while embedded, and .pipeline-panel.open's width rules otherwise
+// win on specificity over the plain .pipeline-panel--embedded rule below
+// — which is what was locking the mobile pipeline tray to a narrow
+// fixed-width box instead of filling the sidebar.
 .pipeline-panel--embedded,
 .pipeline-panel--embedded.open {
   position: static;
@@ -115,9 +117,12 @@
   border-radius: 0;
 }
 
-.pipeline-panel--embedded .pipeline-panel-toggle { display: none; }
+.pipeline-panel--embedded .panel-tabbar,
+.pipeline-panel--embedded #graph-panel-body {
+  display: none;
+}
 
-.pipeline-panel--embedded .pipeline-panel-body {
+.pipeline-panel--embedded #pipeline-panel-body {
   display: block;
   max-height: none;
   padding: 0.25rem 0 0;
@@ -188,7 +193,7 @@
 
 .pipeline-step-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start; // keeps the chevron pinned to the top line once the title wraps to two
   justify-content: space-between;
   width: 100%;
   padding: 0.6rem 0.8rem;
@@ -206,7 +211,18 @@
   color: #333;
 }
 
-.step-title { font-weight: 500; }
+// Long step titles were overflowing the rail instead of wrapping —
+// flex items don't wrap text on their own without room to shrink into,
+// and a single long word (or a title close to the rail's width) can
+// still overflow with only white-space:normal, hence the break rules.
+.step-title {
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
 
 .step-chevron {
   color: #999;
@@ -224,14 +240,36 @@
   transform: rotate(180deg);
 }
 
+// grid-template-rows: 0fr -> 1fr instead of max-height: 0 -> 1000px.
+// The old max-height approach animated toward an arbitrary large value
+// rather than the summary's real height, so an opening step reached its
+// true height almost immediately while a closing step (animating from
+// that same arbitrary 1000px down to 0) stayed visually full-height for
+// most of the transition — briefly stacking a full-height opening step
+// on top of a still-full-height closing one and overflowing the rail
+// into a scrollbar. The grid track trick animates toward each step's
+// actual content height, so open/close are symmetric and never overlap.
 .pipeline-step-body {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.25s ease;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.25s ease;
+  overflow: hidden; // backstop while the row track is mid-transition
 }
 
 .pipeline-step.active .pipeline-step-body {
-  max-height: 220px;
+  grid-template-rows: 1fr;
+}
+
+// This is the actual grid item the 0fr/1fr row stretches — min-height:0
+// only zeroes its CONTENT box, not its padding, and padding is never
+// removable, so the row's floor was stuck at .step-summary's own
+// padding (~17.6px) rather than 0, and a sliver of its text rendered
+// inside that gap even while "closed". Keeping .step-summary (and its
+// padding) as a plain child of this wrapper instead means the wrapper
+// — which has no padding of its own — is what actually shrinks to 0.
+.step-summary-inner {
+  overflow: hidden;
+  min-height: 0;
 }
 
 .step-summary {

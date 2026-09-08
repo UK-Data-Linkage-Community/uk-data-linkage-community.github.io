@@ -1,33 +1,24 @@
 // =============================================================================
-// CONCEPT GRAPH — collapsible
+// CONCEPT GRAPH — lives in the shared rail's "Graph" tab (see
+// _pipeline.scss / panel-tabs.js) on desktop/tablet, filling that tab
+// pane completely. On mobile it reverts to an inline accordion under the
+// term definition instead (see the compact override at the bottom of
+// this file) — there's no fixed-height rail there to embed it in.
 // =============================================================================
 .graph-section {
-  // Always sits at the bottom of a term's own detail now (never as a
-  // standalone page section), so it needs margin above to separate it
-  // from the relations/tags content it follows instead of touching it.
-  margin-top: 1.1rem;
-  border: 1px solid #e8e8e8;
-  border-radius: 6px;
-  background: #fff;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
+// The tab button in the rail's header opens/closes this now (see
+// panel-tabs.js, which just clicks this button programmatically to reuse
+// its existing lazy-init logic) — so the button itself is invisible on
+// desktop/tablet. It's still a real element because graph.js's
+// "open"/sibling-selector wiring depends on it either way.
 .graph-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0.6rem 0.9rem;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #333;
-  transition: background 0.15s ease;
-
-  &:hover { background: var(--color-teal-light); }
-  &.open .graph-chevron { transform: rotate(180deg); }
+  display: none;
 }
 
 .graph-chevron {
@@ -39,17 +30,21 @@
 
 .graph-body {
   display: none;
-  height: 34vh;
-  padding: 0 0.75rem 0.5rem;
-  border-top: 1px solid #eee;
-  flex-direction: column;
+  flex: 1;
   min-height: 0;
+  width: 100%;
+  padding: 0.75rem;
+  flex-direction: column;
   overflow: hidden;
 }
 
 .graph-toggle.open + .graph-body { display: flex; }
 
-.graph-body.graph-initialized .graph-empty-state { display: none; }
+// Shown whenever nothing is focused (see focusGraph() in graph.js) —
+// not just before the graph's first-ever init — so switching to a
+// pipeline stage and back to the Graph tab shows this prompt again
+// instead of a stale or blank graph canvas.
+.graph-body:not(.graph-empty) .graph-empty-state { display: none; }
 
 .graph-empty-state {
   display: flex;
@@ -62,6 +57,18 @@
   background: #fafafa;
   color: #bbb;
   margin-top: 1.2rem;
+}
+
+// "Thinner tray": no active selection doesn't need the full graph-tab
+// footprint, so the prompt sits in a compact block near the top instead
+// of stretching into a big empty square.
+.graph-body.graph-empty {
+  flex: 0 0 auto;
+}
+
+.graph-body.graph-empty .graph-empty-state {
+  flex: 0 0 auto;
+  padding: 1.5rem 1rem;
 }
 
 .empty-inner {
@@ -84,7 +91,7 @@
   flex-direction: column;
 }
 
-.graph-body.graph-initialized #concept-graph-container { display: flex; }
+.graph-body.graph-initialized:not(.graph-empty) #concept-graph-container { display: flex; }
 
 #concept-graph {
   width: 100%;
@@ -232,12 +239,39 @@ $rel-ink: #334155;
 
 .concept-detail-body {
   min-height: 300px; // tune so the graph's top edge lands at a consistent y — raise/lower to taste
-  padding-right: 200px; // clears the closed pipeline pill
+}
+
+// This clearance was scoped to .concept-detail-body (the single-concept
+// view only), so a pipeline SECTION's content — rendered straight into
+// #detail-content with no such wrapper — had no reserved space at all
+// and ran text full-width underneath the rail. Moved up to #detail-content
+// itself, the shared scrolling container behind both views, so both get
+// it. min-width:0 alongside the padding is needed for the same reason as
+// .panel-def below — a flex item's default min-width:auto otherwise lets
+// content refuse to shrink into the reserved space and overflow instead.
+#detail-content {
+  box-sizing: border-box; // padding-right below must not add to the flex-basis width
+  padding-right: 250px; // clears the closed rail (pipeline/graph tab strip)
   transition: padding-right 0.25s ease;
 }
 
-.content-row:has(.pipeline-panel.open) .concept-detail-body {
-  padding-right: 300px; // clears the open drawer
+.content-row:has(.pipeline-panel.open[data-active-tab="pipeline"]) #detail-content {
+  padding-right: 320px; // clears the open pipeline drawer
+}
+
+.content-row:has(.pipeline-panel.open[data-active-tab="graph"]) #detail-content {
+  padding-right: calc(min(58%, 640px) + 20px); // clears the open graph drawer
+}
+
+// The rule above assumes the graph tab's full width, but an empty
+// selection shrinks the tray down to a small 320px prompt (see
+// .graph-empty in this file / the :has() width override in
+// _pipeline.scss). Without this, the definition text kept wrapping as
+// if the full-size graph box were still there — a "shadow" reservation
+// much wider than the tray actually visible next to it. Same +20px
+// clearance convention as the pipeline-tab rule above.
+.content-row:has(.pipeline-panel.open[data-active-tab="graph"]:has(.graph-body.graph-empty)) #detail-content {
+  padding-right: 340px;
 }
 
 .concept-detail-header h3 {
@@ -371,16 +405,9 @@ $rel-ink: #334155;
   background: $rel-selected;
 }
 
-#detail-content .graph-section {
-  flex-shrink: 0;
-  margin-top: 1.1rem;
-  padding-right: 0; // full width by default
-  transition: padding-right 0.25s ease;
-}
-
-.content-row:has(.pipeline-panel.open) #detail-content .graph-section {
-  padding-right: 300px; // shrinks in step with the drawer
-}
+// The graph pill is position:absolute now, anchored to #detail-panel
+// (see below) — it no longer takes part in the document flow, so none
+// of the old flex/margin/padding-right flow rules apply to it.
 
 .concept-def,
 .relation-row,
@@ -389,10 +416,31 @@ $rel-ink: #334155;
 }
 
 @media (max-width: $bp-nav) {
+  // Compact/mobile stacks everything into one scrolling column already
+  // (see _glossary.scss), so the floating tray is reverted back to an
+  // ordinary in-flow accordion here — there's no fixed-height panel for
+  // it to float over, and a corner-pinned overlay would just cover
+  // content on a small screen.
+  .graph-section {
+    position: static;
+    margin-top: 1rem;
+    display: block;
+  }
+
+  .graph-toggle {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    border-radius: 6px;
+  }
+
   .graph-body {
+    width: 100%;
     height: auto;
     overflow: visible;
     padding-bottom: 1rem;
+    border-radius: 0 0 6px 6px;
+    box-shadow: none;
   }
 
   .graph-body.graph-initialized #concept-graph-container {
@@ -405,4 +453,5 @@ $rel-ink: #334155;
   }
 
   .graph-empty-state { flex: none; height: 240px; }
+
 }

@@ -27,3 +27,33 @@
   background: var(--color-teal);
   z-index: 1001;
 }
+
+// =============================================================================
+// COMPACT HEADER — glossary dashboard page only
+// The glossary is a self-contained, viewport-height dashboard; the full
+// 80px-logo header eats into that budget for no benefit on this one page,
+// so it's shrunk to a slim strip here. Keep the pixel figure in sync with
+// `--dashboard-offset` in pages/_glossary.scss.
+// =============================================================================
+body.layout--glossary .site-header {
+  min-height: 56px;
+}
+
+body.layout--glossary .site-header .wrapper {
+  padding: 8px 24px;
+}
+
+body.layout--glossary .site-logo {
+  margin-right: 20px;
+  padding: 0 8px;
+}
+
+body.layout--glossary .logo-svg {
+  height: 32px !important;
+  min-height: 32px !important;
+  min-width: 32px !important;
+}
+
+body.layout--glossary .site-nav .page-link {
+  font-size: 0.88rem;
+}

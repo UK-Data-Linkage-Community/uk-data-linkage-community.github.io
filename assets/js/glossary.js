@@ -2,6 +2,7 @@ import { data, state, initState, conceptMap, allTerms, renderDefinitionBlock } f
 import { initPopovers, viewSettingsPopover, filterPopover } from "./popovers.js";
 import { initSidebar } from "./sidebar.js";
 import { initPipelinePanel, clearPipelineActive } from "./pipeline-panel.js";
+import { initPanelTabs } from "./panel-tabs.js";
 import { initGraphSection, homeGraphSection, mountGraphSectionInto, focusGraph } from "./graph.js";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -18,6 +19,17 @@ document.addEventListener("DOMContentLoaded", function () {
   initPopovers();
   initSidebar();
   initGraphSection(id => selectGlossaryConcept(id, false));
+
+  // initGraphSection() just parked the graph section in its off-screen
+  // holder (its default "nowhere selected yet" home) — but on desktop
+  // that section's real home is the Graph tab's pane, which is a static
+  // part of the page, not something only rendered once a concept exists.
+  // Nothing else moves it there until the first renderConceptDetail(),
+  // so opening the Graph tab before ever selecting a term found the pane
+  // empty. isCompactLayout() is declared further down but hoisted.
+  if (!isCompactLayout()) {
+    mountGraphSectionInto(document.getElementById("graph-panel-body"));
+  }
 
   function syncDashboardOffset() {
     const header = document.querySelector("header"); // swap for your real site header selector
@@ -58,7 +70,14 @@ document.addEventListener("DOMContentLoaded", function () {
   // --- Content rendering --------------------------------------------
 
   function renderSection(section) {
-    homeGraphSection();
+    // The graph now lives permanently in the rail's Graph tab (desktop/
+    // tablet) rather than inside this content area, so it doesn't need
+    // evicting just because a pipeline section is being shown — doing
+    // that unconditionally used to leave the Graph tab empty the next
+    // time it was opened. Only mobile still needs it homed away, since
+    // there the graph is mounted inline inside this same innerHTML.
+    if (isCompactLayout()) homeGraphSection();
+    focusGraph(null);
     state.activeSection   = section;
     state.activeConceptId = null;
 
@@ -162,8 +181,16 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="concept-tag-chips">${tagHtml}</div>
           </div>
         </div>
+        <!-- Only used on mobile — desktop/tablet mounts the graph into
+             the shared rail's Graph tab instead (see #graph-panel-body
+             and isCompactLayout() below). -->
+        <div id="mobile-graph-mount"></div>
       </div>`;
-    mountGraphSectionInto(content.querySelector(".concept-detail-inner"));
+    mountGraphSectionInto(
+      isCompactLayout()
+        ? content.querySelector("#mobile-graph-mount")
+        : document.getElementById("graph-panel-body")
+    );
 
     attachContentLinkHandlers();
     initClamp(content.querySelector("#def-clamp"), 4);
@@ -171,7 +198,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function showEmptyDetail() {
-    homeGraphSection();
+    if (isCompactLayout()) homeGraphSection();
+    focusGraph(null);
     state.activeSection   = null;
     state.activeConceptId = null;
     content.innerHTML = `<p class="detail-empty">Select a stage from the pipeline panel, or a term from the browse list, to see its definition here.</p>`;
@@ -189,6 +217,18 @@ document.addEventListener("DOMContentLoaded", function () {
       if (section) renderSection(section);
     },
     onStepDeselect: showEmptyDetail,
+  });
+  initPanelTabs();
+
+  // If a concept is on screen when the desktop/mobile breakpoint is
+  // crossed, re-render it so the graph gets re-mounted into the right
+  // place (the rail's Graph tab vs. inline under the definition).
+  const bpStackQuery = window.matchMedia(
+    `(max-width: ${getComputedStyle(document.querySelector(".glossary-page"))
+      .getPropertyValue("--bp-stack").trim() || "1200px"})`
+  );
+  bpStackQuery.addEventListener("change", () => {
+    if (state.activeConceptId) renderConceptDetail(state.activeConceptId);
   });
 
   // --- Search ---------------------------------------------------------
