@@ -33,17 +33,9 @@ function buildConceptMap() {
 }
 
 function buildSearchIndex() {
-  data.sections.forEach(section => {
-    section.methods.forEach(method => {
-      (method.concepts || []).forEach(cid => {
-        const c = conceptMap[cid];
-        if (!c) return;
-        allTerms.push({ term: c.prefLabel, section: section.id, id: c.id });
-        (c.altLabel || []).forEach(alt =>
-          allTerms.push({ term: alt, section: section.id, id: c.id })
-        );
-      });
-    });
+  data.skos.concepts.forEach(c => {
+    allTerms.push({ term: c.prefLabel, id: c.id });
+    (c.altLabel || []).forEach(alt => allTerms.push({ term: alt, id: c.id }));
   });
 }
 

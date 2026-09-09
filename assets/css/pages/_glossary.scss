@@ -727,3 +727,13 @@ body.layout--glossary {
 
 /// Concept graph
 @import "../glossary/graph";
+
+
+.glossary-page { overflow-anchor: none; }
+
+.suggestion:hover,
+.suggestion.active {
+  border-color: var(--color-teal);
+  color: var(--color-teal-dark);
+  background: var(--color-teal-light);
+}
