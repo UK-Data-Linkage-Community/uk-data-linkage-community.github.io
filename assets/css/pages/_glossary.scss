@@ -14,9 +14,23 @@
 // feeds that same height back into the vh calc below so the dashboard
 // box stops just below the header instead of overshooting the viewport
 // — the overshoot was what forced the whole page to scroll just to
-// reach the theme's footer/copyright strip underneath.
+// reach the theme's footer/copyright strip underneath. Only matters
+// above $bp-nav — the mobile/tablet override further down switches
+// .glossary-page to height: auto, so this is ignored there regardless.
+// 48px desktop header + 8px gap (see the .page-content override below).
 body.layout--glossary {
   --dashboard-offset: 56px;
+}
+
+// The theme's default page padding (see layout/_basepage.scss) leaves a
+// large gap between the header and this page's own content — reasonable
+// on a normal article page, oversized on a dashboard that wants to sit
+// flush under a thin header. Desktop only, to match the thinner desktop
+// header in _header.scss; mobile/tablet keeps the theme's normal gap.
+@media (min-width: $bp-nav + 1) {
+  body.layout--glossary .page-content {
+    padding-top: 8px !important;
+  }
 }
 
 
@@ -44,7 +58,7 @@ body.layout--glossary {
 // =============================================================================
 .glossary-layout {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: $glossary-sidebar-width 1fr;
   grid-template-rows: auto 1fr;
   grid-template-areas:
     "top     top"
@@ -52,6 +66,17 @@ body.layout--glossary {
   gap: 1.75rem;
   height: 100%;
   min-height: 0;
+}
+
+// Desktop only: with the header-to-content gap already tightened above,
+// the grid's own 1.75rem row-gap (plus .top-section's margin-bottom
+// below) was the next biggest chunk of empty space before the actual
+// term list / definition boxes. row-gap only, so the sidebar/main
+// column gap is untouched.
+@media (min-width: $bp-nav + 1) {
+  .glossary-layout {
+    row-gap: 0.5rem;
+  }
 }
 
 .top-section       { grid-area: top; }
@@ -75,6 +100,12 @@ body.layout--glossary {
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 0.6rem;
+}
+
+@media (min-width: $bp-nav + 1) {
+  .top-section {
+    margin-bottom: 0.25rem;
+  }
 }
 
 .top-section-text {
@@ -111,6 +142,19 @@ body.layout--glossary {
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+// Desktop only: the header's logo tab (see _header.scss) hangs down on
+// the left above this column, so the term list starts below the tab
+// instead of behind it. calc() keeps the sidebar's bottom edge lined up
+// with .glossary-main's (which has no tab beside it and isn't pushed
+// down) — margin-top alone would push the bottom edge down too and
+// overflow the grid row. 48px matches the tab's overhang below the bar.
+@media (min-width: $bp-nav + 1) {
+  .glossary-sidebar {
+    margin-top: 48px;
+    height: calc(100% - 48px);
+  }
 }
 
 // Hidden entirely on desktop — the sidebar is always open there.

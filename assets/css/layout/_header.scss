@@ -29,11 +29,12 @@
 }
 
 // =============================================================================
-// COMPACT HEADER — glossary dashboard page only
+// COMPACT HEADER — glossary dashboard page, mobile/tablet (<= $bp-nav)
 // The glossary is a self-contained, viewport-height dashboard; the full
 // 80px-logo header eats into that budget for no benefit on this one page,
 // so it's shrunk to a slim strip here. Keep the pixel figure in sync with
-// `--dashboard-offset` in pages/_glossary.scss.
+// `--dashboard-offset` in pages/_glossary.scss. Desktop gets a different,
+// taller treatment below — this block is what mobile/tablet keeps.
 // =============================================================================
 body.layout--glossary .site-header {
   min-height: 56px;
@@ -56,4 +57,119 @@ body.layout--glossary .logo-svg {
 
 body.layout--glossary .site-nav .page-link {
   font-size: 0.88rem;
+}
+
+// The compact header's tighter side padding (24px vs. the default 80px)
+// leaves the rightmost "Resources" dropdown little room — its menu was
+// overflowing past the right edge of the viewport before this page's
+// mid-width breakpoint (see _dropdown.scss) kicks in and flattens it.
+// Opening it from the right edge of its own toggle instead of the left
+// keeps it on-screen without touching the shared dropdown component.
+// (Harmless below that breakpoint too, since the mobile dropdown is
+// forced to `position: static` there regardless of left/right.)
+body.layout--glossary .nav-dropdown:last-child .dropdown-content {
+  left: auto;
+  right: 0;
+}
+
+// =============================================================================
+// DESKTOP DASHBOARD HEADER — glossary page, above $bp-nav only
+// Thinner nav strip than the compact mobile bar above, with the logo
+// pulled out into its own tab that hangs down past the bottom edge for
+// a bigger logo without a taller bar everywhere.
+//
+// The tab is deliberately just a plain rectangle: same width as
+// .glossary-sidebar ($glossary-sidebar-width) and left-aligned with it,
+// so the tab and the term list below read as one column — no
+// clip-path/gradient shaping, which is what made earlier attempts at a
+// "seamless" tapered/curved tab look bolted-on.
+//
+// Getting that alignment right means the header's own wrapper has to
+// use the SAME max-width + centering + side padding as .page-content
+// (layout/_basepage.scss) and .glossary-page (pages/_glossary.scss),
+// breakpoint for breakpoint — otherwise the two containers drift apart
+// at viewport widths where either one is centered or padded
+// differently. If those source values ever change, update the mirrored
+// numbers below to match.
+// =============================================================================
+@media (min-width: $bp-nav + 1) {
+  body.layout--glossary .site-header {
+    min-height: 48px;
+  }
+
+  // $glossary-sidebar-width + 0.75rem = tab width + .glossary-page's own
+  // left padding, i.e. the same left inset .glossary-sidebar renders at
+  // in the 1201–1799px tier (no page-content padding rule applies there).
+  body.layout--glossary .site-header .wrapper {
+    position: relative;
+    // !important: the base `.site-header .wrapper` rule above sets
+    // max-width/margin with !important, which otherwise beats this
+    // override regardless of selector specificity — leaving the wrapper
+    // capped at 2400px instead of matching .page-content's 1600/1800px,
+    // and pulling the tab left of the (correctly-centered) sidebar on
+    // wide monitors.
+    max-width: $max-content-width !important;
+    margin: 0 auto !important;
+    // .site-logo is taken out of flow below, leaving .site-nav as the
+    // wrapper's only flex child — `justify-content: space-between`
+    // (inherited from the base rule above) has nothing left to space
+    // BETWEEN, so it collapses to flex-start and nav drifts to the
+    // left. flex-end pushes it back to its usual right-hand spot.
+    justify-content: flex-end;
+    padding: 0 24px 0 calc(#{$glossary-sidebar-width} + 0.75rem);
+  }
+
+  // A plain rectangle: fixed width (matches .glossary-sidebar) instead
+  // of hugging the logo's own size, and `left` mirrors the wrapper's own
+  // padding-left minus the tab's width (an absolutely positioned child's
+  // offset is relative to the wrapper's border/padding edge, ignoring
+  // the wrapper's own padding — so this can't just be `left: 0`).
+  body.layout--glossary .site-logo {
+    position: absolute;
+    left: 0.75rem;
+    top: 0;
+    width: $glossary-sidebar-width;
+    height: 96px; // 48px bar + 48px overhang below it
+    margin: 0;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    background: #fff;
+    border: 1px solid #e6e6e6; // matches .glossary-sidebar's border colour
+    border-top: none;
+    border-radius: 0 0 10px 10px; // matches .glossary-sidebar's radius
+    z-index: 2; // above the header's own border-bottom line
+  }
+
+  // 1061–1200px tier: mirrors .page-content's `max-width: $bp-desktop`
+  // rule (30px side padding) in layout/_basepage.scss.
+  @media (max-width: $bp-desktop) {
+    body.layout--glossary .site-header .wrapper {
+      padding-left: calc(#{$glossary-sidebar-width} + 0.75rem + 30px);
+    }
+
+    body.layout--glossary .site-logo {
+      left: calc(0.75rem + 30px);
+    }
+  }
+
+  // 1800px+ tier: mirrors .page-content's `min-width: $bp-wide` rule
+  // (1800px cap, 10px side padding) in layout/_basepage.scss.
+  @media (min-width: $bp-wide) {
+    body.layout--glossary .site-header .wrapper {
+      max-width: 1800px !important; // see !important note above
+      padding-left: calc(#{$glossary-sidebar-width} + 0.75rem + 10px);
+    }
+
+    body.layout--glossary .site-logo {
+      left: calc(0.75rem + 10px);
+    }
+  }
+
+  body.layout--glossary .logo-svg {
+    height: 52px !important;
+    min-height: 52px !important;
+    min-width: 52px !important;
+  }
 }
