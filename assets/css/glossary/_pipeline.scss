@@ -117,6 +117,20 @@
   border-radius: 0;
 }
 
+// .pipeline-panel--embedded.open above still loses the width war against
+// .pipeline-panel.open[data-active-tab="..."] (further up this file) —
+// two classes plus an attribute selector outscores two plain classes,
+// regardless of which one comes later in the file. setActiveTab() runs
+// unconditionally at init, so the embedded panel always carries a
+// data-active-tab too, and always lost this fight — locking the mobile
+// pipeline tray at a fixed 300px (or the graph tab's min(58%, 640px))
+// instead of filling the sidebar's real width. Matching selectors here
+// restores the same specificity so source order can decide.
+.pipeline-panel--embedded.open[data-active-tab="pipeline"],
+.pipeline-panel--embedded.open[data-active-tab="graph"] {
+  width: 100%;
+}
+
 .pipeline-panel--embedded .panel-tabbar,
 .pipeline-panel--embedded #graph-panel-body {
   display: none;

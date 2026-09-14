@@ -416,6 +416,47 @@ $rel-ink: #334155;
 }
 
 @media (max-width: $bp-nav) {
+  // The padding-right rules above reserve space for the desktop/tablet
+  // rail (up to ~58% of the row width when the graph tab is open) — but
+  // on mobile the rail doesn't float beside #detail-content at all, it's
+  // relocated into the sidebar's own Pipeline tab (see .pipeline-panel
+  // mobile override in _pipeline.scss / _glossary.scss). Left unreset,
+  // that padding-right survives onto a ~375px viewport and eats most of
+  // it, forcing the term definition, pipeline text, and graph toggle
+  // (all descendants of #detail-content) to wrap into whatever sliver
+  // of width is left instead of using the real screen width.
+  //
+  // The embedded panel keeps its .open/[data-active-tab] state even on
+  // mobile (see the .pipeline-panel--embedded comment in _pipeline.scss
+  // — it "always carries the open class while embedded"), so the three
+  // .content-row:has(...) variants above still match here too. They're
+  // more specific than a plain #detail-content rule, so all three need
+  // resetting by name — a lone #detail-content { padding-right: 0 }
+  // would lose to them regardless of media-query source order.
+  //
+  // Written as 4 SEPARATE rules on purpose, not one comma-joined list:
+  // the last selector nests :has() inside :has(), which this browser
+  // engine doesn't support (confirmed via CSS.supports('selector(...)')
+  // — single-level :has() works, nested doesn't). CSS selector lists are
+  // all-or-nothing to parse — one unsupported selector in a comma list
+  // drops the WHOLE rule, silently taking the other 3 valid ones down
+  // with it. Kept separate, only the unsupported one is dropped.
+  #detail-content {
+    padding-right: 0;
+  }
+
+  .content-row:has(.pipeline-panel.open[data-active-tab="pipeline"]) #detail-content {
+    padding-right: 0;
+  }
+
+  .content-row:has(.pipeline-panel.open[data-active-tab="graph"]) #detail-content {
+    padding-right: 0;
+  }
+
+  .content-row:has(.pipeline-panel.open[data-active-tab="graph"]:has(.graph-body.graph-empty)) #detail-content {
+    padding-right: 0; // still won't parse in this engine (nested :has()), but harmless now
+  }
+
   // Compact/mobile stacks everything into one scrolling column already
   // (see _glossary.scss), so the floating tray is reverted back to an
   // ordinary in-flow accordion here — there's no fixed-height panel for
