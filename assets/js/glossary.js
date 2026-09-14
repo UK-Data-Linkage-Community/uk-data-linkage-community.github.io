@@ -2,6 +2,7 @@ import { data, state, initState, conceptMap, allTerms, renderDefinitionBlock } f
 import { initPopovers, viewSettingsPopover, filterPopover } from "./popovers.js";
 import { initSidebar } from "./sidebar.js";
 import { initPipelinePanel, clearPipelineActive } from "./pipeline-panel.js";
+import { initPanelTabs } from "./panel-tabs.js";
 import { initGraphSection, homeGraphSection, mountGraphSectionInto, focusGraph } from "./graph.js";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -19,13 +20,28 @@ document.addEventListener("DOMContentLoaded", function () {
   initSidebar();
   initGraphSection(id => selectGlossaryConcept(id, false));
 
+  // initGraphSection() just parked the graph section in its off-screen
+  // holder (its default "nowhere selected yet" home) — but on desktop
+  // that section's real home is the Graph tab's pane, which is a static
+  // part of the page, not something only rendered once a concept exists.
+  // Nothing else moves it there until the first renderConceptDetail(),
+  // so opening the Graph tab before ever selecting a term found the pane
+  // empty. isCompactLayout() is declared further down but hoisted.
+  if (!isCompactLayout()) {
+    mountGraphSectionInto(document.getElementById("graph-panel-body"));
+  }
+
+  function syncDashboardOffset() {
+    const header = document.querySelector("header"); // swap for your real site header selector
+    const h = header ? header.getBoundingClientRect().height : 0;
+    document.documentElement.style.setProperty("--dashboard-offset", `${h}px`);
+  }
+
+  syncDashboardOffset();
+  window.addEventListener("resize", syncDashboardOffset);
   function rerenderActiveView() {
     if (state.activeConceptId)    renderConceptDetail(state.activeConceptId);
     else if (state.activeSection) renderSection(state.activeSection);
-  }
-
-  function isCompactMode() {
-    return getComputedStyle(document.getElementById("sidebar-tabs")).display !== "none";
   }
 
   modeToggle.querySelectorAll(".mode-btn").forEach(btn => {
@@ -54,7 +70,14 @@ document.addEventListener("DOMContentLoaded", function () {
   // --- Content rendering --------------------------------------------
 
   function renderSection(section) {
-    homeGraphSection();
+    // The graph now lives permanently in the rail's Graph tab (desktop/
+    // tablet) rather than inside this content area, so it doesn't need
+    // evicting just because a pipeline section is being shown — doing
+    // that unconditionally used to leave the Graph tab empty the next
+    // time it was opened. Only mobile still needs it homed away, since
+    // there the graph is mounted inline inside this same innerHTML.
+    if (isCompactLayout()) homeGraphSection();
+    focusGraph(null);
     state.activeSection   = section;
     state.activeConceptId = null;
 
@@ -88,6 +111,29 @@ document.addEventListener("DOMContentLoaded", function () {
     attachContentLinkHandlers();
   }
 
+  function initClamp(el, lines = 3) {
+    if (!el) return;
+    const content = el.querySelector(".clamp-content");
+    if (!content) return;
+    el.style.setProperty("--clamp-lines", lines);
+
+    requestAnimationFrame(() => {
+      if (content.scrollHeight <= content.clientHeight + 2) return;
+
+      el.dataset.clamped = "true";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "clamp-toggle";
+      btn.textContent = "Read more";
+      btn.addEventListener("click", () => {
+        const clamped = el.dataset.clamped === "true";
+        el.dataset.clamped = clamped ? "false" : "true";
+        btn.textContent = clamped ? "Show less" : "Read more";
+      });
+      el.appendChild(btn);
+    });
+  }
+
   function renderConceptDetail(conceptId) {
     const concept = conceptMap[conceptId];
     if (!concept) return;
@@ -117,26 +163,43 @@ document.addEventListener("DOMContentLoaded", function () {
 
     content.innerHTML = `
       <div class="concept-detail-inner">
-        <div class="concept-detail-header">
-          <h3>${concept.prefLabel} ${altHtml}</h3>
+        <div class="concept-detail-body">
+          <div class="concept-detail-header">
+            <h3>${concept.prefLabel} ${altHtml}</h3>
+          </div>
+          <div class="clamp-block" id="def-clamp">
+            <p class="concept-def clamp-content">${renderDefinitionBlock(concept)}</p>
+          </div>
+          ${relationRows.length
+            ? `<div class="clamp-block" id="rel-clamp">
+                 <div class="concept-relations clamp-content">
+                   ${relationRows.map(r => `<div class="relation-row">${r}</div>`).join("")}
+                 </div>
+               </div>`
+            : ""}
+          <div class="concept-detail-footer">
+            <div class="concept-tag-chips">${tagHtml}</div>
+          </div>
         </div>
-        <p class="concept-def">${renderDefinitionBlock(concept)}</p>
-        ${relationRows.length
-          ? `<div class="concept-relations">
-               ${relationRows.map(r => `<div class="relation-row">${r}</div>`).join("")}
-             </div>`
-          : ""}
-        <div class="concept-detail-footer">
-          <div class="concept-tag-chips">${tagHtml}</div>
-        </div>
+        <!-- Only used on mobile — desktop/tablet mounts the graph into
+             the shared rail's Graph tab instead (see #graph-panel-body
+             and isCompactLayout() below). -->
+        <div id="mobile-graph-mount"></div>
       </div>`;
-    mountGraphSectionInto(content.querySelector(".concept-detail-inner"));
+    mountGraphSectionInto(
+      isCompactLayout()
+        ? content.querySelector("#mobile-graph-mount")
+        : document.getElementById("graph-panel-body")
+    );
 
     attachContentLinkHandlers();
+    initClamp(content.querySelector("#def-clamp"), 4);
+    initClamp(content.querySelector("#rel-clamp"), 3);
   }
 
   function showEmptyDetail() {
-    homeGraphSection();
+    if (isCompactLayout()) homeGraphSection();
+    focusGraph(null);
     state.activeSection   = null;
     state.activeConceptId = null;
     content.innerHTML = `<p class="detail-empty">Select a stage from the pipeline panel, or a term from the browse list, to see its definition here.</p>`;
@@ -154,6 +217,18 @@ document.addEventListener("DOMContentLoaded", function () {
       if (section) renderSection(section);
     },
     onStepDeselect: showEmptyDetail,
+  });
+  initPanelTabs();
+
+  // If a concept is on screen when the desktop/mobile breakpoint is
+  // crossed, re-render it so the graph gets re-mounted into the right
+  // place (the rail's Graph tab vs. inline under the definition).
+  const bpStackQuery = window.matchMedia(
+    `(max-width: ${getComputedStyle(document.querySelector(".glossary-page"))
+      .getPropertyValue("--bp-stack").trim() || "1200px"})`
+  );
+  bpStackQuery.addEventListener("change", () => {
+    if (state.activeConceptId) renderConceptDetail(state.activeConceptId);
   });
 
   // --- Search ---------------------------------------------------------
@@ -316,13 +391,18 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  function isCompactLayout() {
+    const toggle = document.querySelector(".sidebar-toggle");
+    return !!toggle && getComputedStyle(toggle).display !== "none";
+  }
+
   function selectGlossaryConcept(id, scrollToTop) {
     state.activeConceptId = id;
     renderConceptDetail(id);
     renderGlossaryList();
     focusGraph(id);
 
-    if (scrollToTop && isCompactMode()) {
+    if (scrollToTop && isCompactLayout()) {
       document.querySelector("#detail-panel")
         ?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -345,5 +425,6 @@ document.addEventListener("DOMContentLoaded", function () {
     renderGlossaryList();
   }
 
+  initClamp(document.getElementById("page-desc-clamp"), 1);
   requestAnimationFrame(initGlossary);
 });

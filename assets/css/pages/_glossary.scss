@@ -9,15 +9,41 @@
   --bp-stack:          #{$bp-nav};
 }
 
+// The site header is shrunk to a compact strip on this page (see
+// _header.scss's `body.layout--glossary .site-header` override). This
+// feeds that same height back into the vh calc below so the dashboard
+// box stops just below the header instead of overshooting the viewport
+// — the overshoot was what forced the whole page to scroll just to
+// reach the theme's footer/copyright strip underneath. Only matters
+// above $bp-nav — the mobile/tablet override further down switches
+// .glossary-page to height: auto, so this is ignored there regardless.
+// 48px desktop header + 8px gap (see the .page-content override below).
+body.layout--glossary {
+  --dashboard-offset: 56px;
+}
+
+// The theme's default page padding (see layout/_basepage.scss) leaves a
+// large gap between the header and this page's own content — reasonable
+// on a normal article page, oversized on a dashboard that wants to sit
+// flush under a thin header. Desktop only, to match the thinner desktop
+// header in _header.scss; mobile/tablet keeps the theme's normal gap.
+@media (min-width: $bp-nav + 1) {
+  body.layout--glossary .page-content {
+    padding-top: 8px !important;
+  }
+}
+
 
 // =============================================================================
 // PAGE SHELL
 // =============================================================================
 .glossary-page {
   position: relative;
-  max-width: 1550px;
-  margin: 0 auto;
-  padding: 1rem;
+  max-width: none;
+  margin: 0;
+  padding: 0 0.75rem 0.6rem;
+  height: calc(100vh - var(--dashboard-offset, 0px));
+  overflow: hidden;
 }
 
 
@@ -32,17 +58,36 @@
 // =============================================================================
 .glossary-layout {
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: $glossary-sidebar-width 1fr;
+  grid-template-rows: auto 1fr;
   grid-template-areas:
     "top     top"
     "sidebar main";
   gap: 1.75rem;
-  align-items: start;
+  height: 100%;
+  min-height: 0;
+}
+
+// Desktop only: with the header-to-content gap already tightened above,
+// the grid's own 1.75rem row-gap (plus .top-section's margin-bottom
+// below) was the next biggest chunk of empty space before the actual
+// term list / definition boxes. row-gap only, so the sidebar/main
+// column gap is untouched.
+@media (min-width: $bp-nav + 1) {
+  .glossary-layout {
+    row-gap: 0.5rem;
+  }
 }
 
 .top-section       { grid-area: top; }
 .glossary-sidebar   { grid-area: sidebar; }
-.glossary-main      { grid-area: main; min-width: 0; }
+.glossary-main      {
+  grid-area: main;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
 
 
 // =============================================================================
@@ -51,16 +96,38 @@
 .top-section {
   position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.25rem;
-
-  h1 { margin: 0 0 0.35rem; font-size: 1.6rem; }
-  p  { margin: 0; color: #666; max-width: 60ch; }
+  margin-bottom: 0.6rem;
 }
 
-.top-section-text { min-width: 0; }
+@media (min-width: $bp-nav + 1) {
+  .top-section {
+    margin-bottom: 0.25rem;
+  }
+}
+
+.top-section-text {
+  min-width: 0;
+}
+
+.top-section-text .clamp-content {
+  margin: 0;
+  color: #666;
+  font-size: 0.85rem;
+}
+
+.sidebar-brand {
+  flex-shrink: 0;
+  padding: 0.75rem 1rem 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-teal-dark);
+  border-bottom: 1px solid #eee;
+}
 
 
 // =============================================================================
@@ -71,11 +138,23 @@
   border-radius: 10px;
   background: #fff;
   overflow: hidden;
-  position: sticky;
-  top: 1rem;
-  max-height: calc(100vh - 2rem);
+  height: 100%;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+// Desktop only: the header's logo tab (see _header.scss) hangs down on
+// the left above this column, so the term list starts below the tab
+// instead of behind it. calc() keeps the sidebar's bottom edge lined up
+// with .glossary-main's (which has no tab beside it and isn't pushed
+// down) — margin-top alone would push the bottom edge down too and
+// overflow the grid row. 48px matches the tab's overhang below the bar.
+@media (min-width: $bp-nav + 1) {
+  .glossary-sidebar {
+    margin-top: 48px;
+    height: calc(100% - 48px);
+  }
 }
 
 // Hidden entirely on desktop — the sidebar is always open there.
@@ -310,34 +389,46 @@
 // CONTENT ROW  —  detail panel (flex) + collapsible pipeline panel (right)
 // =============================================================================
 .content-row {
+  position: relative;
   display: flex;
-  align-items: flex-start;
-  gap: 1.25rem;
-  margin: 1rem 0 1.5rem;
+  align-items: stretch;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid #e4e4e4;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 4px 18px rgba(20, 22, 28, 0.05);
+  overflow: hidden;
 }
 
 .detail-column {
   flex: 1;
   min-width: 0;
+  min-height: 0;
 }
 
 // =============================================================================
 // CENTRAL DETAIL PANEL  (shared by pipeline sections AND single concepts)
 // =============================================================================
 #detail-panel {
-  border: 1px solid #e4e4e4;
-  border-radius: 10px;
+  position: relative; // anchors the floating concept-graph pill/tray (see _graph.scss)
   padding: 1.4rem 1.6rem;
-  background: #fff;
-  box-shadow: 0 4px 18px rgba(20, 22, 28, 0.05);
-  min-height: calc(100vh - 2rem);
-  margin-bottom: 1.5rem;
-  position: sticky;
-  top: 1rem;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-@media (max-width: $bp-nav) {
-  #detail-panel { position: static; }
+#detail-content {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .detail-empty {
@@ -376,33 +467,46 @@
   text-decoration-style: dotted;
 }
 
-#detail-panel {
-  border: 1px solid #e4e4e4;
-  border-radius: 10px;
-  padding: 1.4rem 1.6rem;
-  background: #fff;
-  box-shadow: 0 4px 18px rgba(20, 22, 28, 0.05);
-  margin-bottom: 1.5rem;
-
-  position: sticky;
-  top: 1rem;
-  height: calc(100vh - 2rem);
-  overflow-y: auto;
-  overflow-anchor: none;
-}
-@media (max-width: $bp-nav) {
-  #detail-panel {
-    position: static;
-    height: auto;
-    overflow: visible;
-  }
-}
-
 .concept-link:hover { text-decoration-style: solid; }
 
 .panel-tags { display: flex; gap: 0.2rem; }
 
-.panel-def { flex: 1 0 100%; color: #555; }
+// flex-shrink was 0 here, so this refused to shrink to the row's
+// available width and rendered at its natural full-line (no-wrap)
+// width instead — overflowing rightward, under the rail, rather
+// than wrapping. min-width:0 is needed alongside shrink:1 since a
+// flex item's default min-width:auto has the same effect as shrink:0
+// once the content itself can't be broken any smaller.
+.panel-def { flex: 1 1 100%; min-width: 0; color: #555; }
+
+
+
+
+// Read-more
+
+.clamp-block { position: relative; }
+
+.clamp-block[data-clamped="true"] .clamp-content {
+  display: -webkit-box;
+  -webkit-line-clamp: var(--clamp-lines, 3);
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.clamp-toggle {
+  display: inline-block;
+  margin-top: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-teal);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.clamp-toggle:hover { color: var(--color-teal-dark); }
+
 
 
 // =============================================================================
@@ -473,6 +577,15 @@
 // itself collapses at).
 // =============================================================================
 @media (max-width: $bp-nav) {
+
+  .glossary-page   { height: auto; overflow: visible; }
+  .glossary-layout { height: auto; }
+  .glossary-sidebar,
+  .glossary-main   { height: auto; }
+  .content-row     { flex: none; }
+  #detail-panel    { height: auto; overflow: visible; }
+  #detail-content  { overflow: visible; }
+
   .glossary-page { padding: 0.75rem; }
 
   .glossary-layout {
@@ -512,28 +625,6 @@
     width: 100%;
     flex-basis: auto;
   }
-
-  // These need to match (or beat) the specificity of the collapsed-rail
-  // rules above (.pipeline-panel:not(.open) .pipeline-panel-toggle /
-  // -toggle-label), or the rail styling keeps winning here whenever the
-  // panel happens to be collapsed — which is exactly what was causing
-  // the vertical, rotated-text tray to still show up in compact mode.
-  .pipeline-panel .pipeline-panel-toggle,
-  .pipeline-panel:not(.open) .pipeline-panel-toggle {
-    flex-direction: row;
-    height: auto;
-    padding: 0.85rem 1rem;
-    border-bottom: 1px solid #eee;
-    gap: 0;
-  }
-
-  .pipeline-panel .pipeline-panel-toggle-label,
-  .pipeline-panel:not(.open) .pipeline-panel-toggle-label {
-    writing-mode: horizontal-tb;
-    transform: none;
-  }
-
-  .pipeline-panel-body { max-height: 340px; }
 
   // Terms/Pipeline switcher becomes a real tab control, and JS reparents
   // #pipeline-panel into the Pipeline tab panel — same breakpoint as
@@ -664,17 +755,6 @@
     font-size: 0.76rem;
     padding: 0.5rem 0.3rem;
   }
-}
-
-.pipeline-panel-toggle svg {
-    transition:
-        transform 0.32s cubic-bezier(.22,1,.36,1),
-        opacity 0.2s ease;
-    transform-origin: center;
-}
-
-.pipeline-panel.open .pipeline-panel-toggle svg {
-    transform: rotate(135deg) scale(1.05);
 }
 
 // Settings Select

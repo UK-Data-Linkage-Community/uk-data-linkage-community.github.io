@@ -4,18 +4,18 @@ export function clearPipelineActive() {
   steps.forEach(s => s.classList.remove("active"));
 }
 
+// The old standalone collapse/expand toggle button is gone — opening and
+// closing the shared rail is now driven by panel-tabs.js instead. This
+// module just keeps the pipeline steps themselves working, plus the
+// mobile re-parenting into the sidebar's Pipeline tab.
+//
 // callbacks:
 //   onStepSelect(sectionId) — a step was opened
 //   onStepDeselect()        — the open step was clicked again to close it
 export function initPipelinePanel({ onStepSelect, onStepDeselect }) {
   const pipelinePanel        = document.getElementById("pipeline-panel");
-  const pipelinePanelToggle  = document.getElementById("pipeline-panel-toggle");
   const pipelinePanelAnchor  = document.getElementById("pipeline-panel-anchor");
   const sidebarPipelineMount = document.getElementById("sidebar-pipeline-mount");
-
-  pipelinePanelToggle.addEventListener("click", () => {
-    pipelinePanel.classList.toggle("open");
-  });
 
   // --bp-stack (set in SCSS) is the single source of truth for the
   // wide/mobile breakpoint — read it rather than hardcoding a pixel value.
