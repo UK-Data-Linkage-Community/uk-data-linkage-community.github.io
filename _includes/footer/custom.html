@@ -1,0 +1,31 @@
+{% comment %}
+  Loads the card/modal/filter system used by the materials grid, person
+  cards, and tutorial pages. Was never included anywhere — this is the fix.
+
+  The ?v= param busts the browser's cache using the file's own mtime, so a
+  browser that already cached an old cards.js (e.g. from before it was
+  wired up at all) picks up each new edit automatically instead of serving
+  a stale copy until a hard-refresh.
+{% endcomment %}
+{% assign cardsjs = site.static_files | where: "relative_path", "/assets/js/cards.js" | first %}
+<script src="{{ '/assets/js/cards.js' | relative_url }}?v={{ cardsjs.modified_time | date: '%s' }}" defer></script>
+
+{% comment %}
+  main.css (the theme's own compiled stylesheet, linked from the remote
+  theme's <head>) has the exact same stale-cache problem as cards.js did —
+  but it's a Sass-compiled page, not a static_file, so it has no mtime we
+  can query and its <link> tag lives in a head.html we don't control locally.
+  Instead: find that <link> at runtime and rewrite its href with a
+  site.time-based cache-buster (site.time changes on every Jekyll rebuild),
+  forcing a fresh fetch instead of the browser's cached copy.
+{% endcomment %}
+<script>
+(function () {
+  var link = document.querySelector('link[rel="stylesheet"][href*="/assets/css/main.css"]');
+  if (link) {
+    var url = new URL(link.href, window.location.origin);
+    url.searchParams.set('v', '{{ site.time | date: "%s" }}');
+    link.href = url.toString();
+  }
+})();
+</script>

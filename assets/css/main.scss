@@ -3,7 +3,1376 @@
 
 @import "minimal-mistakes/skins/default";
 @import "minimal-mistakes";
-@import "components/card";
+
+/* --------------------------------------------------------------------------
+   Card system (was `@import "components/card";`, now inlined) —
+   jekyll-remote-theme overrides the Sass load paths and drops this site's
+   own `assets/css`, so a same-repo @import can't be resolved no matter what
+   `sass.load_paths` says in _config.yml. This block is now the only copy —
+   assets/css/components/_card.scss is unused; edit here, not there.
+   -------------------------------------------------------------------------- */
+
+/* ==========================================================================
+   JEKYLL CARD SYSTEM  — cards.css
+   Namespace: .jk-*   (won't conflict with your existing theme)
+
+   Add to your layout <head>:
+     <link rel="stylesheet" href="/assets/css/cards.css">
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   CSS CUSTOM PROPERTIES
+   Override any of these in your theme to adapt colors/spacing to your site
+   -------------------------------------------------------------------------- */
+:root {
+  /* Surface & background */
+  --jk-bg:            #ffffff;
+  --jk-surface:       #f7f6f3;
+  --jk-surface-hover: #f0ede6;
+  --jk-border:        #e5e1d8;
+  --jk-border-strong: #c8c2b4;
+
+  /* Text */
+  --jk-text:          #1c1a17;
+  --jk-text-muted:    #6b6558;
+  --jk-text-faint:    #9e978a;
+
+  /* Accent */
+  --jk-accent:        #2563eb;
+  --jk-accent-light:  #eff6ff;
+  --jk-accent-hover:  #1d4ed8;
+
+  /* Type colours */
+  --jk-slides:        #7c3aed;
+  --jk-slides-bg:     #f5f3ff;
+  --jk-video:         #dc2626;
+  --jk-video-bg:      #fef2f2;
+  --jk-document:      #059669;
+  --jk-document-bg:   #ecfdf5;
+  --jk-notebook:      #d97706;
+  --jk-notebook-bg:   #fffbeb;
+  --jk-code:          #0891b2;
+  --jk-code-bg:       #ecfeff;
+  --jk-tutorial:      #be185d;
+  --jk-tutorial-bg:   #fdf2f8;
+
+  /* Audience-level */
+  --jk-level-intro:        #059669;
+  --jk-level-practitioner: #2563eb;
+  --jk-level-advanced:     #7c3aed;
+
+  /* Spacing & shape */
+  --jk-radius-sm:     6px;
+  --jk-radius-filter: 20px;
+  --jk-radius:        10px;
+  --jk-radius-lg:     16px;
+  --jk-shadow-sm:     0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+  --jk-shadow:        0 4px 12px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+  --jk-shadow-lg:     0 16px 40px rgba(0,0,0,0.14), 0 4px 12px rgba(0,0,0,0.08);
+
+  /* Animation */
+  --jk-ease:          cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --jk-ease-spring:   cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* --------------------------------------------------------------------------
+   TYPE COLOUR HELPERS  (used on elements with class jk-card--type-*)
+   -------------------------------------------------------------------------- */
+.jk-card--type-slides   { --jk-type-color: var(--jk-slides);   --jk-type-bg: var(--jk-slides-bg);   }
+.jk-card--type-video    { --jk-type-color: var(--jk-video);    --jk-type-bg: var(--jk-video-bg);    }
+.jk-card--type-document { --jk-type-color: var(--jk-document); --jk-type-bg: var(--jk-document-bg); }
+.jk-card--type-notebook { --jk-type-color: var(--jk-notebook); --jk-type-bg: var(--jk-notebook-bg); }
+.jk-card--type-code     { --jk-type-color: var(--jk-code);     --jk-type-bg: var(--jk-code-bg);     }
+.jk-card--type-tutorial { --jk-type-color: var(--jk-tutorial); --jk-type-bg: var(--jk-tutorial-bg); }
+
+/* --------------------------------------------------------------------------
+   AUDIENCE-LEVEL COLOUR HELPERS  (used on jk-card__level-badge)
+   -------------------------------------------------------------------------- */
+.jk-card--level-intro        { --jk-level-color: var(--jk-level-intro); }
+.jk-card--level-practitioner { --jk-level-color: var(--jk-level-practitioner); }
+.jk-card--level-advanced     { --jk-level-color: var(--jk-level-advanced); }
+
+/* --------------------------------------------------------------------------
+   BASE CARD RESET
+   -------------------------------------------------------------------------- */
+.jk-card {
+  box-sizing: border-box;
+  font-family: inherit;
+  color: var(--jk-text);
+  text-decoration: none;
+  position: relative;
+}
+.jk-card *,
+.jk-card *::before,
+.jk-card *::after {
+  box-sizing: border-box;
+}
+/* Clickable cards get pointer + focus ring */
+[data-card-trigger] {
+  cursor: pointer;
+}
+[data-card-trigger]:focus-visible {
+  outline: 2px solid var(--jk-accent);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   CARD — FULL (default)
+   -------------------------------------------------------------------------- */
+.jk-card--full {
+  background: var(--jk-bg);
+  border: 1px solid var(--jk-border);
+  border-radius: var(--jk-radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  /* Fixed tile height so the grid reads as a uniform grid rather than
+     masonry — title/description are clamped below to fit inside it.
+     Tightened from 400px now that the wider page fits more columns —
+     tiles no longer need to be this tall to avoid looking sparse. */
+  height: 340px;
+  box-shadow: var(--jk-shadow-sm);
+  transition: box-shadow 0.18s var(--jk-ease), transform 0.18s var(--jk-ease), border-color 0.18s;
+}
+.jk-card--full[data-card-trigger]:hover {
+  box-shadow: var(--jk-shadow);
+  transform: translateY(-2px);
+  border-color: var(--jk-border-strong);
+}
+
+/* Hero area */
+.jk-card__hero {
+  position: relative;
+  width: 100%;
+  height: 130px;
+  overflow: hidden;
+  background: var(--jk-type-bg, var(--jk-surface));
+}
+.jk-card__hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.jk-card__hero--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.jk-card__hero--person {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--jk-surface);
+}
+
+/* Type badge on hero */
+.jk-card__type-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 2px 7px;
+  border-radius: var(--jk-radius-sm);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  background: var(--jk-type-color, var(--jk-text-muted));
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* Audience-level badge on hero (top-right, pairs with type badge bottom-left) */
+.jk-card__level-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 2px 7px;
+  border-radius: var(--jk-radius-sm);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  background: rgba(255,255,255,0.92);
+  color: var(--jk-level-color, var(--jk-text-muted));
+  border: 1px solid var(--jk-level-color, var(--jk-border));
+  cursor: help;
+  white-space: nowrap;
+}
+.jk-card--small .jk-card__thumb .jk-card__level-badge {
+  top: 4px;
+  right: 4px;
+  font-size: 0.55rem;
+  padding: 1px 5px;
+}
+
+/* Type icon (large placeholder) */
+.jk-card__type-icon-lg {
+  font-size: 2.5rem;
+  opacity: 0.25;
+  color: var(--jk-type-color, var(--jk-text-muted));
+  line-height: 1;
+}
+
+/* Body */
+.jk-card__body {
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-height: 0; /* let children clamp instead of pushing the fixed-height card taller */
+}
+.jk-card__title {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--jk-text);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* Safety net alongside line-clamp: on the rare browser/layout combo where
+     the clamp doesn't kick in cleanly, this still guarantees a "…" instead
+     of a hard, silent cut mid-word (this is what was happening on longer
+     tutorial titles). */
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+.jk-card__desc {
+  margin: 0;
+  font-size: 0.74rem;
+  color: var(--jk-text-muted);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.jk-card__body .jk-card__meta-row {
+  margin-top: auto;
+  flex-shrink: 0;
+  overflow: hidden;
+  /* 26px clipped the bottom sliver of the person-tag pill (border + padding
+     push its real height past that); 30px gives it room to sit whole. */
+  max-height: 30px;
+}
+.jk-card__role {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--jk-accent);
+}
+.jk-card__affiliation {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--jk-text-muted);
+}
+.jk-card__meta-row,
+.jk-card__tags-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+.jk-card__meta-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--jk-text-faint);
+  margin-right: 4px;
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   CARD — SMALL
+   -------------------------------------------------------------------------- */
+.jk-card--small {
+  background: var(--jk-bg);
+  border: 1px solid var(--jk-border);
+  border-radius: var(--jk-radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+  box-shadow: var(--jk-shadow-sm);
+  transition: box-shadow 0.18s var(--jk-ease), transform 0.18s var(--jk-ease);
+}
+.jk-card--small[data-card-trigger]:hover {
+  box-shadow: var(--jk-shadow);
+  transform: translateY(-1px);
+}
+.jk-card--small .jk-card__thumb {
+  position: relative;
+  width: 80px;
+  min-width: 80px;
+  height: auto;
+  overflow: hidden;
+  background: var(--jk-type-bg, var(--jk-surface));
+  flex-shrink: 0;
+}
+.jk-card--small .jk-card__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.jk-card--small .jk-card__thumb--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+}
+.jk-card--small .jk-card__thumb .jk-card__type-icon-lg {
+  font-size: 1.5rem;
+}
+.jk-card--small .jk-card__thumb .jk-card__type-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  font-size: 0.58rem;
+  padding: 1px 5px;
+}
+.jk-card--small .jk-card__body {
+  padding: 10px 12px;
+  gap: 5px;
+}
+.jk-card--small .jk-card__title {
+  font-size: 0.88rem;
+}
+
+/* Person small card */
+.jk-card--small.jk-card--person {
+  align-items: center;
+}
+.jk-card--small.jk-card--person .jk-card__body {
+  padding: 10px 12px;
+}
+
+/* --------------------------------------------------------------------------
+   CARD — BUTTON
+   -------------------------------------------------------------------------- */
+.jk-card--button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px 5px 8px;
+  background: var(--jk-surface);
+  border: 1px solid var(--jk-border);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--jk-text);
+  transition: background 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.jk-card--button:hover {
+  background: var(--jk-surface-hover);
+  border-color: var(--jk-border-strong);
+}
+.jk-card--button .jk-card__type-icon {
+  font-size: 0.9rem;
+  color: var(--jk-type-color, var(--jk-text-muted));
+}
+
+/* --------------------------------------------------------------------------
+   CARD — EMBEDDED
+   -------------------------------------------------------------------------- */
+/* ═══════════════════════════════════════════════
+   EMBEDDED MATERIAL CARD
+   ═══════════════════════════════════════════════ */
+
+.jk-card--embedded {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  border: 1px solid var(--jk-border);
+  border-radius: var(--jk-radius-lg);
+  overflow: hidden;
+  background: var(--jk-bg);
+  box-shadow: var(--jk-shadow);
+}
+
+/* ── Left: iframe ─────────────────────────────── */
+
+.jk-card__embed-wrapper {
+  flex: 1 1 auto;
+  position: relative;
+  min-height: 375px;
+  background: #000;
+}
+
+.jk-card__embed-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+.jk-card__embed-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;   /* was: right — fixed */
+  gap: 12px;
+  background: var(--jk-surface);
+  color: var(--jk-text-muted);
+  text-align: center;
+  padding: 24px;
+}
+
+/* ── Right: meta panel ────────────────────────── */
+
+.jk-card__embed-meta {
+  flex: 0 0 220px;
+  width: 220px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;                    /* gaps handled per-section via margin */
+  border-left: 1px solid var(--jk-border);
+  overflow-y: auto;
+  max-height: 400px;
+  background: var(--jk-surface, var(--jk-bg));
+}
+
+/* ── Meta header: badge + title ───────────────── */
+
+.jk-card__embed-header {
+  display: flex;
+  flex-direction: column !important;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+/* Scoped to embedded mode only — this used to be a bare .jk-card__type-badge
+   rule that clobbered the real positioned/colored type badge used by the
+   card/small modes (later in this file), squashing their layout. */
+.jk-card--embedded .jk-card__type-badge {
+  display: inline-flex;
+  position: static;
+  align-self: flex-start;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--jk-surface);
+  color: var(--jk-text-muted);
+  border: 1px solid var(--jk-border);
+  white-space: nowrap;
+}
+
+.jk-card__embed-header .jk-card__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0;
+  color: var(--jk-text);
+  /* Allow long titles to wrap naturally */
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.jk-card--embedded .jk-card__embed-header .jk-card__type-badge {
+  align-self: flex-start;  /* shrink-wrap to content, don't stretch */
+}
+
+.jk-card__embed-header .jk-card__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 0;
+  word-break: break-word;
+}
+
+/* ── Divider between meta sections ───────────── */
+
+.jk-card--embedded .jk-card__meta-divider {
+  border: none;
+  border-top: 1px solid var(--jk-border);
+  margin: 0 0 12px;
+}
+
+/* ── Each meta section (authors / event / tags) ─
+   Scoped to embedded mode — this used to be a bare .jk-card__meta-row rule
+   forcing a vertical column layout, which fought the card/small modes'
+   horizontal meta-row and squeezed the author/tag row into a sliver. */
+
+.jk-card--embedded .jk-card__meta-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;   /* left-align everything */
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.jk-card--embedded .jk-card__meta-row:last-child {
+  margin-bottom: 0;
+}
+
+.jk-card--embedded .jk-card__meta-label {
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--jk-text-muted);
+  line-height: 1;
+}
+
+/* Tags inside meta rows wrap horizontally */
+.jk-card--embedded .jk-card__meta-row .jk-tag-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+}
+
+.jk-card--embedded .jk-card__meta-row .jk-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  line-height: 1.5;
+  white-space: normal;
+  word-break: break-word;
+  /* Ensure tags don't stretch full width */
+  align-self: flex-start;
+}
+
+/* ── Tablet: narrow the meta panel ───────────── */
+
+@media (max-width: 768px) {
+  .jk-card__embed-meta {
+    flex: 0 0 185px;
+    width: 185px;
+    padding: 14px 12px;
+  }
+}
+
+/* ── Mobile: stack vertically ────────────────── */
+
+@media (max-width: 600px) {
+  .jk-card--embedded {
+    flex-direction: column;
+  }
+
+  .jk-card__embed-wrapper {
+    /* 16:9 approximation */
+    height: calc(56.25vw - 2px);
+    min-height: 180px;
+    max-height: 280px;
+  }
+
+  .jk-card__embed-meta {
+    flex: none;
+    width: 100%;
+    max-height: none;
+    border-left: none;
+    border-top: 1px solid var(--jk-border);
+    padding: 14px;
+    overflow-y: visible;
+  }
+}
+
+/* ── Tooltip (unchanged) ──────────────────────── */
+
+.jk-tag-tooltip {
+  position: fixed;
+  z-index: 99999;
+  pointer-events: auto;
+}
+
+/* --------------------------------------------------------------------------
+   AVATAR
+   -------------------------------------------------------------------------- */
+.jk-avatar {
+  border-radius: 10%;
+  overflow: hidden;
+  background: var(--jk-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--jk-text-muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.jk-avatar--xs { width: 24px; height: 24px; font-size: 0.65rem; }
+.jk-avatar--sm { width: 32px; height: 32px; font-size: 0.75rem; }
+.jk-avatar--md { width: 48px; height: 48px; font-size: 1rem; }
+.jk-avatar--lg { width: 72px; height: 72px; font-size: 1.4rem; }
+.jk-avatar--xl { width: 96px; height: 96px; font-size: 2rem; }
+.jk-avatar img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.jk-avatar__initials {
+  letter-spacing: -0.02em;
+  user-select: none;
+  color: var(--jk-text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   TAGS  (linkable inline labels)
+   -------------------------------------------------------------------------- */
+.jk-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: var(--jk-radius-sm);
+  font-size: 0.7rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  user-select: none;
+}
+.jk-tag--person {
+  background: var(--jk-accent-light);
+  color: var(--jk-accent-hover);
+  border-color: #bfdbfe;
+}
+.jk-tag--person:hover { background: #dbeafe; }
+
+.jk-tag--topic {
+  background: var(--jk-surface);
+  color: var(--jk-text-muted);
+  border-color: var(--jk-border);
+}
+.jk-tag--topic:hover { background: var(--jk-surface-hover); color: var(--jk-text); }
+
+.jk-tag--event {
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #fed7aa;
+}
+.jk-tag--event:hover { background: #ffedd5; }
+
+/* --------------------------------------------------------------------------
+   MODAL
+   -------------------------------------------------------------------------- */
+.jk-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  transition: opacity 0.22s var(--jk-ease);
+}
+.jk-modal-overlay:not([hidden]) {
+  opacity: 1;
+}
+.jk-modal-overlay[hidden] {
+  display: none;
+}
+
+.jk-modal {
+  background: var(--jk-bg);
+  border-radius: var(--jk-radius-lg);
+  box-shadow: var(--jk-shadow-lg);
+  width: 100%;
+  max-width: 600px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  position: relative;
+  transform: translateY(12px) scale(0.98);
+  transition: transform 0.25s var(--jk-ease-spring);
+}
+.jk-modal-overlay:not([hidden]) .jk-modal {
+  transform: translateY(0) scale(1);
+}
+
+.jk-modal__close {
+  position: sticky;
+  top: 6px;
+  float: right;
+  margin: 6px 12px 0 0;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--jk-border);
+  background: var(--jk-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--jk-text-muted);
+  transition: background 0.12s, color 0.12s;
+}
+.jk-modal__close:hover {
+  background: var(--jk-surface);
+  color: var(--jk-text);
+}
+
+.jk-modal__content {
+  padding: 24px;
+  clear: both;
+}
+
+/* Modal hero */
+.jk-modal__hero {
+  width: calc(100% + 48px);
+  margin: -24px -24px 20px;
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  background: var(--jk-type-bg, var(--jk-surface));
+  border-radius: var(--jk-radius-lg) var(--jk-radius-lg) 0 0;
+}
+.jk-modal__hero img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+.jk-modal__hero--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.jk-modal__hero--person {
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--jk-surface);
+}
+.jk-modal__hero .jk-card__type-badge {
+  bottom: 12px;
+  left: 12px;
+  font-size: 0.72rem;
+  padding: 3px 10px;
+}
+.jk-modal__hero .jk-card__type-icon-lg {
+  font-size: 3.5rem;
+}
+
+/* Modal body */
+.jk-modal__title {
+  margin: 0 0 4px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--jk-text);
+}
+.jk-modal__subtitle {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+  color: var(--jk-text-muted);
+}
+.jk-modal__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+.jk-modal__meta-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.jk-modal__meta-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--jk-text-faint);
+  min-width: 68px;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+.jk-modal__meta-value {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  flex: 1;
+}
+.jk-modal__desc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--jk-text-muted);
+  margin: 12px 0 0;
+}
+.jk-modal__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--jk-border);
+}
+.jk-modal__embed {
+  width: calc(100% + 48px);
+  margin: -24px -24px 20px;
+  position: relative;
+  padding-bottom: 56.25%;
+  background: #000;
+  border-radius: var(--jk-radius-lg) var(--jk-radius-lg) 0 0;
+  overflow: hidden;
+}
+.jk-modal__embed iframe {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  border: none;
+}
+
+/* Person modal */
+.jk-modal__person-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.jk-modal__person-info {
+  flex: 1;
+}
+.jk-modal__links {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   BUTTONS
+   -------------------------------------------------------------------------- */
+.jk-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--jk-radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.jk-btn--primary {
+  /* --jk-surface is near-white, so white text on it was invisible; --color-teal
+     was never defined anywhere in the codebase either. Using the site's real
+     brand teal (matches _config.yml's ukdlc_color_teal) for real contrast. */
+  background: #30cabf;
+  color: #fff;
+}
+.jk-btn--primary:hover { background: #26a89f; }
+
+.jk-btn--secondary {
+  background: var(--jk-surface);
+  color: var(--jk-text);
+  border: 1px solid var(--jk-border);
+}
+.jk-btn--secondary:hover { background: var(--jk-surface-hover); }
+
+.jk-btn--ghost {
+  background: transparent;
+  color: var(--jk-text-muted);
+  border: 1px solid var(--jk-border);
+}
+.jk-btn--ghost:hover { background: var(--jk-surface); color: var(--jk-text); }
+
+/* --------------------------------------------------------------------------
+   TAG TOOLTIP  (popup on author/tag click)
+   -------------------------------------------------------------------------- */
+.jk-tag-tooltip {
+  position: fixed;
+  z-index: 9100;
+  max-width: 280px;
+  width: 280px;
+  background: var(--jk-bg);
+  border: 1px solid var(--jk-border);
+  border-radius: var(--jk-radius);
+  box-shadow: var(--jk-shadow-lg);
+  padding: 14px;
+  opacity: 0;
+  transform: translateY(4px) scale(0.97);
+  transition: opacity 0.15s var(--jk-ease), transform 0.15s var(--jk-ease-spring);
+}
+.jk-tag-tooltip:not([hidden]) {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.jk-tag-tooltip[hidden] {
+  display: none;
+}
+.jk-tag-tooltip__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 10px;
+}
+.jk-tag-tooltip__action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: var(--jk-radius-sm);
+  font-size: 0.82rem;
+  cursor: pointer;
+  color: var(--jk-text);
+  text-decoration: none;
+  transition: background 0.12s;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+.jk-tag-tooltip__action:hover { background: var(--jk-surface); }
+.jk-tag-tooltip__action-icon { font-size: 1rem; flex-shrink: 0; }
+
+/* Person tooltip header */
+.jk-tag-tooltip__person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.jk-tag-tooltip__person-info {
+  flex: 1;
+  min-width: 0;
+}
+.jk-tag-tooltip__name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--jk-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.jk-tag-tooltip__sub {
+  font-size: 0.75rem;
+  color: var(--jk-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Divider */
+.jk-tag-tooltip__divider {
+  height: 1px;
+  background: var(--jk-border);
+  margin: 10px 0 6px;
+}
+
+/* --------------------------------------------------------------------------
+   MATERIALS PAGE
+   -------------------------------------------------------------------------- */
+/* The real cause of the "empty side columns" — found by inspecting the live
+   page, not guessing: minimal-mistakes' `page.html` layout always floats its
+   <article class="page"> and gives it a hard-coded width reserving space for
+   a sidebar (theme default, ~1085px of a 1385px container here), regardless
+   of whether a sidebar is actually shown. `classes: wide` in front matter —
+   the documented theme escape hatch — has no effect here because this repo's
+   page.html doesn't render page.classes onto the article at all. Overriding
+   the theme's own rule directly, scoped with :has() so ONLY the page
+   containing our grid is affected — no other "layout: page" page changes. */
+article.page:has(.jk-materials-page-wrap) {
+  float: none !important;
+  width: 100% !important;
+}
+article.page:has(.jk-materials-page-wrap) .content {
+  width: 100% !important;
+}
+
+.jk-materials-page {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 28px;
+  align-items: start;
+  /* Was capped at 1200px (too narrow — empty side columns), then widened to
+     1600/1800px (too wide — zero side margin, 5 tiles/row). Settling in the
+     middle so there's breathing room on the sides and one fewer tile fits
+     per row on a typical wide screen. */
+  max-width: 1440px;
+  margin: 0 auto;
+}
+@media (min-width: 1800px) {
+  .jk-materials-page { max-width: 1600px; }
+}
+@media (max-width: 768px) {
+  .jk-materials-page { grid-template-columns: 1fr; }
+}
+
+/* Filter panel */
+.jk-filter-panel {
+  background: var(--jk-surface);
+  border: 1px solid var(--jk-border);
+  border-radius: var(--jk-radius-lg);
+  padding: 18px;
+  position: sticky;
+  top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.jk-filter-panel__title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--jk-text-faint);
+  margin: 0;
+}
+
+/* Page title, moved from a big banner above the whole page into the top of
+   the search/filter sidebar — smaller and in the site's teal brand colour. */
+.jk-filter-panel__page-title {
+  margin: 0 0 4px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--jk-border);
+}
+.jk-filter-panel__page-title h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0 0 4px;
+  color: #1a8f86; /* darker than the #30cabf button teal for text contrast */
+}
+.jk-filter-panel__page-title p {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--jk-text-muted);
+  margin: 0;
+}
+.jk-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.jk-filter-group__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--jk-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.jk-filter-search {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid var(--jk-border);
+  border-radius: var(--jk-radius-sm);
+  background: var(--jk-bg);
+  color: var(--jk-text);
+  font-size: 0.8rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.jk-filter-search:focus {
+  border-color: var(--jk-accent);
+  box-shadow: 0 0 0 3px var(--jk-accent-light);
+}
+
+/* Search autocomplete */
+.jk-search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin: 4px 0 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--jk-bg);
+  border: 1px solid var(--jk-border);
+  border-radius: var(--jk-radius);
+  box-shadow: var(--jk-shadow);
+  max-height: 260px;
+  overflow-y: auto;
+}
+.jk-search-suggestion {
+  padding: 7px 10px;
+  border-radius: var(--jk-radius-sm);
+  font-size: 0.78rem;
+  color: var(--jk-text);
+  cursor: pointer;
+}
+.jk-search-suggestion:hover,
+.jk-search-suggestion--active {
+  background: var(--jk-accent-light);
+  color: var(--jk-accent-hover);
+}
+
+.jk-filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.jk-filter-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: var(--jk-radius-sm);
+  cursor: pointer;
+  transition: background 0.12s;
+  font-size: 0.78rem;
+  color: var(--jk-text);
+  user-select: none;
+}
+.jk-filter-option:hover { background: var(--jk-surface-hover); }
+.jk-filter-option input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  accent-color: var(--jk-accent);
+}
+.jk-filter-option__count {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--jk-text-faint);
+}
+.jk-filter-reset {
+  font-size: 0.78rem;
+  color: var(--jk-accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+.jk-filter-reset:hover { text-decoration: underline; }
+
+/* Active filter chips */
+.jk-active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  border-radius: var(--jk-radius-filter);
+  min-height: 28px;
+}
+.jk-active-filters:empty::after {
+  content: "No filters active";
+  font-size: 0.8rem;
+  color: var(--jk-text-faint);
+}
+.jk-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  background: var(--jk-accent-light);
+  border: 1px solid #bfdbfe;
+  border-radius: var(--jk-radius-filter);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--jk-accent-hover);
+}
+.jk-filter-chip__remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0;
+  line-height: 1;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+.jk-filter-chip__remove:hover { opacity: 1; }
+
+/* Results area */
+.jk-materials-results {}
+.jk-materials-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.jk-results-count {
+  font-size: 0.76rem;
+  color: var(--jk-text-muted);
+}
+
+.jk-card-grid {
+  display: grid;
+  /* auto-fit (not auto-fill): auto-fill reserves a full row of tracks even
+     when there aren't enough tiles to fill it, leaving empty columns on the
+     side; auto-fit collapses the empty ones so real tiles stretch to fill
+     the row instead. */
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 16px;
+}
+.jk-card-grid--list {
+  grid-template-columns: 1fr;
+}
+.jk-card-grid--list .jk-card--full {
+  flex-direction: row;
+}
+.jk-card-grid--list .jk-card--full .jk-card__hero {
+  width: 120px;
+  min-width: 120px;
+  height: auto;
+  border-radius: 0;
+  flex-shrink: 0;
+}
+
+/* Empty state */
+.jk-materials-empty {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--jk-text-muted);
+  grid-column: 1 / -1;
+}
+.jk-materials-empty h3 { margin: 0 0 6px; color: var(--jk-text); }
+.jk-materials-empty p  { margin: 0; font-size: 0.9rem; }
+
+/* --------------------------------------------------------------------------
+   UTILITY
+   -------------------------------------------------------------------------- */
+.jk-hidden { display: none !important; }
+
+@media (max-width: 520px) {
+  .jk-modal { border-radius: var(--jk-radius); }
+  .jk-modal__content { padding: 16px; }
+  .jk-modal__hero,
+  .jk-modal__embed { width: calc(100% + 32px); margin: -16px -16px 16px; }
+  .jk-modal__title { font-size: 1.1rem; }
+}
+
+
+.jk-card__embed-header .jk-card__type-badge {
+  position: static;   /* ← overrides the global position: absolute */
+  align-self: flex-start;
+  /* also restore the appearance since the global uses white text on type-color bg */
+  background: var(--jk-surface);
+  color: var(--jk-text-muted);
+  border: 1px solid var(--jk-border);
+}
+
+
+
+
+
+
+//overrides
+.jk-card--embedded {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: transparent;
+  border: 0;
+}
+
+.jk-card__embed-wrapper {
+  width: 100%;
+}
+
+.jk-card__embed-frame,
+.jk-card__embed-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  border: 0;
+  border-radius: 10px;
+}
+
+.jk-card__embed-caption {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding: 0 4px;
+}
+
+.jk-card__embed-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.jk-card__info-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 28px;
+  height: 28px;
+
+  border: none;
+  border-radius: 50%;
+  background: var(--jk-surface);
+  cursor: pointer;
+}
+
+.jk-card__info-btn:hover {
+  transform: scale(1.05);
+}
+
+.jk-filter-panel__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin: 0;
+}
+
+.jk-filter-panel__header p {
+  margin: 0;
+}
+.jk-materials-header {
+  margin: 0;
+}
+
+.jk-filter-panel {
+  gap: 10px;
+}
+
+.jk-filter-group {
+  gap: 4px;
+}
+
+/* --------------------------------------------------------------------------
+   TUTORIAL PAGE  (_layouts/tutorial.html)
+   -------------------------------------------------------------------------- */
+.jk-tutorial__header {
+  margin-bottom: 24px;
+}
+.jk-tutorial__badge {
+  position: static;
+  display: inline-block;
+}
+.jk-tutorial__intro {
+  font-size: 1.05rem;
+  color: var(--jk-text-muted);
+  margin: 8px 0 14px;
+}
+.jk-tutorial__authors {
+  margin-top: 10px;
+}
+.jk-tutorial__content {
+  font-size: 1rem;
+  line-height: 1.65;
+}
+.jk-tutorial__footer-actions {
+  margin-top: 32px;
+  padding-top: 16px;
+  border-top: 1px solid var(--jk-border);
+}
 
 
 // Breakpoints
