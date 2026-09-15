@@ -2,6 +2,7 @@
 layout: page
 title:
 permalink: /resources/materials/
+classes: wide
 ---
  
 <style>
@@ -9,34 +10,21 @@ permalink: /resources/materials/
 .jk-materials-page-wrap {
   padding: 32px 0 64px;
 }
-.jk-materials-page-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin: 0 0 6px;
-  color: var(--jk-text, #1c1a17);
-}
-.jk-materials-page-subtitle {
-  font-size: 1rem;
-  color: var(--jk-text-muted, #6b6558);
-  margin: 0 0 28px;
-}
 </style>
  
 <div class="jk-materials-page-wrap">
-  <h1 class="jk-materials-page-title">Site Materials</h1>
-  <p class="jk-materials-page-subtitle">
-    Slides, recordings, notebooks, and documents from all our events.
-  </p>
- 
   <div class="jk-materials-page" id="jk-materials-page">
  
     <!-- ═══ FILTER PANEL ═══════════════════════════════════════════════ -->
     <aside class="jk-filter-panel" aria-label="Filter materials">
+      <div class="jk-filter-panel__page-title">
+        <h1>Site Materials</h1>
+      </div>
       <div class="jk-filter-panel__header">
         <p class="jk-filter-panel__title">Filter</p>
     
         <p class="jk-results-count" id="jk-results-count" aria-live="polite">
-          {{ site.data.materials.items | size }} results
+          {{ site.data.materials.items | size | plus: site.tutorials.size }} results
         </p>
       </div>
 
@@ -44,13 +32,18 @@ permalink: /resources/materials/
       <div class="jk-active-filters" id="jk-active-filters" aria-label="Active filters" aria-live="polite"></div>
  
  
-      <div class="jk-filter-group">
+      <div class="jk-filter-group" style="position:relative">
         <div class="jk-filter-group__label">Search</div>
         <input type="search"
                class="jk-filter-search"
                id="jk-filter-search"
                placeholder="Title, description…"
-               aria-label="Search materials">
+               aria-label="Search materials"
+               autocomplete="off"
+               role="combobox"
+               aria-expanded="false"
+               aria-controls="jk-search-suggestions">
+        <ul class="jk-search-suggestions" id="jk-search-suggestions" role="listbox" hidden></ul>
       </div>
 
       <details class="jk-filter-group jk-filter-group--dropdown">
@@ -92,6 +85,16 @@ permalink: /resources/materials/
             <!-- populated by JS -->
           </div>
         </details>
+
+      <details class="jk-filter-group jk-filter-group--dropdown">
+          <summary class="jk-filter-group__label">
+            Audience Level
+          </summary>
+
+          <div class="jk-filter-options" id="jk-filter-levels" role="group" aria-label="Filter by audience level">
+            <!-- populated by JS -->
+          </div>
+        </details>
  
       <button class="jk-filter-reset" id="jk-filter-reset">Clear all filters</button>
     </aside>
@@ -104,8 +107,17 @@ permalink: /resources/materials/
  
       <!-- Card grid -->
       <div class="jk-card-grid" id="jk-card-grid">
- 
-        {% for item in site.data.materials.items %}
+
+        {% comment %}
+          Two sources feed this grid: uploaded materials (_data/materials.yml —
+          slides/video/document/notebook/code) and full tutorial pages (the
+          collections/_tutorials collection — type "tutorial"). Both render
+          through the same cards/material-card.html include so they're
+          indistinguishable to the filter/search JS.
+        {% endcomment %}
+        {% assign all_materials = site.data.materials.items | concat: site.tutorials %}
+
+        {% for item in all_materials %}
           {% comment %} Build searchable text for JS {% endcomment %}
           {% capture search_text %}{{ item.title }} {{ item.description }} {{ item.tags | join: " " }} {{ item.authors | join: " " }}{% endcapture %}
           {% capture author_ids %}{% for a in item.authors %}{{ a }}{% unless forloop.last %},{% endunless %}{% endfor %}{% endcapture %}
@@ -116,6 +128,7 @@ permalink: /resources/materials/
                data-authors="{{ author_ids }}"
                data-event="{{ item.event_id }}"
                data-tags="{{ tag_list }}"
+               data-level="{{ item.audience_level }}"
                data-searchtext="{{ search_text | downcase | strip_newlines }}">
             {% include cards/material-card.html item=item display="card" %}
           </div>

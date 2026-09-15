@@ -76,6 +76,7 @@ function applyURLParams(params) {
   apply(f.authors, "author");
   apply(f.events,  "event");
   apply(f.tags,    "tags");
+  apply(f.levels,  "level");
 
   if (window._jkApplyFilters) {
     window._jkApplyFilters();
@@ -87,6 +88,7 @@ function applyURLParams(params) {
         "jk-filter-authors": f.authors,
         "jk-filter-events":  f.events,
         "jk-filter-tags":    f.tags,
+        "jk-filter-levels":  f.levels,
       };
       if (map[id]) cb.checked = map[id].includes(cb.value);
     });
@@ -98,7 +100,10 @@ function applyURLParams(params) {
     if (!item) return "<p>Not found.</p>";
     const authors = (item.authors || []).map(personById).filter(Boolean);
     const event   = item.event_id ? eventById(item.event_id) : null;
-    const embeddable = ["video","slides","notebook"].includes(item.type) && item.src;
+    const isTutorial  = item.type === "tutorial";
+    const embeddable  = !isTutorial && ["video","slides","notebook"].includes(item.type) && item.src;
+    const levelBadge  = levelName(item.audience_level)
+      ? `<span class="jk-card__level-badge jk-card--level-${esc(item.audience_level)}" data-tag-type="level" data-level-value="${esc(item.audience_level)}" tabindex="0" style="position:static;margin-left:6px">${levelName(item.audience_level)}</span>` : "";
 
     const hero = embeddable
       ? `<div class="jk-modal__embed"><iframe src="${esc(item.src)}" frameborder="0" allowfullscreen title="${esc(item.title)}"></iframe></div>`
@@ -114,8 +119,14 @@ function applyURLParams(params) {
     const eventTag   = event ? `<span class="jk-tag jk-tag--event" data-tag-type="event" data-event-id="${esc(event.id)}" tabindex="0" role="button">${esc(event.title)}</span>` : "";
     const topicTags  = (item.tags||[]).map(t => `<span class="jk-tag jk-tag--topic" data-tag-type="topic" data-tag-value="${esc(t)}" tabindex="0" role="button">${esc(t)}</span>`).join("");
 
+    // Tutorials link to an internal page (same tab, no download-style arrow);
+    // everything else opens the referenced file/URL in a new tab.
+    const primaryAction = isTutorial
+      ? `<a class="jk-btn jk-btn--primary" href="${esc(item.src)}">Read tutorial</a>`
+      : `<a class="jk-btn jk-btn--primary" href="${esc(item.src)}" target="_blank" rel="noopener">Open ${typeName(item.type)} ↗</a>`;
+
     return `${hero}
-      <h2 class="jk-modal__title">${esc(item.title)}</h2>
+      <h2 class="jk-modal__title">${esc(item.title)}${levelBadge}</h2>
       <div class="jk-modal__meta">
         ${metaRow("Authors", authorTags)}
         ${metaRow("Event",   eventTag)}
@@ -125,7 +136,7 @@ function applyURLParams(params) {
       ${item.description ? `<p class="jk-modal__desc">${esc(item.description)}</p>` : ""}
       ${item.caption     ? `<p class="jk-modal__desc" style="font-style:italic">${esc(item.caption)}</p>` : ""}
       ${item.src ? `<div class="jk-modal__actions">
-        <a class="jk-btn jk-btn--primary" href="${esc(item.src)}" target="_blank" rel="noopener">Open ${typeName(item.type)} ↗</a>
+        ${primaryAction}
         ${event ? `<a class="jk-btn jk-btn--secondary" href="${MATERIALS_PAGE}?event=${esc(event.id)}">More from this event</a>` : ""}
       </div>` : ""}`;
   }
@@ -196,6 +207,12 @@ function applyURLParams(params) {
   let currentTag     = null;
   let hideTimer      = null;
 
+  const LEVEL_DESCRIPTIONS = {
+    intro:        "No coding or technical background needed — written for anyone curious about data linkage.",
+    practitioner: "Assumes the terminology and day-to-day familiarity of someone already working in data science, statistics, or a related research/analytical field.",
+    advanced:     "For specialists already comfortable with entity resolution methods — assumes deeper technical or methodological background.",
+  };
+
   function showTooltip(el) {
     if (!tooltip || !tooltipInner) return;
     clearTimeout(hideTimer);
@@ -227,6 +244,10 @@ function applyURLParams(params) {
         <div class="jk-tag-tooltip__actions">
           <a class="jk-tag-tooltip__action" href="${MATERIALS_PAGE}?tags=${esc(tagVal)}">🔍 Browse "${esc(tagVal)}" materials</a>
         </div>`;
+    } else if (type === "level") {
+      const levelVal = el.dataset.levelValue;
+      html = `<div style="font-size:.85rem;font-weight:600;margin-bottom:4px">${levelName(levelVal) || "Audience level"}</div>
+        <div style="font-size:.82rem;color:var(--jk-text-muted);line-height:1.5">${esc(LEVEL_DESCRIPTIONS[levelVal] || "")}</div>`;
     } else if (type === "event" && eventId) {
       const ev = eventById(eventId);
       if (!ev) return;
@@ -296,6 +317,24 @@ function applyURLParams(params) {
     tooltip.addEventListener("mouseenter", () => clearTimeout(hideTimer));
     tooltip.addEventListener("mouseleave", () => hideTooltip());
   }
+
+  // Audience-level badges: hover/focus (not click) shows what the level means
+  document.addEventListener("mouseover", e => {
+    const el = e.target.closest(".jk-card__level-badge[data-tag-type='level']");
+    if (el) showTooltip(el);
+  });
+  document.addEventListener("mouseout", e => {
+    const el = e.target.closest(".jk-card__level-badge[data-tag-type='level']");
+    if (el && !el.contains(e.relatedTarget)) hideTooltip();
+  });
+  document.addEventListener("focusin", e => {
+    const el = e.target.closest(".jk-card__level-badge[data-tag-type='level']");
+    if (el) showTooltip(el);
+  });
+  document.addEventListener("focusout", e => {
+    const el = e.target.closest(".jk-card__level-badge[data-tag-type='level']");
+    if (el) hideTooltip();
+  });
 
   // ── 4. UNIFIED CLICK HANDLER (fixes stopPropagation across two listeners) ─
   document.addEventListener("click", e => {
@@ -396,7 +435,7 @@ function applyURLParams(params) {
   }
 
 function initMaterialsPage() {
-  const filters = window._jkFilters = { search: "", types: [], authors: [], events: [], tags: [] };
+  const filters = window._jkFilters = { search: "", types: [], authors: [], events: [], tags: [], levels: [] };
 
   const params = new URLSearchParams(window.location.search);
   if (params.get("search")) filters.search  = params.get("search");
@@ -404,6 +443,7 @@ function initMaterialsPage() {
   if (params.get("author")) filters.authors = params.get("author").split(",");
   if (params.get("event"))  filters.events  = params.get("event").split(",");
   if (params.get("tags"))   filters.tags    = params.get("tags").split(",");
+  if (params.get("level"))  filters.levels  = params.get("level").split(",");
 
   const cardEls = Array.from(document.querySelectorAll(".jk-mat-item"));
 
@@ -433,11 +473,107 @@ function initMaterialsPage() {
       (el.dataset.tags || "").split(",").filter(Boolean)
     ))
   );
+
+  const allLevels = unique(cardEls.map(el => el.dataset.level).filter(Boolean));
+
   // Search
   const searchEl = document.getElementById("jk-filter-search");
   if (searchEl) {
     searchEl.value = filters.search;
-    searchEl.addEventListener("input", () => { filters.search = searchEl.value; applyFilters(); });
+    searchEl.addEventListener("input", () => {
+      filters.search = searchEl.value;
+      applyFilters();
+      renderSuggestions(searchEl.value);
+    });
+  }
+
+  // ── Search autocomplete ──────────────────────────────────────────────────
+  // Suggestion pool: material/tutorial titles, tags and author names — the
+  // same flat-list-of-terms approach the glossary sidebar search uses.
+  const suggestBox = document.getElementById("jk-search-suggestions");
+  const suggestionTerms = unique([
+    ...cardEls.map(el => el.querySelector(".jk-card__title")?.textContent?.trim()).filter(Boolean),
+    ...allTags,
+    ...allAuthors.map(id => (personById(id) && personById(id).name) || id),
+  ]);
+  let activeSuggestion = -1;
+  let currentSuggestions = [];
+
+  function renderSuggestions(query) {
+    const q = query.trim().toLowerCase();
+    activeSuggestion = -1;
+    if (!suggestBox) return;
+    if (!q) { closeSuggestions(); return; }
+
+    currentSuggestions = suggestionTerms
+      .filter(t => t.toLowerCase().includes(q) && t.toLowerCase() !== q)
+      .slice(0, 8);
+
+    if (!currentSuggestions.length) { closeSuggestions(); return; }
+
+    suggestBox.innerHTML = currentSuggestions
+      .map((t, i) => `<li class="jk-search-suggestion" role="option" id="jk-suggestion-${i}" data-index="${i}">${esc(t)}</li>`)
+      .join("");
+    suggestBox.hidden = false;
+    searchEl.setAttribute("aria-expanded", "true");
+  }
+
+  function closeSuggestions() {
+    if (!suggestBox) return;
+    suggestBox.hidden = true;
+    suggestBox.innerHTML = "";
+    currentSuggestions = [];
+    activeSuggestion = -1;
+    searchEl.setAttribute("aria-expanded", "false");
+  }
+
+  function selectSuggestion(term) {
+    searchEl.value = term;
+    filters.search = term;
+    closeSuggestions();
+    applyFilters();
+  }
+
+  function highlightSuggestion() {
+    suggestBox.querySelectorAll(".jk-search-suggestion").forEach((li, i) => {
+      li.classList.toggle("jk-search-suggestion--active", i === activeSuggestion);
+    });
+    const active = suggestBox.querySelector(".jk-search-suggestion--active");
+    if (active) active.scrollIntoView({ block: "nearest" });
+  }
+
+  if (suggestBox && searchEl) {
+    suggestBox.addEventListener("click", e => {
+      const li = e.target.closest(".jk-search-suggestion");
+      if (li) selectSuggestion(currentSuggestions[+li.dataset.index]);
+    });
+
+    searchEl.addEventListener("keydown", e => {
+      if (suggestBox.hidden || !currentSuggestions.length) return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        activeSuggestion = (activeSuggestion + 1) % currentSuggestions.length; // wraparound
+        highlightSuggestion();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        activeSuggestion = (activeSuggestion - 1 + currentSuggestions.length) % currentSuggestions.length;
+        highlightSuggestion();
+      } else if (e.key === "Enter") {
+        if (activeSuggestion >= 0) {
+          e.preventDefault();
+          selectSuggestion(currentSuggestions[activeSuggestion]);
+        } else {
+          closeSuggestions();
+        }
+      } else if (e.key === "Escape") {
+        closeSuggestions();
+      }
+    });
+
+    searchEl.addEventListener("blur", () => {
+      // Delay so a click on a suggestion still registers before it's removed.
+      setTimeout(closeSuggestions, 150);
+    });
   }
 
   // Build checkbox groups — dataAttr is the card element's dataset key
@@ -475,11 +611,13 @@ function initMaterialsPage() {
   buildGroup("jk-filter-authors", allAuthors, filters.authors, id => (personById(id) && personById(id).name) || id, "authors");
   buildGroup("jk-filter-events",  allEvents,  filters.events,  id => (eventById(id) && eventById(id).title) || id, "event");
   buildGroup("jk-filter-tags",    allTags,    filters.tags,    t => t,                               "tags");
+  buildGroup("jk-filter-levels",  allLevels,  filters.levels,  l => levelName(l) || l,                "level");
 
   document.getElementById("jk-filter-reset")?.addEventListener("click", () => {
     filters.search = ""; filters.types.length = 0; filters.authors.length = 0;
-    filters.events.length = 0; filters.tags.length = 0;
+    filters.events.length = 0; filters.tags.length = 0; filters.levels.length = 0;
     if (searchEl) searchEl.value = "";
+    closeSuggestions();
     // Uncheck all boxes
     document.querySelectorAll(".jk-filter-options input[type=checkbox]")
       .forEach(cb => cb.checked = false);
@@ -497,6 +635,7 @@ function initMaterialsPage() {
       const authors = (el.dataset.authors || "").split(",").filter(Boolean);
       const event   = el.dataset.event   || "";
       const tags    = (el.dataset.tags   || "").split(",").filter(Boolean);
+      const level   = el.dataset.level   || "";
       const text    = (el.dataset.searchtext || el.textContent || "").toLowerCase();
 
       const ok =
@@ -504,7 +643,8 @@ function initMaterialsPage() {
         (!filters.types.length   || filters.types.includes(type))                  &&
         (!filters.authors.length || filters.authors.some(a => authors.includes(a))) &&
         (!filters.events.length  || filters.events.includes(event))                &&
-        (!filters.tags.length    || filters.tags.every(t => tags.includes(t)));
+        (!filters.tags.length    || filters.tags.every(t => tags.includes(t)))     &&
+        (!filters.levels.length  || filters.levels.includes(level));
 
       el.classList.toggle("jk-hidden", !ok);
       if (ok) visible++;
@@ -535,6 +675,7 @@ function initMaterialsPage() {
     filters.authors.slice().forEach(a => addChip(personById(a)?.name || a, () => filters.authors.splice(filters.authors.indexOf(a), 1)));
     filters.events.slice().forEach(e  => addChip(eventById(e)?.title || e,  () => filters.events.splice(filters.events.indexOf(e), 1)));
     filters.tags.slice().forEach(t    => addChip(`#${t}`,                   () => filters.tags.splice(filters.tags.indexOf(t), 1)));
+    filters.levels.slice().forEach(l  => addChip(levelName(l) || l,         () => filters.levels.splice(filters.levels.indexOf(l), 1)));
     if (filters.search) addChip(`"${filters.search}"`, () => { filters.search = ""; if (searchEl) searchEl.value = ""; });
     // Sync checkboxes to match chip removals
     syncCheckboxes();
@@ -546,7 +687,8 @@ function initMaterialsPage() {
       const id = container?.id;
       if (!id) return;
       const arr = { "jk-filter-types": filters.types, "jk-filter-authors": filters.authors,
-                    "jk-filter-events": filters.events, "jk-filter-tags": filters.tags }[id];
+                    "jk-filter-events": filters.events, "jk-filter-tags": filters.tags,
+                    "jk-filter-levels": filters.levels }[id];
       if (arr) cb.checked = arr.includes(cb.value);
     });
   }
@@ -558,6 +700,7 @@ function initMaterialsPage() {
     if (filters.authors.length) p.set("author", filters.authors.join(","));
     if (filters.events.length)  p.set("event",  filters.events.join(","));
     if (filters.tags.length)    p.set("tags",   filters.tags.join(","));
+    if (filters.levels.length)  p.set("level",  filters.levels.join(","));
     const qs = p.toString();
     history.replaceState(null, "", qs ? `?${qs}` : window.location.pathname);
   }
@@ -577,8 +720,9 @@ function initMaterialsPage() {
     try { return new Date(s).toLocaleDateString("en-GB",{year:"numeric",month:"long",day:"numeric"}); }
     catch { return s; }
   }
-  function typeIcon(t) { return {slides:"▤",video:"▶",document:"◻",notebook:"◈",code:"⌥"}[t]||"◆"; }
-  function typeName(t) { return {slides:"Slides",video:"Video",document:"Document",notebook:"Notebook",code:"Code"}[t]||(t||"Material"); }
+  function typeIcon(t) { return {slides:"▤",video:"▶",document:"◻",notebook:"◈",code:"⌥",tutorial:"▧"}[t]||"◆"; }
+  function typeName(t) { return {slides:"Slides",video:"Video",document:"Document",notebook:"Notebook",code:"Code",tutorial:"Tutorial"}[t]||(t||"Material"); }
+  function levelName(l) { return {intro:"Intro",practitioner:"Practitioner",advanced:"Advanced"}[l]||""; }
   function personTag(p) {
     return `<span class="jk-tag jk-tag--person" data-tag-type="person" data-person-id="${esc(p.id)}" tabindex="0" role="button">${esc(p.name)}</span>`;
   }
