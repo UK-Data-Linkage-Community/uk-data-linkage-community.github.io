@@ -62,6 +62,11 @@ plugins:
 
 collections_dir: collections
 
+collections:
+  tutorials:
+    output: true
+    permalink: /resources/tutorials/:path/
+
 include: ["_pages"]
 # Exclude from processing.
 # The following items will not be processed, by default.

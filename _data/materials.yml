@@ -1,3 +1,32 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# SITE MATERIALS
+# One entry per slide deck, recording, document, notebook or code sample.
+# (Full write-ups belong in collections/_tutorials/ instead — see that folder's
+# README for how those get added; they show up automatically alongside these.)
+#
+# Copy the TEMPLATE block below, fill it in, and add it to `items:`.
+# Only `id`, `title` and `type` are required — everything else is optional
+# but improves search/filtering, so fill in what you can.
+#
+# ── TEMPLATE ──────────────────────────────────────────────────────────────
+# - id: "unique-kebab-case-id"        # required, must be unique across all items
+#   title: "Title shown on the card"  # required
+#   type: "slides"                    # required — one of: slides | video | document | notebook | code
+#   event_id: "event-id-from-events.yml"   # optional — omit if not tied to an event
+#   authors:                          # optional — ids from _data/people.yml
+#     - "person-id"
+#   tags:                             # optional — free-text topic tags, lowercase-kebab-case
+#     - topic-tag
+#   audience_level: "practitioner"    # optional — one of: intro | practitioner | advanced
+#   thumbnail: ""                     # optional — path to a preview image, e.g. /assets/materials/thumbs/x.png
+#   src: "/assets/materials/slides/example.pdf"   # required for slides/video — path or URL to the file
+#   description: "One-sentence summary shown on the card itself."
+#   caption: >
+#     Longer description shown when the item is opened — what it covers,
+#     why it's useful, any context a reader needs.
+#   date: ""                          # optional — YYYY-MM-DD, defaults to event date if omitted
+# ─────────────────────────────────────────────────────────────────────────
+
 items:
   - id: "ukdlc-w1s1-mike-slides"
     title: "SeRP's current practices"
@@ -8,7 +37,9 @@ items:
     tags:
       - entity-resolution
       - probabilistic-matching
+    audience_level: "practitioner"
     src: "/assets/materials/slides/UKDLC_W1S1_SeRP.pdf"
+    description: "How SeRP approaches data linkage in production, from scoping through to operationalised workflows."
     caption: >
       Mike Edwards's slides on the current practices within SERP on data linkage.
 
@@ -21,10 +52,11 @@ items:
     tags:
       - entity-resolution
       - probabilistic-matching
+    audience_level: "practitioner"
     src: "/assets/materials/videos/mike_W1S1.mp4"
+    description: "How SeRP approaches data linkage in production, from scoping through to operationalised workflows."
     caption: >
       Mike Edwards presents the current practices within SERP on data linkage.
-            
 
   - id: "ukdlc-w1s1-josie-slides"
     title: "Data Linkage at the ONS"
@@ -35,7 +67,9 @@ items:
     tags:
       - entity-resolution
       - probabilistic-matching
+    audience_level: "practitioner"
     src: "/assets/materials/slides/UKDLC_W1S1_ONS.pdf"
+    description: "Bespoke linkage methods and methodology development within the ONS."
     caption: >
       Josie's slides on data linkage practices at the ONS.
 
@@ -48,10 +82,15 @@ items:
     tags:
       - entity-resolution
       - probabilistic-matching
+    audience_level: "practitioner"
     src: "/assets/materials/videos/josie_W1S1.mp4"
+    description: "Bespoke linkage methods and methodology development within the ONS."
     caption: >
       Josie presents on data linkage practices at the ONS.
 
+  # NOTE: author id "andy" has no matching entry in _data/people.yml yet, so
+  # his name/photo/bio won't resolve on these two cards until one is added
+  # (see the template at the bottom of people.yml).
   - id: "ukdlc-w1s1-andy-slides"
     title: "Data Linkage at the MoJ"
     event_id: "ukdlc-workshop-1-data-linkers"
@@ -61,7 +100,9 @@ items:
     tags:
       - entity-resolution
       - probabilistic-matching
+    audience_level: "practitioner"
     src: "/assets/materials/slides/UKDLC_W1S1_MoJ.pdf"
+    description: "Linkage practices within the Ministry of Justice's Data First initiative."
     caption: >
       Andy's slides on data linkage practices at the MoJ.
 
@@ -74,6 +115,8 @@ items:
     tags:
       - entity-resolution
       - probabilistic-matching
+    audience_level: "practitioner"
     src: "/assets/materials/videos/andy_W1S1.mp4"
+    description: "Linkage practices within the Ministry of Justice's Data First initiative."
     caption: >
       Andy presents on data linkage practices at the MoJ.

@@ -1,0 +1,54 @@
+---
+layout: default
+---
+
+{% comment %}
+  TUTORIAL LAYOUT
+  ================
+  Used by collections/_tutorials/*.md (front matter: layout: tutorial).
+  Renders the same type/level badges and tag/author chips as a material
+  card, so a tutorial page reads consistently with the rest of the site —
+  then the tutorial's own markdown content below.
+{% endcomment %}
+
+<article class="page jk-tutorial">
+  <header class="jk-tutorial__header">
+    <div class="jk-card__meta-row">
+      <span class="jk-card__type-badge jk-card--type-tutorial jk-tutorial__badge">▧ Tutorial</span>
+      {% if page.audience_level %}
+        <span class="jk-card__level-badge jk-card--level-{{ page.audience_level }} jk-tutorial__badge">{{ page.audience_level | capitalize }}</span>
+      {% endif %}
+    </div>
+
+    <h1>{{ page.title }}</h1>
+
+    {% if page.description %}
+      <p class="jk-tutorial__intro">{{ page.description }}</p>
+    {% endif %}
+
+    {% if page.tags %}
+      <div class="jk-card__meta-row">
+        {% for tag in page.tags %}
+          <span class="jk-tag jk-tag--topic" data-tag-type="topic" data-tag-value="{{ tag }}" tabindex="0" role="button">{{ tag }}</span>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if page.authors %}
+      <div class="jk-card__meta-row jk-tutorial__authors">
+        {% for author_id in page.authors %}
+          {% assign person = site.data.people | where: "id", author_id | first %}
+          {% if person %}{% include cards/person-card.html person=person display="button" %}{% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </header>
+
+  <div class="content jk-tutorial__content">
+    {{ content }}
+  </div>
+
+  <div class="jk-modal__actions jk-tutorial__footer-actions">
+    <a class="jk-btn jk-btn--secondary" href="/resources/materials/">← Back to all materials</a>
+  </div>
+</article>

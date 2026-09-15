@@ -30,4 +30,6 @@ main:
         url: /related-groups/
       - title: "Site Materials"
         url: /resources/materials/
+#      - title: "Tutorials"
+#        url: /resources/materials/?type=tutorial
 
