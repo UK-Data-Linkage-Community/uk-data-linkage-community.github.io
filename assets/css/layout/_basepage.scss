@@ -1,0 +1,42 @@
+/* ==========================================================================
+   General Page Content
+   ========================================================================== */
+
+.page__content,
+.page-content,
+main,
+.main-content,
+#main {
+  max-width: $max-content-width !important;
+  width: 100% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+
+  @media (min-width: $bp-wide) {
+    max-width: 1800px !important;
+    padding: 40px 10px !important;
+  }
+
+  @media (max-width: $bp-desktop) {
+    padding: 40px 30px !important;
+  }
+
+  @media (max-width: $bp-tablet) {
+    padding: 20px 25px !important;
+  }
+}
+
+.page__inner-wrap,
+.archive,
+.layout--single {
+  max-width: $max-content-width !important;
+  width: 100% !important;
+  margin: 0 auto !important;
+}
+
+.page__content p,
+.page-content p {
+  max-width: none;
+  line-height: 1.7;
+  margin-bottom: 1.2rem;
+}

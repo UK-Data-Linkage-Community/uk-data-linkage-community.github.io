@@ -66,6 +66,10 @@ collections:
   tutorials:
     output: true
     permalink: /resources/tutorials/:path/
+  materials:
+    output: false
+    sort_by: date
+
 
 include: ["_pages"]
 # Exclude from processing.

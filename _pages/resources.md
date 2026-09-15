@@ -22,9 +22,6 @@ Overarching themes for materials to be produced include:
 
 If you have suggestions for materials that you would like to see, please submit a request [through github]({{ site.ukdlc_github_discussions }}) or by [email](mailto:{{ site.contact_email }}?subject=UK DLC: Suggestion for materials).
 
-<hr style="border-top: 1px solid {{ site.ukdlc_color_grey }};"> 
+<hr style="border-top: 1px solid #cccccc;"> 
 
-## Useful links
-We also collate a list of [useful links][useful-links] around data linkage which may be of interest.
-
-[useful-links]: {{ site.baseurl }}{% link _pages/useful_links.md %}
+We also collate a list of [useful links](useful-links.html) around data linkage which may be of interest.

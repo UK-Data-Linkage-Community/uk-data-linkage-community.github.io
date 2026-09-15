@@ -1,0 +1,122 @@
+.nav-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  @extend %nav-link-base;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+
+  &:hover {
+    color: #111;
+  }
+}
+
+.dropdown-arrow {
+  font-size: 0.8em;
+  transition: transform 0.2s ease;
+}
+
+// Dropdown menu
+.dropdown-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #fff;
+  min-width: 200px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  z-index: 1002;
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+
+  a {
+    display: block;
+    padding: 12px 20px;
+    color: var(--color-grey);
+    text-decoration: none;
+    font-weight: 400;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background: #f5f5f5;
+      color: #111;
+    }
+  }
+}
+
+// Show dropdown on hover
+.nav-dropdown:hover {
+  .dropdown-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .dropdown-arrow {
+    transform: rotate(180deg);
+  }
+}
+
+// Hide checkbox (used for mobile toggle)
+.nav-trigger {
+  display: none;
+}
+
+.menu-icon {
+  display: none;
+  cursor: pointer;
+  z-index: 1003;
+  padding: 10px;
+
+  span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background: var(--color-grey);
+    margin: 5px 0;
+    transition: 0.3s;
+    border-radius: 2px;
+  }
+}
+
+@media (max-width: 1060px) {
+  .menu-icon {
+    display: block;
+  }
+    .dropdown-content {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    margin-top: 0;
+    padding-left: 15px;
+  }
+
+  .nav-dropdown {
+    display: block;
+    width: 100%;
+  }
+
+  .dropdown-toggle {
+    pointer-events: none; // optional: prevents click-to-toggle behavior
+  }
+
+  .dropdown-arrow {
+    display: none;
+  }
+}

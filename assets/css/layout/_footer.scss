@@ -1,0 +1,12 @@
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.flex-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-content: flex-end;
+  flex-grow: 1;
+  background: #fff;
+}

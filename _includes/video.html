@@ -1,0 +1,20 @@
+<video
+  class="video__file"
+  controls
+  preload="metadata"
+  playsinline
+>
+
+  <source
+    src="{{ include.webm | relative_url }}"
+    type="video/webm"
+  >
+
+  <source
+    src="{{ include.mp4 | relative_url }}"
+    type="video/mp4"
+  >
+
+  Your browser does not support HTML5 video.
+
+</video>

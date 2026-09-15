@@ -11,11 +11,11 @@ permalink: /resources/useful-links
     To add to this list, please submit <a href="mailto:{{ site.contact_email }}?subject=UK DLC: Useful links">via email</a> or through the <a href="{{ site.ukdlc_github_discussions }}">GitHub discussions</a></p>
   </div>
 
-  {% for category in site.data.links.categories %}
+  {% for category in site.data.useful_links.categories %}
   <div class="link-category">
     <h2 class="category-title">{{ category.name }}</h2>
     <p class="category-description">{{ category.description }}</p>
-    
+
     <div class="links-grid">
       {% for link in category.links %}
       <a href="{{ link.url }}" class="link-card" target="_blank" rel="noopener noreferrer">
