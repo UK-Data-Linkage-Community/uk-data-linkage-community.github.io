@@ -1,8 +1,12 @@
 ---
 layout: page
-title: Resources
+title:
 permalink: /resources/
 ---
+
+<div class="jk-resources-intro" markdown="1">
+
+# Resources
 
 One of the key targets of the community is to provide a range of publicly accessible and persistent materials related to data linkage, driven by community requirements.
 
@@ -22,6 +26,16 @@ Overarching themes for materials to be produced include:
 
 If you have suggestions for materials that you would like to see, please submit a request [through github]({{ site.ukdlc_github_discussions }}) or by [email](mailto:{{ site.contact_email }}?subject=UK DLC: Suggestion for materials).
 
-<hr style="border-top: 1px solid #cccccc;"> 
-
 We also collate a list of [useful links](useful-links.html) around data linkage which may be of interest.
+
+</div>
+
+<style>
+.jk-resources-intro {
+  max-width: 700px;
+}
+</style>
+
+<hr style="border-top: 1px solid #cccccc;">
+
+{% include materials_finder.html heading_level="h2" %}
