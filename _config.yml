@@ -70,6 +70,9 @@ collections:
     output: false
     sort_by: date
 
+sass:
+  sass_dir: assets/css
+
 
 include: ["_pages"]
 # Exclude from processing.
