@@ -2,7 +2,10 @@
 layout: page
 title:
 permalink: /resources/
+classes: wide
 ---
+
+<div class="jk-resources-page">
 
 <div class="jk-resources-intro" markdown="1">
 
@@ -30,12 +33,30 @@ We also collate a list of [useful links](useful-links.html) around data linkage 
 
 </div>
 
-<style>
-.jk-resources-intro {
-  max-width: 700px;
-}
-</style>
-
 <hr style="border-top: 1px solid #cccccc;">
 
 {% include materials_finder.html heading_level="h2" %}
+
+</div>
+
+<style>
+.jk-resources-page {
+  padding: 0 max(24px, 4vw);
+  box-sizing: border-box;
+}
+
+.jk-resources-intro {
+  max-width: 1200px;
+  margin: 32px auto 40px;
+  padding: 28px 32px;
+  background: var(--jk-surface);
+  border: 1px solid var(--jk-border);
+  border-left: 4px solid #30CABF;
+  border-radius: var(--jk-radius-lg);
+  box-shadow: var(--jk-shadow-sm);
+}
+
+.jk-resources-intro h1 {
+  margin-top: 0;
+}
+</style>
