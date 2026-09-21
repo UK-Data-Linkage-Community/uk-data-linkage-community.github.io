@@ -27,6 +27,10 @@
   transition: transform 0.2s ease;
 }
 
+.graph-toggle.open .graph-chevron {
+  transform: rotate(180deg);
+}
+
 
 .graph-body {
   display: none;
@@ -81,10 +85,13 @@
     svg {opacity:.4;}
 }
 
+// No margin-top here — it dates from before the legend moved to the top
+// of this container (see the legend comment further down), and on top
+// of .graph-body's own 0.75rem padding it left a large empty gap above
+// the legend. .graph-body's padding is spacing enough.
 #concept-graph-container {
   display: none;
   position: relative;
-  margin-top: 1.2rem;
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -117,10 +124,15 @@
 
 .def-link:hover { color: #1f5fcc; }
 
+// Anchored to the container's bottom edge, not its top — the legend
+// (a sibling earlier in the same flex column) varies in height as it
+// wraps onto one or two lines, and a top offset tuned for one wrap
+// count collided with the other. The bottom-right corner of the
+// canvas is clear regardless of how tall the legend gets.
 .graph-controls {
   position: absolute;
-  top: 1.75rem;
-  right: 0.55rem;
+  bottom: 0.55rem;
+  left: 0.55rem;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
@@ -151,32 +163,55 @@
   color: #222;
 }
 
+// Grid, not flex-wrap: a flex row wraps items at whatever width each
+// icon happens to be. Four columns here (room for one row on the wider
+// rail); the mobile override below drops to two. Each item is its own
+// nested grid — label first, icon trailing at a fixed width — so every
+// label starts flush left regardless of its icon's own width, and the
+// (aria-hidden, purely decorative) icon doesn't need to line up with
+// the others itself.
 .graph-legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem 0.9rem;
-  margin: 0.35rem 0 0.4rem;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  // Grid items stretch to fill their column by default — with room
+  // spare in the rail, that stretched each item's box (and its own
+  // "auto" label column in turn) out to the column's full width,
+  // shoving the icon off to the right instead of hugging the label.
+  // This makes every item hug its own content instead.
+  justify-items: start;
+  column-gap: 0.9rem;
+  row-gap: 0.3rem;
+  margin: 0 0 0.4rem;
   font-size: 0.7rem;
   color: #666;
 }
 
-.legend-icon { transform: scale(0.85); transform-origin: left center; }
-
 .legend-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 44px;
   align-items: center;
   gap: 0.3rem;
+  text-align: left;
 }
 
-.legend-item::before {
-  content: "";
-  display: inline-block;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  box-sizing: border-box;
+.legend-label {
+  white-space: nowrap;
 }
+
+.legend-icon {
+  width: 44px;
+  height: 18px;
+  justify-self: start;
+}
+
+// No ::before shape here — these swatches draw their own inline <svg>
+// icons in the markup instead. This rule used to generate an invisible
+// spare pseudo-element anyway (background: none, below) that, now the
+// item is a grid row, would've counted as an extra grid cell and pushed
+// everything out of its column mapping. .rel-label::before (the pills
+// in the concept detail) sets its own content independently, so
+// removing this doesn't touch those.
+
 
 // =============================================================================
 // RELATION TYPES — single source of truth for the shape/line-style used to
@@ -468,11 +503,43 @@ $rel-ink: #334155;
     display: block;
   }
 
+  // Not enough width for one row of four here — back to two, and
+  // back to the smaller icon size (the wide-mode bump above is too
+  // big for this narrower column).
+  .graph-legend {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .legend-item {
+    grid-template-columns: auto 32px;
+  }
+
+  .legend-icon {
+    width: 32px;
+    height: 24px;
+  }
+
+  // Was display:flex + border-radius only — no background, border,
+  // padding or text styling, so the button rendered as bare unstyled
+  // text. Matches .graph-body's card look below so the two read as one
+  // connected dropdown control.
   .graph-toggle {
     display: flex;
+    align-items: center;
     width: 100%;
     justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: #fff;
+    border: 1px solid #e6e6e6;
     border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .graph-toggle.open {
+    border-radius: 6px 6px 0 0;
+    border-bottom: none;
   }
 
   .graph-body {
@@ -480,6 +547,9 @@ $rel-ink: #334155;
     height: auto;
     overflow: visible;
     padding-bottom: 1rem;
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    border-top: none;
     border-radius: 0 0 6px 6px;
     box-shadow: none;
   }
@@ -494,5 +564,19 @@ $rel-ink: #334155;
   }
 
   .graph-empty-state { flex: none; height: 240px; }
+
+  // Smaller canvas, smaller controls — full-size buttons crowded the
+  // bottom-right corner and sat too close to the canvas edge here.
+  .graph-controls {
+    bottom: 0.4rem;
+    left: 0.4rem;
+    gap: 0.25rem;
+  }
+
+  .graph-ctrl-btn {
+    width: 24px;
+    height: 24px;
+    font-size: 0.85rem;
+  }
 
 }

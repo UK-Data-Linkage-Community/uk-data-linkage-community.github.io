@@ -1,51 +1,88 @@
 // =============================================================================
-// ANALOGY  (expandable pill, or always-inline per display preference)
+// ANALOGY  (expandable box, or always-inline per display preference)
 // =============================================================================
+
+// Collapsed: a small standalone tab. Open: the wrapper becomes the box
+// itself, so nothing needs to size against the analogy text separately.
+.analogy-block {
+  display: block;
+  margin: 0.3rem 0 0.15rem;
+}
+
 .analogy-pill {
-  display: inline-block;
-  margin: 0.3rem 0.4rem 0 0;
-  padding: 0.18rem 0.55rem;
-  border-radius: 999px;
-  border: 1px solid #e07b39;
-  background: #fdf1e7;
-  color: #b45309;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid var(--color-teal-light);
+  background: var(--color-teal-light);
+  color: var(--color-teal-dark);
   font-size: 0.72rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-radius 0.2s ease, padding 0.2s ease;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
 
-.analogy-pill:hover,
-.analogy-pill.open {
-  background: #e07b39;
-  color: #fff;
+.analogy-pill:hover {
+  border-color: var(--color-teal);
 }
 
-.analogy-pill.open {
-  border-radius: 8px;
-  padding: 0.55rem 0.22rem;
-  writing-mode: vertical-lr;
-  text-orientation: sideways;
+// The mouse-click focus ring otherwise lingers on the button until
+// something else is clicked. Keyboard users still get a ring via
+// :focus-visible.
+.analogy-pill:focus {
+  outline: none;
+}
+
+.analogy-pill:focus-visible {
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
+}
+
+.analogy-pill-caret {
+  font-size: 0.7em;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+// Open pill (click-to-toggle "pill" display mode) and the static label
+// (always-on "expanded" display mode) share the same title-bar look —
+// one box, the only difference being whether it's clickable.
+.analogy-block.open .analogy-pill,
+.analogy-label {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--color-teal);
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  background: var(--color-teal-light);
+  color: var(--color-teal-dark);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.analogy-block.open .analogy-pill-caret {
+  transform: rotate(180deg);
 }
 
 .analogy-text {
   display: block;
-  flex: 1 0 100%;
-  margin: 0.5rem 0 0.15rem;
-  padding: 0.6rem 0.8rem;
-  background: #fdf1e7;
-  border-left: 3px solid #e07b39;
-  border-radius: 0 4px 4px 0;
+  margin: 0;
+  padding: 0.55rem 0.7rem;
+  background: var(--color-teal-light);
+  border: 1px solid var(--color-teal);
+  border-top: none;
+  border-radius: 0 0 4px 4px;
   font-size: 0.85rem;
   color: #444;
   line-height: 1.45;
-  max-width: 60ch;
-}
-
-// When shown inline (display preference), no click needed, so drop the
-// pointer/hover cues that imply interactivity
-.analogy-text--inline {
-  margin-top: 0.4rem;
 }
 
 .analogy-display-options {
@@ -71,7 +108,7 @@
 }
 
 .analogy-display-btn.active {
-  border-color: #e07b39;
-  background: #fdf1e7;
-  color: #b45309;
+  border-color: var(--color-teal);
+  background: var(--color-teal-light);
+  color: var(--color-teal-dark);
 }

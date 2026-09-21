@@ -408,16 +408,16 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // Analogy pill expand/collapse (delegated — pills are re-rendered often)
+  // Analogy box expand/collapse (delegated — blocks are re-rendered often)
   document.addEventListener("click", e => {
     const pill = e.target.closest(".analogy-pill");
     if (!pill) return;
-    const id   = pill.dataset.analogyFor;
-    const text = document.getElementById(`analogy-${id}`);
-    if (!text) return;
-    const isOpen = text.style.display !== "none";
+    const block = pill.closest(".analogy-block");
+    const text  = block?.querySelector(".analogy-text");
+    if (!block || !text) return;
+    const isOpen = block.classList.contains("open");
+    block.classList.toggle("open", !isOpen);
     text.style.display = isOpen ? "none" : "block";
-    pill.classList.toggle("open", !isOpen);
   });
 
   function initGlossary() {
