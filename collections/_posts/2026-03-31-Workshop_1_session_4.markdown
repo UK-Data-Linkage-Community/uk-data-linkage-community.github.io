@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "UK DLC Workshop 1 Session 4 - Reviewing Linkage Quality"
-date:   2026-03-02 12:00:00 +0000
+date:   2026-03-31 14:45:00 +0100
 event_id: "ukdlc-workshop-1-data-linkers"
 ---
 
