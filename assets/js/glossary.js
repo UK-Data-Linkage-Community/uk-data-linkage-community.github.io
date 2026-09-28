@@ -1,5 +1,6 @@
 import { data, state, initState, conceptMap, allTerms, renderDefinitionBlock } from "./state.js";
-import { initPopovers, viewSettingsPopover, filterPopover, initAkaPopover } from "./popovers.js";import { initSidebar } from "./sidebar.js";
+import { initPopovers, viewSettingsPopover, filterPopover, initAkaPopover } from "./popovers.js";
+import { initSidebar } from "./sidebar.js";
 import { initPipelinePanel, clearPipelineActive } from "./pipeline-panel.js";
 import { initGraphSection, homeGraphSection, mountGraphSectionInto, focusGraph } from "./graph.js";
 
@@ -339,13 +340,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const isOpen = text.style.display !== "none";
     text.style.display = isOpen ? "none" : "block";
     pill.classList.toggle("open", !isOpen);
-  });
-
-  document.addEventListener("click", e => {
-    const toggle = e.target.closest(".aka-toggle");
-    if (!toggle) return;
-    const container = toggle.closest(".also-known-as");
-    container.classList.toggle("aka-expanded");
   });
 
   function initGlossary() {

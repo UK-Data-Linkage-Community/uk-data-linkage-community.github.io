@@ -51,8 +51,6 @@ export function initPopovers() {
     document.getElementById("view-settings-close")
   );
 
-
-
   filterPopover = makePopover(
     document.getElementById("filter-toggle"),
     document.getElementById("filter-popover"),
