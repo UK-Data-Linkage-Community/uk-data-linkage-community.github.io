@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "UK DLC Workshop 1 Session 3 - Presenting Linkage to End Users & Stakeholders"
-date:   2026-03-02 12:00:00 +0000
+date:   2026-03-31 13:30:00 +0100
 event_id: "ukdlc-workshop-1-data-linkers"
 ---
 
