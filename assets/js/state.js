@@ -50,7 +50,7 @@ function buildLabelIndex() {
 }
 
 function buildSearchIndex() {
-  Object.values(conceptMap).forEach(c => {
+  data.skos.concepts.forEach(c => {
     allTerms.push({ term: c.prefLabel, id: c.id });
     (c.altLabel || []).forEach(alt => allTerms.push({ term: alt, id: c.id }));
   });
