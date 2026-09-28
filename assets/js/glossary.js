@@ -31,10 +31,14 @@ document.addEventListener("DOMContentLoaded", function () {
     mountGraphSectionInto(document.getElementById("graph-panel-body"));
   }
 
+  // Distance from the top of the document to the dashboard, i.e. header
+  // plus page padding. Only takes effect where CSS doesn't pin its own
+  // value (glossary.html pins 56px on body.layout--glossary; glossary-2
+  // keeps the standard header, whose height varies with the logo/nav).
   function syncDashboardOffset() {
-    const header = document.querySelector("header"); // swap for your real site header selector
-    const h = header ? header.getBoundingClientRect().height : 0;
-    document.documentElement.style.setProperty("--dashboard-offset", `${h}px`);
+    const page = document.querySelector(".glossary-page");
+    const top = page ? page.getBoundingClientRect().top + window.scrollY : 0;
+    document.documentElement.style.setProperty("--dashboard-offset", `${top}px`);
   }
 
   syncDashboardOffset();
@@ -218,17 +222,21 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     onStepDeselect: showEmptyDetail,
   });
-  initPanelTabs();
+  const panelTabs = initPanelTabs();
 
   // If a concept is on screen when the desktop/mobile breakpoint is
   // crossed, re-render it so the graph gets re-mounted into the right
-  // place (the rail's Graph tab vs. inline under the definition).
+  // place (the rail's Graph tab vs. inline under the definition). With
+  // nothing selected, the graph still needs moving back into the rail on
+  // desktop. Then reset the graph to that layout's default open/closed.
   const bpStackQuery = window.matchMedia(
     `(max-width: ${getComputedStyle(document.querySelector(".glossary-page"))
       .getPropertyValue("--bp-stack").trim() || "1200px"})`
   );
-  bpStackQuery.addEventListener("change", () => {
+  bpStackQuery.addEventListener("change", e => {
     if (state.activeConceptId) renderConceptDetail(state.activeConceptId);
+    else if (!e.matches) mountGraphSectionInto(document.getElementById("graph-panel-body"));
+    panelTabs.applyDefaultTab();
   });
 
   // --- Search ---------------------------------------------------------

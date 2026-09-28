@@ -27,8 +27,10 @@ body.layout--glossary {
 // on a normal article page, oversized on a dashboard that wants to sit
 // flush under a thin header. Desktop only, to match the thinner desktop
 // header in _header.scss; mobile/tablet keeps the theme's normal gap.
+// glossary-2's --dashboard-offset is measured in glossary.js instead.
 @media (min-width: $bp-nav + 1) {
-  body.layout--glossary .page-content {
+  body.layout--glossary .page-content,
+  body.layout--glossary-2 .page-content {
     padding-top: 8px !important;
   }
 }
@@ -150,8 +152,9 @@ body.layout--glossary {
 // with .glossary-main's (which has no tab beside it and isn't pushed
 // down) — margin-top alone would push the bottom edge down too and
 // overflow the grid row. 48px matches the tab's overhang below the bar.
+// Not applied to glossary-2, which keeps the standard header (no tab).
 @media (min-width: $bp-nav + 1) {
-  .glossary-sidebar {
+  body.layout--glossary .glossary-sidebar {
     margin-top: 48px;
     height: calc(100% - 48px);
   }

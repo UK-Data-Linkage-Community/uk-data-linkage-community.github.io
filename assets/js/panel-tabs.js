@@ -43,9 +43,28 @@ export function initPanelTabs() {
     }
   }
 
+  // Per-layout default: desktop shows the Graph tab (a collapsed rail
+  // leaves the detail panel mostly empty space), mobile keeps the inline
+  // graph closed so it only takes up its toggle's height. Re-run when the
+  // breakpoint is crossed.
+  function applyDefaultTab() {
+    if (isEmbedded()) {
+      graphToggle.classList.remove("open");
+      return;
+    }
+    if (!panel.classList.contains("open")) {
+      openTab("graph");
+    } else if (panel.dataset.activeTab === "graph" && !graphToggle.classList.contains("open")) {
+      graphToggle.click();
+    }
+  }
+
   tabButtons.forEach(btn => {
     btn.addEventListener("click", () => openTab(btn.dataset.tab));
   });
 
   setActiveTab("pipeline");
+  applyDefaultTab();
+
+  return { applyDefaultTab };
 }

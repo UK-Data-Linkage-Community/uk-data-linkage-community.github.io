@@ -272,8 +272,13 @@ $rel-ink: #334155;
   overflow-x: hidden;
 }
 
-.concept-detail-body {
-  min-height: 300px; // tune so the graph's top edge lands at a consistent y — raise/lower to taste
+// Desktop only: on mobile the graph sits inline right under this block,
+// closed by default, so reserving height here just left a gap above its
+// toggle.
+@media (min-width: $bp-nav + 1) {
+  .concept-detail-body {
+    min-height: 300px; // tune so the graph's top edge lands at a consistent y — raise/lower to taste
+  }
 }
 
 // This clearance was scoped to .concept-detail-body (the single-concept
