@@ -896,13 +896,18 @@
   display: grid;
   grid-template-columns: 260px 1fr;
   gap: 28px;
-  align-items: start;
   max-width: 1200px;
   margin: 0 auto;
+  background: var(--jk-bg);
+  border: 1px solid var(--jk-border);
+  border-radius: var(--jk-radius-lg);
+  box-shadow: var(--jk-shadow);
+  padding: 24px;
 }
 @media (max-width: 768px) {
   .jk-materials-page { grid-template-columns: 1fr; }
 }
+
 
 /* Filter panel */
 .jk-filter-panel {
@@ -910,8 +915,6 @@
   border: 1px solid var(--jk-border);
   border-radius: var(--jk-radius-lg);
   padding: 18px;
-  position: sticky;
-  top: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1178,4 +1181,88 @@
 
 .jk-filter-group {
   gap: 4px;
+}
+/* ── Sticky search/filter toolbar ─────────────────────────────────────
+   Replaces the old "whole sidebar sticky" approach: only this toolbar
+   sticks (title, result count, active chips, search box), sized to
+   roughly two card-row heights via --jk-sticky-toolbar-height (set by
+   cards.js from the real rendered card height) so it reads as part of
+   the grid's own rhythm rather than a thin floating strip. Offset from
+   the top by --jk-header-height (also set by cards.js) so it never
+   sits underneath the site's own sticky header. */
+.jk-filter-sticky {
+  position: sticky;
+  top: calc(var(--jk-header-height, 70px) + 12px);
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  min-height: var(--jk-sticky-toolbar-height, 220px);
+  background: var(--jk-surface);
+  margin: -18px -18px 12px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--jk-border);
+}
+
+/* "More Filters" toggle: invisible passthrough on desktop (all 5 dropdowns
+   show normally, ungrouped), a real collapsing toggle on mobile. */
+.jk-filter-more__toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .jk-filter-more__toggle {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 10px;
+    background: var(--jk-surface-hover);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-sm);
+    font-size: 0.83rem;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--jk-text);
+  }
+
+  .jk-filter-more__groups {
+    display: none;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .jk-filter-more__groups--open {
+    display: flex;
+  }
+
+  .jk-materials-page {
+    padding: 12px;
+  }
+
+  /* Compact the cards themselves */
+  .jk-card-grid {
+    gap: 8px;
+  }
+  .jk-card__hero {
+    height: 90px;
+  }
+  .jk-card__body {
+    padding: 8px 10px 10px;
+    gap: 4px;
+  }
+  .jk-card__title {
+    font-size: 0.88rem;
+    line-height: 1.25;
+  }
+  .jk-card__desc {
+    font-size: 0.78rem;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+  .jk-card__meta-row {
+    gap: 3px;
+  }
 }

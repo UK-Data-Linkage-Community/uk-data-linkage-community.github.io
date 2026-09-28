@@ -15,6 +15,17 @@
 
   const MATERIALS_PAGE = "/resources/materials/";
 
+  // Keep --jk-header-height in sync with the real sticky header height, so
+  // the sticky search bar on mobile sits just below it rather than under it.
+  function syncHeaderOffset() {
+    var header = document.querySelector(".site-header");
+    if (header) {
+      document.documentElement.style.setProperty("--jk-header-height", header.getBoundingClientRect().height + "px");
+    }
+  }
+  syncHeaderOffset();
+  window.addEventListener("resize", syncHeaderOffset);
+
   // ── 2. MODAL ─────────────────────────────────────────────────────────────
   const modalOverlay = document.getElementById("jk-modal");
   const modalContent = document.getElementById("jk-modal-content");
@@ -612,6 +623,12 @@ function initMaterialsPage() {
   buildGroup("jk-filter-events",  allEvents,  filters.events,  id => (eventById(id) && eventById(id).title) || id, "event");
   buildGroup("jk-filter-tags",    allTags,    filters.tags,    t => t,                               "tags");
   buildGroup("jk-filter-levels",  allLevels,  filters.levels,  l => levelName(l) || l,                "level");
+
+  document.getElementById("jk-filter-more-toggle")?.addEventListener("click", function () {
+    const groups = document.getElementById("jk-filter-more-groups");
+    const open = groups.classList.toggle("jk-filter-more__groups--open");
+    this.setAttribute("aria-expanded", open);
+  });
 
   document.getElementById("jk-filter-reset")?.addEventListener("click", () => {
     filters.search = ""; filters.types.length = 0; filters.authors.length = 0;

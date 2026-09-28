@@ -1020,8 +1020,6 @@ article.page:has(.jk-materials-page-wrap) .content {
   border: 1px solid var(--jk-border);
   border-radius: var(--jk-radius-lg);
   padding: 18px;
-  position: sticky;
-  top: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1042,7 +1040,8 @@ article.page:has(.jk-materials-page-wrap) .content {
   padding-bottom: 14px;
   border-bottom: 1px solid var(--jk-border);
 }
-.jk-filter-panel__page-title h1 {
+.jk-filter-panel__page-title h1,
+.jk-filter-panel__page-title h2 {
   font-size: 1.15rem;
   font-weight: 700;
   line-height: 1.25;
@@ -1344,6 +1343,141 @@ article.page:has(.jk-materials-page-wrap) .content {
 
 .jk-filter-group {
   gap: 4px;
+}
+
+/* ── Dashboard layout ─────────────────────────────────────────────────────
+   Desktop: filter panel locks below the site header (--jk-header-height is
+   set by cards.js) and fills the rest of the viewport; filter groups scroll
+   inside it. Mobile: a compact bar pinned above the cards. */
+.jk-filter-panel {
+  position: sticky;
+  top: calc(var(--jk-header-height, 70px) + 12px);
+  height: calc(100vh - var(--jk-header-height, 70px) - 24px);
+  height: calc(100dvh - var(--jk-header-height, 70px) - 24px);
+  z-index: 20;
+  box-sizing: border-box;
+}
+.jk-filter-panel > :not(.jk-filter-more__groups) {
+  flex-shrink: 0;
+}
+.jk-filter-panel__page-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+.jk-filter-panel__page-title h1,
+.jk-filter-panel__page-title h2 {
+  margin: 0;
+}
+.jk-filter-group--search {
+  position: relative;
+}
+.jk-filter-group--dropdown > summary {
+  cursor: pointer;
+}
+.jk-filter-more__groups {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--jk-border);
+}
+.jk-filter-more__groups .jk-filter-reset {
+  margin-top: auto;
+  padding-top: 8px;
+}
+.jk-filter-more__toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .jk-materials-page {
+    gap: 12px;
+  }
+  .jk-filter-panel {
+    top: var(--jk-header-height, 70px);
+    height: auto;
+    padding: 10px 12px;
+    gap: 8px;
+    box-shadow: 0 8px 14px -8px rgba(0, 0, 0, 0.25);
+  }
+  .jk-filter-panel__page-title {
+    padding-bottom: 6px;
+  }
+  .jk-filter-panel__page-title h1,
+  .jk-filter-panel__page-title h2 {
+    font-size: 1rem;
+  }
+  .jk-filter-bar {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+  .jk-filter-bar .jk-filter-group--search {
+    flex: 1;
+    min-width: 0;
+  }
+  .jk-filter-group--search .jk-filter-group__label {
+    display: none;
+  }
+  .jk-filter-more__toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+    background: var(--jk-bg);
+    border: 1px solid var(--jk-border);
+    border-radius: var(--jk-radius-sm);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--jk-text);
+    cursor: pointer;
+  }
+  .jk-filter-more__toggle::after {
+    content: "▾";
+    transition: transform 0.15s;
+  }
+  .jk-filter-more__toggle[aria-expanded="true"] {
+    background: var(--jk-accent-light);
+    border-color: var(--jk-accent);
+    color: var(--jk-accent-hover);
+  }
+  .jk-filter-more__toggle[aria-expanded="true"]::after {
+    transform: rotate(180deg);
+  }
+  .jk-active-filters {
+    min-height: 0;
+  }
+  .jk-active-filters:empty {
+    display: none;
+  }
+  .jk-filter-more__groups {
+    display: none;
+    max-height: 50vh;
+  }
+  .jk-filter-more__groups--open {
+    display: flex;
+  }
+
+  /* Condensed cards */
+  .jk-card-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+  .jk-card--full {
+    height: 270px;
+  }
+  .jk-card__hero {
+    height: 95px;
+  }
+  .jk-card__body {
+    padding: 8px 10px 10px;
+    gap: 4px;
+  }
 }
 
 /* --------------------------------------------------------------------------

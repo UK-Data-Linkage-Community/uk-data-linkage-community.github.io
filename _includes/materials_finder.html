@@ -23,87 +23,68 @@
 
     <!-- ═══ FILTER PANEL ═══════════════════════════════════════════════ -->
     <aside class="jk-filter-panel" aria-label="Filter materials">
+
       <div class="jk-filter-panel__page-title">
         {% assign heading_tag = include.heading_level | default: "h1" %}
         <{{ heading_tag }}>Site Materials</{{ heading_tag }}>
-      </div>
-      <div class="jk-filter-panel__header">
-        <p class="jk-filter-panel__title">Filter</p>
-
         <p class="jk-results-count" id="jk-results-count" aria-live="polite">
           {{ site.data.materials.items | size }} results
         </p>
       </div>
 
-      <!-- Active filter chips -->
-      <div class="jk-active-filters" id="jk-active-filters" aria-label="Active filters" aria-live="polite"></div>
+      <div class="jk-filter-bar">
+        <div class="jk-filter-group jk-filter-group--search">
+          <div class="jk-filter-group__label">Search</div>
+          <input type="search"
+                 class="jk-filter-search"
+                 id="jk-filter-search"
+                 placeholder="Title, description…"
+                 aria-label="Search materials"
+                 autocomplete="off"
+                 role="combobox"
+                 aria-expanded="false"
+                 aria-controls="jk-search-suggestions">
+          <ul class="jk-search-suggestions" id="jk-search-suggestions" role="listbox" hidden></ul>
+        </div>
 
-
-      <div class="jk-filter-group" style="position:relative">
-        <div class="jk-filter-group__label">Search</div>
-        <input type="search"
-               class="jk-filter-search"
-               id="jk-filter-search"
-               placeholder="Title, description…"
-               aria-label="Search materials"
-               autocomplete="off"
-               role="combobox"
-               aria-expanded="false"
-               aria-controls="jk-search-suggestions">
-        <ul class="jk-search-suggestions" id="jk-search-suggestions" role="listbox" hidden></ul>
+        <!-- Mobile only: collapses the filter groups -->
+        <button type="button" class="jk-filter-more__toggle" id="jk-filter-more-toggle"
+                aria-expanded="false" aria-controls="jk-filter-more-groups">
+          Filters
+        </button>
       </div>
 
-      <details class="jk-filter-group jk-filter-group--dropdown">
-        <summary class="jk-filter-group__label">
-          Material Type
-        </summary>
+      <div class="jk-active-filters" id="jk-active-filters" aria-label="Active filters" aria-live="polite"></div>
 
-        <div class="jk-filter-options" id="jk-filter-types" role="group" aria-label="Filter by type">
-          <!-- populated by JS -->
-        </div>
-      </details>
+      <div class="jk-filter-more__groups" id="jk-filter-more-groups">
 
-      <details class="jk-filter-group jk-filter-group--dropdown">
-        <summary class="jk-filter-group__label">
-          Authors
-        </summary>
-
-        <div class="jk-filter-options" id="jk-filter-authors" role="group" aria-label="Filter by author">
-          <!-- populated by JS -->
-        </div>
-      </details>
-
-      <details class="jk-filter-group jk-filter-group--dropdown">
-        <summary class="jk-filter-group__label">
-          Events
-        </summary>
-
-        <div class="jk-filter-options" id="jk-filter-events" role="group" aria-label="Filter by event">
-          <!-- populated by JS -->
-        </div>
-      </details>
-
-      <details class="jk-filter-group jk-filter-group--dropdown">
-          <summary class="jk-filter-group__label">
-            Tags
-          </summary>
-
-          <div class="jk-filter-options" id="jk-filter-tags" role="group" aria-label="Filter by tag">
-            <!-- populated by JS -->
-          </div>
+        <details class="jk-filter-group jk-filter-group--dropdown">
+          <summary class="jk-filter-group__label">Material Type</summary>
+          <div class="jk-filter-options" id="jk-filter-types" role="group" aria-label="Filter by type"></div>
         </details>
 
-      <details class="jk-filter-group jk-filter-group--dropdown">
-          <summary class="jk-filter-group__label">
-            Audience Level
-          </summary>
-
-          <div class="jk-filter-options" id="jk-filter-levels" role="group" aria-label="Filter by audience level">
-            <!-- populated by JS -->
-          </div>
+        <details class="jk-filter-group jk-filter-group--dropdown">
+          <summary class="jk-filter-group__label">Authors</summary>
+          <div class="jk-filter-options" id="jk-filter-authors" role="group" aria-label="Filter by author"></div>
         </details>
 
-      <button class="jk-filter-reset" id="jk-filter-reset">Clear all filters</button>
+        <details class="jk-filter-group jk-filter-group--dropdown">
+          <summary class="jk-filter-group__label">Events</summary>
+          <div class="jk-filter-options" id="jk-filter-events" role="group" aria-label="Filter by event"></div>
+        </details>
+
+        <details class="jk-filter-group jk-filter-group--dropdown">
+          <summary class="jk-filter-group__label">Tags</summary>
+          <div class="jk-filter-options" id="jk-filter-tags" role="group" aria-label="Filter by tag"></div>
+        </details>
+
+        <details class="jk-filter-group jk-filter-group--dropdown">
+          <summary class="jk-filter-group__label">Audience Level</summary>
+          <div class="jk-filter-options" id="jk-filter-levels" role="group" aria-label="Filter by audience level"></div>
+        </details>
+
+        <button type="button" class="jk-filter-reset" id="jk-filter-reset">Clear all filters</button>
+      </div>
     </aside>
 
     <!-- ═══ RESULTS ════════════════════════════════════════════════════ -->

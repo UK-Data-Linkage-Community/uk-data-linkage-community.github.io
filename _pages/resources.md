@@ -5,9 +5,9 @@ permalink: /resources/
 classes: wide
 ---
 
-<div class="jk-resources-page">
+<div class="jk-resources-page" markdown="1">
 
-<div class="jk-resources-intro" markdown="1">
+<div class="jk-resources-text" markdown="1">
 
 # Resources
 
@@ -35,7 +35,12 @@ We also collate a list of [useful links](useful-links.html) around data linkage 
 
 <hr style="border-top: 1px solid #cccccc;">
 
+<details class="jk-resources-finder-toggle" id="jk-resources-finder-toggle">
+  <summary>Browse Site Materials</summary>
+
 {% include materials_finder.html heading_level="h2" %}
+
+</details>
 
 </div>
 
@@ -45,18 +50,38 @@ We also collate a list of [useful links](useful-links.html) around data linkage 
   box-sizing: border-box;
 }
 
-.jk-resources-intro {
-  max-width: 1200px;
-  margin: 32px auto 40px;
-  padding: 28px 32px;
-  background: var(--jk-surface);
-  border: 1px solid var(--jk-border);
-  border-left: 4px solid #30CABF;
-  border-radius: var(--jk-radius-lg);
-  box-shadow: var(--jk-shadow-sm);
+.jk-resources-text {
+  max-width: 825px;
+  margin: 0 auto;
 }
 
-.jk-resources-intro h1 {
-  margin-top: 0;
+.jk-resources-finder-toggle {
+  scroll-margin-top: var(--jk-header-height, 70px);
+}
+
+.jk-resources-finder-toggle > summary {
+  cursor: pointer;
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 12px 0;
+  list-style: revert;
+}
+
+.jk-resources-finder-toggle[open] > summary {
+  margin-bottom: 8px;
 }
 </style>
+
+<script>
+(function () {
+  var details = document.getElementById('jk-resources-finder-toggle');
+  if (!details) return;
+  var params = new URLSearchParams(window.location.search);
+  var filterKeys = ['search', 'type', 'author', 'event', 'tags', 'level'];
+  var hasFilter = filterKeys.some(function (k) { return params.has(k); });
+  if (hasFilter) {
+    details.open = true;
+    details.scrollIntoView({ block: 'start' });
+  }
+})();
+</script>
