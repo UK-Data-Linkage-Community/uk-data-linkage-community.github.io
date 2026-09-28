@@ -5,7 +5,7 @@ date:   2026-03-31 11:45:00 +0100
 event_id: "ukdlc-workshop-1-data-linkers"
 ---
 
-After establishing the current practices of the attendees in the [first session](/blog/2026/03/02/Workshop_1_session_1/), the second session of our first workshop was aimed at looking at the challenges practitioners face, what tricky or edge cases can come up, and what approaches the group have for them. In practice, edge cases are far from rare, but rather structurally embedded in real datasets, and lead to ambiguity, inconsistency, and fundamentally mistrust in linkage. 
+After establishing the current practices of the attendees in the [first session](/blog/2026/03/31/Workshop_1_session_1/), the second session of our first workshop was aimed at looking at the challenges practitioners face, what tricky or edge cases can come up, and what approaches the group have for them. In practice, edge cases are far from rare, but rather structurally embedded in real datasets, and lead to ambiguity, inconsistency, and fundamentally mistrust in linkage. 
 <!--more-->
 
 In an open discussion, the group identified some of the notable tricky cases that they see in their work. Included in these were:
