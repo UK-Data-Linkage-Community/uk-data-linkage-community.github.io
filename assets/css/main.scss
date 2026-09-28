@@ -1389,6 +1389,11 @@ article.page:has(.jk-materials-page-wrap) .content {
 .jk-filter-more__toggle {
   display: none;
 }
+.jk-materials-results {
+  border: 1px solid var(--jk-border);
+  border-radius: var(--jk-radius-lg);
+  padding: 12px;
+}
 
 @media (min-width: 769px) {
   .jk-materials-page {
@@ -1404,7 +1409,6 @@ article.page:has(.jk-materials-page-wrap) .content {
   .jk-materials-results {
     min-height: 0;
     overflow-y: auto;
-    padding: 4px 8px 16px 4px; /* room for card hover lift/shadow */
   }
 }
 
@@ -1479,6 +1483,10 @@ article.page:has(.jk-materials-page-wrap) .content {
   }
   .jk-filter-more__groups--open {
     display: flex;
+  }
+
+  .jk-materials-results {
+    padding: 8px;
   }
 
   /* Condensed cards */

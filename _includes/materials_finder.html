@@ -4,6 +4,17 @@
   padding: 32px 0 64px;
 }
 
+/* Standalone page: sit 12px below the site header, matching the frame gap */
+.jk-materials-page-wrap--standalone {
+  padding-top: 0;
+}
+main.page-content:has(.jk-materials-page-wrap--standalone) {
+  padding-top: 12px !important; /* theme sets main padding with !important */
+}
+article.page:has(.jk-materials-page-wrap--standalone) > header {
+  display: none;
+}
+
 {% if include.breakout %}
 /* Break the finder out of the parent article's narrower max-width so it
    spans the viewport even when the page itself isn't in "wide" mode. */
@@ -18,7 +29,7 @@
 {% endif %}
 </style>
 
-<div class="jk-materials-page-wrap{% if include.breakout %} jk-materials-page-wrap--breakout{% endif %}">
+<div class="jk-materials-page-wrap{% if include.breakout %} jk-materials-page-wrap--breakout{% endif %}{% if include.standalone %} jk-materials-page-wrap--standalone{% endif %}">
   <div class="jk-materials-page" id="jk-materials-page">
 
     <!-- ═══ FILTER PANEL ═══════════════════════════════════════════════ -->
