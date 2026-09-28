@@ -391,7 +391,6 @@ export class ConceptGraphManager {
       strokeOp = Math.max(strokeOp, MIN_STROKE_OP);
       fontOp   = Math.max(fontOp, MIN_FONT_OP);
       d._scale = scale;
-      d._scale = scale;
 
       inner.transition().duration(T).attr("transform", `scale(${scale})`);
 
