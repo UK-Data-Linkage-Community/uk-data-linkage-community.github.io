@@ -2,13 +2,11 @@
   Loads the card/modal/filter system used by the materials grid, person
   cards, and tutorial pages. Was never included anywhere — this is the fix.
 
-  The ?v= param busts the browser's cache using the file's own mtime, so a
-  browser that already cached an old cards.js (e.g. from before it was
-  wired up at all) picks up each new edit automatically instead of serving
-  a stale copy until a hard-refresh.
+  The ?v= param busts the browser's cache on every build (site.time), so a
+  stale cards.js is never served. The old static_files mtime lookup
+  rendered an empty ?v=, which let browsers keep an outdated copy.
 {% endcomment %}
-{% assign cardsjs = site.static_files | where: "relative_path", "/assets/js/cards.js" | first %}
-<script src="{{ '/assets/js/cards.js' | relative_url }}?v={{ cardsjs.modified_time | date: '%s' }}" defer></script>
+<script src="{{ '/assets/js/cards.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
 
 {% comment %}
   main.css (the theme's own compiled stylesheet, linked from the remote

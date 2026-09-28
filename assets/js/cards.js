@@ -25,6 +25,11 @@
   }
   syncHeaderOffset();
   window.addEventListener("resize", syncHeaderOffset);
+  window.addEventListener("load", syncHeaderOffset);
+  // Header height can change after first paint (logo load, nav wrapping)
+  if (window.ResizeObserver && document.querySelector(".site-header")) {
+    new ResizeObserver(syncHeaderOffset).observe(document.querySelector(".site-header"));
+  }
 
   // ── 2. MODAL ─────────────────────────────────────────────────────────────
   const modalOverlay = document.getElementById("jk-modal");

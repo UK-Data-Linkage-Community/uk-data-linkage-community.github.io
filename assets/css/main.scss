@@ -1346,14 +1346,11 @@ article.page:has(.jk-materials-page-wrap) .content {
 }
 
 /* ── Dashboard layout ─────────────────────────────────────────────────────
-   Desktop: filter panel locks below the site header (--jk-header-height is
-   set by cards.js) and fills the rest of the viewport; filter groups scroll
-   inside it. Mobile: a compact bar pinned above the cards. */
+   Desktop: the finder is one viewport-high frame below the site header
+   (--jk-header-height is set by cards.js); the filter panel stays put while
+   the cards and filter groups scroll inside it.
+   Mobile: a compact bar pinned above the cards. */
 .jk-filter-panel {
-  position: sticky;
-  top: calc(var(--jk-header-height, 70px) + 12px);
-  height: calc(100vh - var(--jk-header-height, 70px) - 24px);
-  height: calc(100dvh - var(--jk-header-height, 70px) - 24px);
   z-index: 20;
   box-sizing: border-box;
 }
@@ -1362,9 +1359,8 @@ article.page:has(.jk-materials-page-wrap) .content {
 }
 .jk-filter-panel__page-title {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 8px;
+  flex-direction: column;
+  gap: 2px;
 }
 .jk-filter-panel__page-title h1,
 .jk-filter-panel__page-title h2 {
@@ -1394,18 +1390,40 @@ article.page:has(.jk-materials-page-wrap) .content {
   display: none;
 }
 
+@media (min-width: 769px) {
+  .jk-materials-page {
+    height: calc(100vh - var(--jk-header-height, 70px) - 24px);
+    height: calc(100dvh - var(--jk-header-height, 70px) - 24px);
+    grid-template-rows: minmax(0, 1fr);
+    align-items: stretch;
+    scroll-margin-top: calc(var(--jk-header-height, 70px) + 12px);
+  }
+  .jk-filter-panel {
+    min-height: 0;
+  }
+  .jk-materials-results {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 4px 8px 16px 4px; /* room for card hover lift/shadow */
+  }
+}
+
 @media (max-width: 768px) {
   .jk-materials-page {
     gap: 12px;
   }
   .jk-filter-panel {
+    position: sticky;
     top: var(--jk-header-height, 70px);
-    height: auto;
     padding: 10px 12px;
     gap: 8px;
     box-shadow: 0 8px 14px -8px rgba(0, 0, 0, 0.25);
   }
   .jk-filter-panel__page-title {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
     padding-bottom: 6px;
   }
   .jk-filter-panel__page-title h1,

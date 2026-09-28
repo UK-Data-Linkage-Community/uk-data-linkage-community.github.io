@@ -76,12 +76,24 @@ We also collate a list of [useful links](useful-links.html) around data linkage 
 (function () {
   var details = document.getElementById('jk-resources-finder-toggle');
   if (!details) return;
+  var finder = details.querySelector('.jk-materials-page');
+
+  // On desktop, frame the finder in the viewport so it reads as a dashboard
+  function frameFinder(behavior) {
+    var wide = window.matchMedia('(min-width: 769px)').matches;
+    (wide && finder ? finder : details).scrollIntoView({ block: 'start', behavior: behavior });
+  }
+
+  details.addEventListener('toggle', function () {
+    if (details.open) frameFinder('smooth');
+  });
+
   var params = new URLSearchParams(window.location.search);
   var filterKeys = ['search', 'type', 'author', 'event', 'tags', 'level'];
   var hasFilter = filterKeys.some(function (k) { return params.has(k); });
   if (hasFilter) {
     details.open = true;
-    details.scrollIntoView({ block: 'start' });
+    frameFinder('auto');
   }
 })();
 </script>
