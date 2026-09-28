@@ -8,8 +8,8 @@ export const allTerms = [];
 export const state = {
   defMode: "technical",
   // Replaces the old `showAnalogies` boolean. Three states:
-  //   "expanded" (default) — analogy text always shown, no pill needed
-  //   "pill"               — collapsed to a small clickable pill
+  //   "expanded"           — analogy text always shown, no pill needed
+  //   "pill" (default)     — collapsed to a small clickable pill
   //   "hidden"             — analogy is not rendered at all
   analogyDisplay: "pill",
   activeSection: null,
