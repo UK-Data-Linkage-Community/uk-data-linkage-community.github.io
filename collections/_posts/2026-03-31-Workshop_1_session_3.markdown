@@ -5,7 +5,7 @@ date:   2026-03-31 13:30:00 +0100
 event_id: "ukdlc-workshop-1-data-linkers"
 ---
 
-In  the third session of the day, the attendees were asked to form groups to discuss approaches for explaining linkage to particular audiences. This included a policy audience, a technical research auudience, and finally a governance/ethics board.
+In the third session of the day, the attendees were asked to form groups to discuss approaches for explaining linkage to particular audiences. This included a policy audience, a technical research audience, and finally a governance/ethics board.
 <!--more-->
 
 ### Technical Truth vs Usable Explanation
