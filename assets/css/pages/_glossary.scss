@@ -9,28 +9,13 @@
   --bp-stack:          #{$bp-nav};
 }
 
-// The site header is shrunk to a compact strip on this page (see
-// _header.scss's `body.layout--glossary .site-header` override). This
-// feeds that same height back into the vh calc below so the dashboard
-// box stops just below the header instead of overshooting the viewport
-// — the overshoot was what forced the whole page to scroll just to
-// reach the theme's footer/copyright strip underneath. Only matters
-// above $bp-nav — the mobile/tablet override further down switches
-// .glossary-page to height: auto, so this is ignored there regardless.
-// 48px desktop header + 8px gap (see the .page-content override below).
-body.layout--glossary {
-  --dashboard-offset: 56px;
-}
-
 // The theme's default page padding (see layout/_basepage.scss) leaves a
 // large gap between the header and this page's own content — reasonable
 // on a normal article page, oversized on a dashboard that wants to sit
-// flush under a thin header. Desktop only, to match the thinner desktop
-// header in _header.scss; mobile/tablet keeps the theme's normal gap.
-// glossary-2's --dashboard-offset is measured in glossary.js instead.
+// flush under the header. Desktop only; mobile/tablet keeps the theme's
+// normal gap. --dashboard-offset is measured in glossary.js.
 @media (min-width: $bp-nav + 1) {
-  body.layout--glossary .page-content,
-  body.layout--glossary-2 .page-content {
+  body.layout--glossary .page-content {
     padding-top: 8px !important;
   }
 }
@@ -144,20 +129,6 @@ body.layout--glossary {
   min-height: 0;
   display: flex;
   flex-direction: column;
-}
-
-// Desktop only: the header's logo tab (see _header.scss) hangs down on
-// the left above this column, so the term list starts below the tab
-// instead of behind it. calc() keeps the sidebar's bottom edge lined up
-// with .glossary-main's (which has no tab beside it and isn't pushed
-// down) — margin-top alone would push the bottom edge down too and
-// overflow the grid row. 48px matches the tab's overhang below the bar.
-// Not applied to glossary-2, which keeps the standard header (no tab).
-@media (min-width: $bp-nav + 1) {
-  body.layout--glossary .glossary-sidebar {
-    margin-top: 48px;
-    height: calc(100% - 48px);
-  }
 }
 
 // Hidden entirely on desktop — the sidebar is always open there.

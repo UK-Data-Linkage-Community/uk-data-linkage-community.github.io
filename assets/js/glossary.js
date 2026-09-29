@@ -32,9 +32,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Distance from the top of the document to the dashboard, i.e. header
-  // plus page padding. Only takes effect where CSS doesn't pin its own
-  // value (glossary.html pins 56px on body.layout--glossary; glossary-2
-  // keeps the standard header, whose height varies with the logo/nav).
+  // plus page padding — measured, since the standard header's height
+  // varies with the logo/nav.
   function syncDashboardOffset() {
     const page = document.querySelector(".glossary-page");
     const top = page ? page.getBoundingClientRect().top + window.scrollY : 0;
