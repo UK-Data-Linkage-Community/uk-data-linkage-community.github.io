@@ -7,23 +7,3 @@
   rendered an empty ?v=, which let browsers keep an outdated copy.
 {% endcomment %}
 <script src="{{ '/assets/js/cards.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>
-
-{% comment %}
-  main.css (the theme's own compiled stylesheet, linked from the remote
-  theme's <head>) has the exact same stale-cache problem as cards.js did —
-  but it's a Sass-compiled page, not a static_file, so it has no mtime we
-  can query and its <link> tag lives in a head.html we don't control locally.
-  Instead: find that <link> at runtime and rewrite its href with a
-  site.time-based cache-buster (site.time changes on every Jekyll rebuild),
-  forcing a fresh fetch instead of the browser's cached copy.
-{% endcomment %}
-<script>
-(function () {
-  var link = document.querySelector('link[rel="stylesheet"][href*="/assets/css/main.css"]');
-  if (link) {
-    var url = new URL(link.href, window.location.origin);
-    url.searchParams.set('v', '{{ site.time | date: "%s" }}');
-    link.href = url.toString();
-  }
-})();
-</script>
