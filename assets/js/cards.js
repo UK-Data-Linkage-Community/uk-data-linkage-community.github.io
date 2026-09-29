@@ -122,7 +122,7 @@ function applyURLParams(params) {
       ? `<span class="jk-card__level-badge jk-card--level-${esc(item.audience_level)}" data-tag-type="level" data-level-value="${esc(item.audience_level)}" tabindex="0" style="position:static;margin-left:6px">${levelName(item.audience_level)}</span>` : "";
 
     const hero = embeddable
-      ? `<div class="jk-modal__embed"><iframe src="${esc(item.src)}" frameborder="0" allowfullscreen title="${esc(item.title)}"></iframe></div>`
+      ? `<div class="jk-modal__embed"><iframe src="${esc(embedURL(item.src))}" frameborder="0" allowfullscreen title="${esc(item.title)}"></iframe></div>`
       : `<div class="jk-modal__hero jk-modal__hero--placeholder jk-card--type-${esc(item.type)}">
            <span class="jk-card__type-icon-lg">${typeIcon(item.type)}</span>
            <span class="jk-card__type-badge jk-card--type-${esc(item.type)}">${typeIcon(item.type)} ${typeName(item.type)}</span>
@@ -741,6 +741,11 @@ function initMaterialsPage() {
   function formatDate(s) {
     try { return new Date(s).toLocaleDateString("en-GB",{year:"numeric",month:"long",day:"numeric"}); }
     catch { return s; }
+  }
+  // YouTube page links (watch?v=, youtu.be/) refuse to load in an iframe — map them to the embed URL
+  function embedURL(s) {
+    const yt = String(s || "").match(/(?:youtu\.be\/|youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/))([\w-]{11})/);
+    return yt ? `https://www.youtube-nocookie.com/embed/${yt[1]}` : s;
   }
   function typeIcon(t) { return {slides:"▤",video:"▶",document:"◻",notebook:"◈",code:"⌥",tutorial:"▧"}[t]||"◆"; }
   function typeName(t) { return {slides:"Slides",video:"Video",document:"Document",notebook:"Notebook",code:"Code",tutorial:"Tutorial"}[t]||(t||"Material"); }

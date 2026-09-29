@@ -19,7 +19,9 @@
 #     - topic-tag
 #   audience_level: "practitioner"    # optional — one of: intro | practitioner | advanced
 #   thumbnail: ""                     # optional — path to a preview image, e.g. /assets/materials/thumbs/x.png
-#   src: "/assets/materials/slides/example.pdf"   # required for slides/video — path or URL to the file
+#   src: "/assets/materials/slides/example.pdf"   # path or URL (any YouTube link form works).
+#                                     # Leave "" until published — the item still lists and
+#                                     # embeds show "coming soon" instead of a broken frame.
 #   description: "One-sentence summary shown on the card itself."
 #   caption: >
 #     Longer description shown when the item is opened — what it covers,
@@ -38,7 +40,7 @@ items:
       - entity-resolution
       - probabilistic-matching
     audience_level: "practitioner"
-    src: "/assets/materials/slides/UKDLC_W1S1_SeRP.pdf"
+    src: ""   # TODO: /assets/materials/slides/UKDLC_W1S1_SeRP.pdf
     description: "How SeRP approaches data linkage in production, from scoping through to operationalised workflows."
     caption: >
       Mike Edwards's slides on the current practices within SERP on data linkage.
@@ -53,7 +55,7 @@ items:
       - entity-resolution
       - probabilistic-matching
     audience_level: "practitioner"
-    src: "/assets/materials/videos/mike_W1S1.mp4"
+    src: ""   # TODO: YouTube link once uploaded
     description: "How SeRP approaches data linkage in production, from scoping through to operationalised workflows."
     caption: >
       Mike Edwards presents the current practices within SERP on data linkage.
@@ -68,7 +70,7 @@ items:
       - entity-resolution
       - probabilistic-matching
     audience_level: "practitioner"
-    src: "/assets/materials/slides/UKDLC_W1S1_ONS.pdf"
+    src: ""   # TODO: /assets/materials/slides/UKDLC_W1S1_ONS.pdf
     description: "Bespoke linkage methods and methodology development within the ONS."
     caption: >
       Josie's slides on data linkage practices at the ONS.
@@ -83,7 +85,7 @@ items:
       - entity-resolution
       - probabilistic-matching
     audience_level: "practitioner"
-    src: "/assets/materials/videos/josie_W1S1.mp4"
+    src: ""   # TODO: YouTube link once uploaded
     description: "Bespoke linkage methods and methodology development within the ONS."
     caption: >
       Josie presents on data linkage practices at the ONS.
@@ -101,7 +103,7 @@ items:
       - entity-resolution
       - probabilistic-matching
     audience_level: "practitioner"
-    src: "/assets/materials/slides/UKDLC_W1S1_MoJ.pdf"
+    src: ""   # TODO: /assets/materials/slides/UKDLC_W1S1_MoJ.pdf
     description: "Linkage practices within the Ministry of Justice's Data First initiative."
     caption: >
       Andy's slides on data linkage practices at the MoJ.
@@ -116,7 +118,7 @@ items:
       - entity-resolution
       - probabilistic-matching
     audience_level: "practitioner"
-    src: "/assets/materials/videos/andy_W1S1.mp4"
+    src: ""   # TODO: YouTube link once uploaded
     description: "Linkage practices within the Ministry of Justice's Data First initiative."
     caption: >
       Andy presents on data linkage practices at the MoJ.
