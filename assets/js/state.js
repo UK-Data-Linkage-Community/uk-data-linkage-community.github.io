@@ -8,10 +8,10 @@ export const allTerms = [];
 export const state = {
   defMode: "technical",
   // Replaces the old `showAnalogies` boolean. Three states:
-  //   "expanded" (default) — analogy text always shown, no pill needed
-  //   "pill"               — collapsed to a small clickable pill
+  //   "expanded"           — analogy text always shown, no pill needed
+  //   "pill" (default)     — collapsed to a small clickable pill
   //   "hidden"             — analogy is not rendered at all
-  analogyDisplay: "expanded",
+  analogyDisplay: "pill",
   activeSection: null,
   activeConceptId: null,
   activeFilter: null,
@@ -71,13 +71,20 @@ export function renderDefinitionBlock(c, allowAnalogy = true) {
 
   if (state.analogyDisplay === "expanded") {
     return `<span class="panel-def">${defHtml}</span>
-            <span class="analogy-text analogy-text--inline">${c.analogy}</span>`;
+            <span class="analogy-block">
+              <span class="analogy-label">Analogy</span>
+              <span class="analogy-text">${c.analogy}</span>
+            </span>`;
   }
 
   // "pill" — collapsed by default, click-to-expand.
   return `<span class="panel-def">${defHtml}</span>
-          <button class="analogy-pill" data-analogy-for="${c.id}" type="button">Analogy</button>
-          <span class="analogy-text" id="analogy-${c.id}" style="display:none">${c.analogy}</span>`;
+          <span class="analogy-block" data-analogy-for="${c.id}">
+            <button class="analogy-pill" type="button">
+              Analogy<span class="analogy-pill-caret">&#9662;</span>
+            </button>
+            <span class="analogy-text" id="analogy-${c.id}" style="display:none">${c.analogy}</span>
+          </span>`;
 }
 
 // Call once at startup. Returns false if glossaryData never loaded.
