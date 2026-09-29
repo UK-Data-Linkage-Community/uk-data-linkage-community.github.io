@@ -12,7 +12,7 @@ The first session of the day was focused on establishing the current practices a
   | where: "event_id", "ukdlc-workshop-1-data-linkers"
   | where: "type", "video" %}
 {% for item in event_videos %}
-  {% include cards/material-card.html item=item display="embedded" %}
+  {% include material.html id=item.id display="window" %}
 <br />
 {% endfor %}
 
