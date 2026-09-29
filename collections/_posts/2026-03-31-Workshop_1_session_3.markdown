@@ -10,7 +10,7 @@ In the third session of the day, the attendees were asked to form groups to disc
 
 ### Technical Truth vs Usable Explanation
 
-A key tension that emerged in discussions was the balance between delivering the technical truth and usable explanation to different audiences. Whilst there is often technical knowledge overlap between practitioners and end users, this is not always guaranteed, and a clear and assessable statement about the linkage quality is still necessary for many end users. 
+A key tension that emerged in discussions was the balance between delivering the technical truth and usable explanation to different audiences. Whilst there is often technical knowledge overlap between practitioners and end users, this is not always guaranteed, and a clear and assessable statement about the linkage quality is still necessary for many end users.
 
 Attendees highlighted that linkage teams generally work and understand outputs in terms of probabilities, thresholds, error rates, match weights, etc. but end users prefer clear-cut answers to their request, either in a simple answer to _"Is it linked or not?"_ or a simple metric such as _"Match rate = 95%"_. The danger here is that simplifying a report risks misinterpretation, but providing too much detail may lead to cognitive overload, misunderstanding, and possibly non-usage of some linkage outputs.
 
@@ -42,17 +42,19 @@ There was a clear tension in discussions for how revealing methodology, exposing
 
 ### Governance, Standards, and Inconsistency Across Organisations
 
-A recurring governance concern was the inconsistency across NHS bodies, univeristies, and government teams in how linkage is reported and subsequently, users are subjected to this inconsistency. Different definitions of quality, different outputs, and different explanations all have the potential to deepen any misinterpretation or overconfidence in linkage outputs. To address this, the group proposed sharing **minimum standards** for communication and **community-agreed baseline** expectations. The consensus was not to have rigid rules that slow the linkage process down, but harmonised minimum standard reporting norms.
+
+A recurring governance concern was the inconsistency across NHS bodies, universities, and government teams in how linkage is reported and subsequently, users are subjected to this inconsistency. Different definitions of quality, different outputs, and different explanations all have the potential to deepen any misinterpretation or overconfidence in linkage outputs. To address this, the group proposed sharing **minimum standards** for communication and **community-agreed baseline** expectations. The consensus was not to have rigid rules that slow the linkage process down, but harmonised minimum standard reporting norms.
+
 
 ### Ownership and Accountability
 
-One of the final points raised was the more philosophical question of ownership; 
-- Who owns linked data? 
-- Who is responsable for decisions embedded in preprocessing? 
-- At what point does transformation create a new dataset with new responsibility? 
+One of the final points raised was the more philosophical question of ownership;
+- Who owns linked data?
+- Who is responsible for decisions embedded in preprocessing?
+- At what point does transformation create a new dataset with new responsibility?
 
 This is tied to legal ambiguity, and reveals operational accountability gaps in areas that may link to highly sensitive data. This point was not answered in the discussion, but it remains as one of the clear indicators that entity resolution is a challenging area for even practitioners to navigate, let alone the end users.
 
 > This post is part of the outputs for the <a href="#"
-   data-open-event="ukdlc-workshop-1-data-linkers">
-   UK DLC Workshop 1</a>.
+  data-open-event="ukdlc-workshop-1-data-linkers">
+  UK DLC Workshop 1</a>.
