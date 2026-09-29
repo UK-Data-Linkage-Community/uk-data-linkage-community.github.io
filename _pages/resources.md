@@ -36,7 +36,7 @@ We also collate a list of [useful links](useful-links.html) around data linkage 
 <hr style="border-top: 1px solid #cccccc;">
 
 <details class="jk-resources-finder-toggle" id="jk-resources-finder-toggle">
-  <summary>Browse Site Materials</summary>
+  <summary>Browse Site Materials <a class="jk-resources-finder-full" href="{{ '/resources/materials/' | relative_url }}">Open full page →</a></summary>
 
 {% include materials_finder.html heading_level="h2" %}
 
@@ -65,6 +65,30 @@ We also collate a list of [useful links](useful-links.html) around data linkage 
   font-weight: 700;
   padding: 12px 0;
   list-style: revert;
+}
+
+.jk-resources-finder-full {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 12px;
+  padding: 4px 12px;
+  vertical-align: middle;
+  background: var(--jk-surface);
+  border: 1px solid var(--jk-border);
+  border-radius: 999px;
+  color: var(--jk-text);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.jk-resources-finder-full:hover,
+.jk-resources-finder-full:focus-visible {
+  background: #30cabf;
+  border-color: #30cabf;
+  color: #fff;
+  text-decoration: none;
 }
 
 .jk-resources-finder-toggle[open] > summary {

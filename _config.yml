@@ -75,7 +75,18 @@ sass:
 
 
 include: ["_pages"]
-exclude: ["contributing_guidelines"]
+# Setting exclude replaces Jekyll's defaults, so they are restated here
+exclude:
+  - contributing_guidelines
+  - Gemfile
+  - Gemfile.lock
+  - Dockerfile
+  - docker-compose.yml
+  - README.md
+  - node_modules
+  - vendor
+  - .sass-cache
+  - .jekyll-cache
 # Exclude from processing.
 # The following items will not be processed, by default.
 # Any item listed under the `exclude:` key here will be automatically added to
