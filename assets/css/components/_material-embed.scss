@@ -25,7 +25,9 @@
 }
 
 /* ── Window / full (shared) ───────────────────── */
+/* Theme styles every <figure> as a flex row with serif captions — reset both */
 .jk-material-embed {
+  display: block;
   margin: 1.5rem 0;
   border: 1px solid var(--jk-border);
   border-radius: var(--jk-radius-lg);
@@ -35,8 +37,15 @@
 }
 .jk-material-embed--window { max-width: 720px; }
 
+.jk-material-embed figcaption {
+  margin: 0;
+  font-family: inherit;
+  color: var(--jk-text);
+}
+
 .jk-material-embed__frame {
   position: relative;
+  width: 100%;
   aspect-ratio: 16 / 9;
   background: #000;
 }
@@ -50,6 +59,7 @@
   inset: 0;
   width: 100%;
   height: 100%;
+  margin: 0;
   border: none;
   display: block;
 }

@@ -94,7 +94,7 @@
       <span>{% if mat_src == "" %}{{ type_label }} coming soon{% else %}{{ type_label }} — open for details{% endif %}</span>
     </div>
     {% elsif yt_id != "" %}
-    <iframe src="https://www.youtube-nocookie.com/embed/{{ yt_id }}" title="{{ mat.title }}" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>
+    <iframe class="fitvidsignore" src="https://www.youtube-nocookie.com/embed/{{ yt_id }}" title="{{ mat.title }}" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>
     {% elsif is_file_video %}
     <video controls preload="metadata" playsinline><source src="{{ mat_src | relative_url }}"></video>
     {% else %}
