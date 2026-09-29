@@ -27,6 +27,9 @@
         </div>
       </main>
 
+    {% comment %} Card data + modal for every page; skipped where the materials finder already renders it {% endcomment %}
+    {% unless content contains 'id="jk-site-data"' %}{% include cards/card-modes.html %}{% endunless %}
+
     <div id="footer" class="page__footer">
       <footer>
         {% include footer/custom.html %}

@@ -1,9 +1,12 @@
 categories:
   - event_type: "workshops"
+    label: "Workshops"
     events:
       - event_num: 1
-        title: "Supporting Data Linkage Practitioners"
-        date: "31/03/2026"
+        id: "ukdlc-workshop-1-data-linkers"
+        title: "Workshop 1: Supporting Data Linkage Practitioners"
+        date: "2026-03-31"
+        status: "materials"
         use_provisional_date: false
         registration_link: "https://uk-dlc-data-linkers-workshop.eventbrite.co.uk"
         venue: "Swansea, UK"
@@ -14,8 +17,10 @@ categories:
           greater methodological alignment and cross-sector collaboration.
 
       - event_num: 2
-        title: "Supporting Linked Data Users"
+        id: "ukdlc-workshop-2-linked-data-users"
+        title: "Workshop 2: Supporting Linked Data Users"
         date: "Q2 2026"
+        status: "upcoming"
         use_provisional_date: true
         registration_link: false
         venue: "To be confirmed"
@@ -26,8 +31,10 @@ categories:
           methodological implications, and responsible use in downstream analysis and decision-making.
 
       - event_num: 3
-        title: "Related Topics in Data Linkage"
+        id: "ukdlc-workshop-3-related-linkage"
+        title: "Workshop 3: Relating Topics in Data Linkage"
         date: "Q3 2026"
+        status: "upcoming"
         use_provisional_date: true
         registration_link: false
         venue: "To be confirmed"
