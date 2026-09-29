@@ -1,7 +1,8 @@
 ---
 layout: page
 title: Related Groups
-permalink: /related-groups/
+permalink: /resources/related-groups/
+redirect_from: /related-groups/
 ---
 
 The field of data linkage is a varied landscape, and we support the ongoing work in these areas. 

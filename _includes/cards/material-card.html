@@ -48,7 +48,16 @@
   {% when "document" %}{% assign type_icon = "◻" %}{% assign type_label = "Document" %}
   {% when "notebook" %}{% assign type_icon = "◈" %}{% assign type_label = "Notebook" %}
   {% when "code"     %}{% assign type_icon = "⌥" %}{% assign type_label = "Code" %}
+  {% when "tutorial" %}{% assign type_icon = "▧" %}{% assign type_label = "Tutorial" %}
   {% else            %}{% assign type_icon = "◆" %}{% assign type_label = item.type %}
+{% endcase %}
+
+{% comment %} Audience-level label map {% endcomment %}
+{% assign level_label = "" %}
+{% case item.audience_level %}
+  {% when "intro"        %}{% assign level_label = "Intro" %}
+  {% when "practitioner" %}{% assign level_label = "Practitioner" %}
+  {% when "advanced"     %}{% assign level_label = "Advanced" %}
 {% endcase %}
 
 {% comment %} Build data attributes for JS {% endcomment %}
@@ -85,11 +94,13 @@
     <div class="jk-card__thumb">
       <img src="{{ item.thumbnail }}" alt="{{ item.title }} thumbnail" loading="lazy">
       <span class="jk-card__type-badge jk-card--type-{{ item.type }}">{{ type_label }}</span>
+      {% if level_label != "" %}<span class="jk-card__level-badge jk-card--level-{{ item.audience_level }}" data-tag-type="level" data-level-value="{{ item.audience_level }}" tabindex="0">{{ level_label }}</span>{% endif %}
     </div>
   {% else %}
     <div class="jk-card__thumb jk-card__thumb--placeholder jk-card--type-{{ item.type }}">
       <span class="jk-card__type-icon-lg" aria-hidden="true">{{ type_icon }}</span>
       <span class="jk-card__type-badge jk-card--type-{{ item.type }}">{{ type_label }}</span>
+      {% if level_label != "" %}<span class="jk-card__level-badge jk-card--level-{{ item.audience_level }}" data-tag-type="level" data-level-value="{{ item.audience_level }}" tabindex="0">{{ level_label }}</span>{% endif %}
     </div>
   {% endif %}
   <div class="jk-card__body">
@@ -203,17 +214,19 @@
     <div class="jk-card__hero">
       <img src="{{ item.thumbnail }}" alt="" loading="lazy">
       <span class="jk-card__type-badge jk-card--type-{{ item.type }}">{{ type_icon }} {{ type_label }}</span>
+      {% if level_label != "" %}<span class="jk-card__level-badge jk-card--level-{{ item.audience_level }}" data-tag-type="level" data-level-value="{{ item.audience_level }}" tabindex="0">{{ level_label }}</span>{% endif %}
     </div>
   {% else %}
     <div class="jk-card__hero jk-card__hero--placeholder jk-card--type-{{ item.type }}">
       <span class="jk-card__type-icon-lg" aria-hidden="true">{{ type_icon }}</span>
       <span class="jk-card__type-badge jk-card--type-{{ item.type }}">{{ type_icon }} {{ type_label }}</span>
+      {% if level_label != "" %}<span class="jk-card__level-badge jk-card--level-{{ item.audience_level }}" data-tag-type="level" data-level-value="{{ item.audience_level }}" tabindex="0">{{ level_label }}</span>{% endif %}
     </div>
   {% endif %}
   <div class="jk-card__body">
     <h3 class="jk-card__title">{{ item.title }}</h3>
     {% if item.description %}
-    <p class="jk-card__desc">{{ item.description | truncate: 120 }}</p>
+    <p class="jk-card__desc">{{ item.description | truncate: 110 }}</p>
     {% endif %}
     {% if resolved_authors.size > 0 %}
     <div class="jk-card__meta-row">
