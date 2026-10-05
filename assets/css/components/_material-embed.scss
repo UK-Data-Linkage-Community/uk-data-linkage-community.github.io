@@ -79,9 +79,24 @@
   font-weight: 600;
 }
 
+/* Nothing to embed yet: collapse the 16:9 frame to a short strip */
+.jk-material-embed--pending .jk-material-embed__frame {
+  aspect-ratio: auto;
+  background: var(--jk-type-bg, var(--jk-surface));
+}
+.jk-material-embed--pending .jk-material-embed__pending {
+  position: static;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.jk-material-embed--pending .jk-card__type-icon-lg { font-size: 1.6rem; }
+
 /* Title bar (window) */
 .jk-material-embed__bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   padding: 10px 14px;
@@ -95,6 +110,12 @@
 .jk-material-embed__title {
   font-weight: 600;
   color: var(--jk-text);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.jk-material-embed__authors {
+  font-size: 0.8rem;
+  color: var(--jk-text-muted);
 }
 
 /* Header + body (full) */
@@ -119,6 +140,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+/* Author id with no people.yml entry — plain, non-interactive */
+.jk-tag--guest {
+  background: var(--jk-surface);
+  color: var(--jk-text-muted);
+  border-color: var(--jk-border);
+  cursor: default;
 }
 
 .jk-material-missing {

@@ -114,7 +114,7 @@ function applyURLParams(params) {
   // ── Modal HTML: material ──────────────────────────────────────────────────
   function materialModalHTML(item) {
     if (!item) return "<p>Not found.</p>";
-    const authors = (item.authors || []).map(personById).filter(Boolean);
+    const authors = toList(item.authors).map(personById).filter(Boolean);
     const event   = item.event_id ? eventById(item.event_id) : null;
     const isTutorial  = item.type === "tutorial";
     const embeddable  = !isTutorial && ["video","slides","notebook"].includes(item.type) && item.src;
@@ -131,9 +131,10 @@ function applyURLParams(params) {
     const metaRow = (label, content) => content
       ? `<div class="jk-modal__meta-row"><span class="jk-modal__meta-label">${label}</span><div class="jk-modal__meta-value">${content}</div></div>` : "";
 
-    const authorTags = authors.map(p => personTag(p)).join(" ");
+    const authorTags = authors.map(p => personTag(p))
+      .concat(toList(item.guest_authors).map(n => `<span class="jk-tag jk-tag--guest">${esc(n)}</span>`)).join(" ");
     const eventTag   = event ? `<span class="jk-tag jk-tag--event" data-tag-type="event" data-event-id="${esc(event.id)}" tabindex="0" role="button">${esc(event.title)}</span>` : "";
-    const topicTags  = (item.tags||[]).map(t => `<span class="jk-tag jk-tag--topic" data-tag-type="topic" data-tag-value="${esc(t)}" tabindex="0" role="button">${esc(t)}</span>`).join("");
+    const topicTags  = toList(item.tags).map(t => `<span class="jk-tag jk-tag--topic" data-tag-type="topic" data-tag-value="${esc(t)}" tabindex="0" role="button">${esc(t)}</span>`).join("");
 
     // Tutorials link to an internal page (same tab, no download-style arrow);
     // everything else opens the referenced file/URL in a new tab.
@@ -170,7 +171,7 @@ function applyURLParams(params) {
       links.email   && `<a class="jk-btn jk-btn--ghost" href="mailto:${esc(links.email)}">✉ Email</a>`,
       links.github  && `<a class="jk-btn jk-btn--ghost" href="https://github.com/${esc(links.github)}" target="_blank" rel="noopener">⌥ GitHub</a>`,
     ].filter(Boolean).join("");
-    const theirMats = SITE.materials.filter(m => (m.authors||[]).includes(person.id));
+    const theirMats = SITE.materials.filter(m => toList(m.authors).includes(person.id));
 
     return `<div class="jk-modal__hero jk-modal__hero--person">
         <div class="jk-avatar jk-avatar--xl">${avatar}</div>
@@ -474,7 +475,7 @@ function initMaterialsPage() {
     if (fromDOM.length) return fromDOM;
     // Fallback: collect from the embedded JSON data
     return unique(
-      [].concat(...SITE.materials.map(m => (m.authors || []).map(String)))
+      [].concat(...SITE.materials.map(m => toList(m.authors)))
     );
   })();
 
@@ -735,12 +736,19 @@ function initMaterialsPage() {
       .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
   }
   function getInitials(n) {
-    const p = (n||"").trim().split(/\s+/);
-    return (p[0][0]+(p[p.length-1][0]||"")).toUpperCase();
+    const p = String(n||"").trim().split(/\s+/).filter(Boolean);
+    if (!p.length) return "?";
+    return (p[0][0]+(p.length > 1 ? p[p.length-1][0] : "")).toUpperCase();
   }
+  // Unparseable dates ("TBC", "Spring 2026") are shown as written, not "Invalid Date"
   function formatDate(s) {
-    try { return new Date(s).toLocaleDateString("en-GB",{year:"numeric",month:"long",day:"numeric"}); }
-    catch { return s; }
+    const d = new Date(s);
+    return isNaN(d) ? esc(s) : d.toLocaleDateString("en-GB",{year:"numeric",month:"long",day:"numeric"});
+  }
+  // YAML lists sometimes arrive as a single "a, b" string or null — always return a clean string array
+  function toList(v) {
+    if (v == null) return [];
+    return (Array.isArray(v) ? v : String(v).split(",")).map(x => String(x).trim()).filter(Boolean);
   }
   // YouTube page links (watch?v=, youtu.be/) refuse to load in an iframe — map them to the embed URL
   function embedURL(s) {
@@ -748,7 +756,7 @@ function initMaterialsPage() {
     return yt ? `https://www.youtube-nocookie.com/embed/${yt[1]}` : s;
   }
   function typeIcon(t) { return {slides:"▤",video:"▶",document:"◻",notebook:"◈",code:"⌥",tutorial:"▧"}[t]||"◆"; }
-  function typeName(t) { return {slides:"Slides",video:"Video",document:"Document",notebook:"Notebook",code:"Code",tutorial:"Tutorial"}[t]||(t||"Material"); }
+  function typeName(t) { return {slides:"Slides",video:"Video",document:"Document",notebook:"Notebook",code:"Code",tutorial:"Tutorial"}[t]||"Material"; }
   function levelName(l) { return {intro:"Intro",practitioner:"Practitioner",advanced:"Advanced"}[l]||""; }
   function personTag(p) {
     return `<span class="jk-tag jk-tag--person" data-tag-type="person" data-person-id="${esc(p.id)}" tabindex="0" role="button">${esc(p.name)}</span>`;
