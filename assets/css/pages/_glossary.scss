@@ -731,6 +731,81 @@
   }
 }
 
+.aka-chip {
+  font-size: 0.78rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--color-surface-alt, #f1f5f9);
+  color: var(--color-text-secondary, #475569);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.concept-detail-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.concept-detail-header h3 {
+  margin: 0;
+}
+
+.aka-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: var(--color-surface-alt, #f1f5f9);
+  color: var(--color-text-secondary, #475569);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &:hover, &.active {
+    background: var(--color-teal-dark, #0f766e);
+    color: #fff;
+  }
+}
+
+.aka-trigger-count {
+  font-weight: 700;
+}
+
+.aka-popover {
+  display: none;
+  position: fixed;
+  z-index: 50;
+  max-width: 260px;
+  padding: 0.5rem;
+  border-radius: 0.6rem;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  border: 1px solid var(--color-border, #e2e8f0);
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+.aka-popover.popover-open { display: flex; }
+
+.aka-popover .aka-chip {
+  font-size: 0.78rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: var(--color-surface-alt, #f1f5f9);
+  color: var(--color-text-secondary, #475569);
+}
+
+.suggestion-owner {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #64748b);
+  margin-left: 0.3rem;
+}
+
 // Settings Select
 @import "../glossary/settings";
 

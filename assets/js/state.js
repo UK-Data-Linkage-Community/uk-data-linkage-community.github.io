@@ -32,6 +32,23 @@ function buildConceptMap() {
   });
 }
 
+export const labelIndex = new Map(); // normalized label -> array of concept ids
+
+function buildLabelIndex() {
+  Object.values(conceptMap).forEach(c => {
+    const add = label => {
+      const key = label.toLowerCase();
+      const existing = labelIndex.get(key) || [];
+      if (existing.length && !existing.includes(c.id)) {
+        console.warn(`"${label}" is shared by: ${[...existing, c.id].join(", ")}`);
+      }
+      labelIndex.set(key, [...existing, c.id]);
+    };
+    add(c.prefLabel);
+    (c.altLabel || []).forEach(add);
+  });
+}
+
 function buildSearchIndex() {
   data.skos.concepts.forEach(c => {
     allTerms.push({ term: c.prefLabel, id: c.id });
@@ -48,13 +65,9 @@ export function getDefinitionText(concept) {
 
 export function linkifyDefinition(text) {
   return text.replace(/\{\{(.*?)\}\}(\w*)/g, (_, term, suffix) => {
-    const concept = Object.values(conceptMap)
-      .find(c => c.prefLabel.toLowerCase() === term.toLowerCase());
-
-    if (!concept) return term + suffix;
-
-    const fullWord = term + suffix;
-    return `<span class="def-link" data-id="${concept.id}">${fullWord}</span>`;
+    const ids = labelIndex.get(term.toLowerCase());
+    if (!ids?.length) return term + suffix;
+    return `<span class="def-link" data-id="${ids[0]}">${term + suffix}</span>`;
   });
 }
 
@@ -91,6 +104,7 @@ export function renderDefinitionBlock(c, allowAnalogy = true) {
 export function initState() {
   if (!data) { console.error("Glossary data not loaded"); return false; }
   buildConceptMap();
+  buildLabelIndex();
   buildSearchIndex();
   return true;
 }

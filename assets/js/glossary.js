@@ -1,5 +1,5 @@
 import { data, state, initState, conceptMap, allTerms, renderDefinitionBlock } from "./state.js";
-import { initPopovers, viewSettingsPopover, filterPopover } from "./popovers.js";
+import { initPopovers, viewSettingsPopover, filterPopover, initAkaPopover } from "./popovers.js";
 import { initSidebar } from "./sidebar.js";
 import { initPipelinePanel, clearPipelineActive } from "./pipeline-panel.js";
 import { initPanelTabs } from "./panel-tabs.js";
@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const prefShowAnalogies  = document.getElementById("pref-show-analogies");
 
   initPopovers();
+  initAkaPopover();
   initSidebar();
   initGraphSection(id => selectGlossaryConcept(id, false));
 
@@ -156,9 +157,14 @@ document.addEventListener("DOMContentLoaded", function () {
     if (concept.narrower?.length) relationRows.push(`<span class="rel-label narrower-label">Narrower</span> ${makeLinks(concept.narrower)}`);
     if (concept.related?.length)  relationRows.push(`<span class="rel-label related-label">Related</span> ${makeLinks(concept.related)}`);
 
-    const altHtml = (concept.altLabel || [])
-      .map(a => `<span class="alt-label">${a}</span>`)
-      .join("");
+    const altList = concept.altLabel || [];
+    const altHtml = altList.length
+      ? `<button class="aka-trigger" type="button"
+           data-alt-list='${JSON.stringify(altList).replace(/'/g, "&#39;")}'>
+           <span class="aka-trigger-count">${altList.length}</span>
+           synonym${altList.length > 1 ? "s" : ""}
+         </button>`
+      : "";
 
     const tagHtml = (concept.tags || [])
       .map(t => `<span class="tag-chip tag-chip--${t}" data-tag="${t}">${t}</span>`)
@@ -168,7 +174,8 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="concept-detail-inner">
         <div class="concept-detail-body">
           <div class="concept-detail-header">
-            <h3>${concept.prefLabel} ${altHtml}</h3>
+            <h3>${concept.prefLabel}</h3>
+            ${altHtml}
           </div>
           <div class="clamp-block" id="def-clamp">
             <p class="concept-def clamp-content">${renderDefinitionBlock(concept)}</p>
@@ -253,13 +260,17 @@ document.addEventListener("DOMContentLoaded", function () {
       .slice(0, 6);
 
     matches.forEach(m => {
+      const owner = conceptMap[m.id];
+      const isPref = m.term.toLowerCase() === owner.prefLabel.toLowerCase();
       const div = document.createElement("div");
       div.className = "suggestion";
-      div.textContent = m.term;
+      div.innerHTML = isPref
+        ? m.term
+        : `${m.term} <span class="suggestion-owner">→ ${owner.prefLabel}</span>`;
       div.addEventListener("click", () => {
         searchInput.value = m.term;
         suggestions.style.display = "none";
-        runSearch();
+        selectGlossaryConcept(m.id, true); // go straight to the concept the user clicked, not runSearch
       });
       suggestions.appendChild(div);
     });
@@ -283,17 +294,44 @@ document.addEventListener("DOMContentLoaded", function () {
     const q = searchInput.value.trim().toLowerCase();
     if (!q) return;
 
-    const match =
-      allTerms.find(t => t.term.toLowerCase() === q) ||
-      allTerms.find(t => t.term.toLowerCase().includes(q));
+    const exact = allTerms.filter(t => t.term.toLowerCase() === q);
 
-    if (match) {
+    if (exact.length === 1) {
       message.textContent = "";
       viewSettingsPopover.close();
-      selectGlossaryConcept(match.id, true);
+      selectGlossaryConcept(exact[0].id, true);
+      return;
+    }
+
+    if (exact.length > 1) {
+      showDisambiguation(exact);
+      return;
+    }
+
+    const partial = allTerms.find(t => t.term.toLowerCase().includes(q));
+    if (partial) {
+      message.textContent = "";
+      viewSettingsPopover.close();
+      selectGlossaryConcept(partial.id, true);
     } else {
       message.textContent = "No match found in glossary.";
     }
+  }
+
+  function showDisambiguation(matches) {
+    message.textContent = `"${searchInput.value.trim()}" means different things depending on context — pick one:`;
+    suggestions.innerHTML = matches.map(m => {
+      const owner = conceptMap[m.id];
+      return `<div class="suggestion" data-id="${m.id}">${owner.prefLabel}</div>`;
+    }).join("");
+    suggestions.style.display = "block";
+    suggestions.querySelectorAll(".suggestion").forEach(el => {
+      el.addEventListener("click", () => {
+        suggestions.style.display = "none";
+        message.textContent = "";
+        selectGlossaryConcept(el.dataset.id, true);
+      });
+    });
   }
 
   searchBtn.addEventListener("click", runSearch);
