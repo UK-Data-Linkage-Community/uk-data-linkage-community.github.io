@@ -135,6 +135,7 @@ skos:
 
     - id: data_linkage
       prefLabel: Data linkage
+      altLabel: [record linkage, data matching]
       definition: "Another term for record linkage and by extension, entity resolution"
       plainDefinition: "Connecting records from different sources when they refer to the same real-world entity."
       related: [entity_resolution]
@@ -264,6 +265,7 @@ skos:
 
     - id: recall
       prefLabel: Recall
+      altLabel: [sensitivity, true positive rate]
       definition: "A linkage evaluation metric measuring the proportion of true matches that are correctly identified, indicating how completely matches are recovered."
       plainDefinition: "Of all the true matches that exist, the proportion that the linkage process successfully finds."
       related: [f_score]
@@ -334,6 +336,7 @@ skos:
 
     - id: fuzzy_match
       prefLabel: Fuzzy match
+      altLabel: [approximate match]
       definition: "A match determined by similarity above a threshold rather than exact equality, allowing for typographical errors, variations, or noise."
       plainDefinition: "A match between values that are similar enough to be considered a match, even though they are not exactly the same."
       tags: [probabilistic, comparison]
