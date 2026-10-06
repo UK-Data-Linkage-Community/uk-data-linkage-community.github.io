@@ -1,0 +1,100 @@
+{%- comment -%}
+  MATERIAL DATA — normalises one materials.yml item so every display path
+  (cards, embeds, site-data JSON) handles missing or loosely typed fields the same way.
+
+  Usage: {% include cards/material-data.html item=mat %}
+
+  Sets (page scope):
+    md_id, md_title, md_type, md_type_icon, md_type_label, md_src, md_desc, md_caption,
+    md_thumb, md_level, md_level_label, md_event, md_event_id, md_date,
+    md_people     : resolved people.yml entries
+    md_author_ids : ids that resolved, comma-separated
+    md_guests     : display names for author ids not in people.yml
+    md_tags       : clean tag array
+
+  Tolerates: missing fields, a single string where a list is expected
+  ("a, b" or "a"), stray whitespace/case, unknown type/level values,
+  placeholder src values (#, tbc, todo, none, null), and unknown event/author ids.
+{%- endcomment -%}
+
+{%- assign md_item = include.item -%}
+{%- assign md_id = md_item.id | default: "" | strip -%}
+{%- assign md_title = md_item.title | default: "" | strip_html | strip_newlines | strip -%}
+
+{%- assign md_type = md_item.type | default: "" | downcase | strip -%}
+{%- case md_type -%}
+  {%- when "slide", "deck", "pdf" -%}{%- assign md_type = "slides" -%}
+  {%- when "videos", "recording", "youtube" -%}{%- assign md_type = "video" -%}
+  {%- when "doc", "documents", "paper" -%}{%- assign md_type = "document" -%}
+  {%- when "notebooks", "jupyter" -%}{%- assign md_type = "notebook" -%}
+  {%- when "repo", "repository" -%}{%- assign md_type = "code" -%}
+{%- endcase -%}
+{%- case md_type -%}
+  {%- when "slides"   -%}{%- assign md_type_icon = "▤" -%}{%- assign md_type_label = "Slides" -%}
+  {%- when "video"    -%}{%- assign md_type_icon = "▶" -%}{%- assign md_type_label = "Video" -%}
+  {%- when "document" -%}{%- assign md_type_icon = "◻" -%}{%- assign md_type_label = "Document" -%}
+  {%- when "notebook" -%}{%- assign md_type_icon = "◈" -%}{%- assign md_type_label = "Notebook" -%}
+  {%- when "code"     -%}{%- assign md_type_icon = "⌥" -%}{%- assign md_type_label = "Code" -%}
+  {%- when "tutorial" -%}{%- assign md_type_icon = "▧" -%}{%- assign md_type_label = "Tutorial" -%}
+  {%- else -%}{%- assign md_type = "other" -%}{%- assign md_type_icon = "◆" -%}{%- assign md_type_label = "Material" -%}
+{%- endcase -%}
+{%- if md_title == "" -%}{%- assign md_title = "Untitled " | append: md_type_label -%}{%- endif -%}
+
+{%- assign md_src = md_item.src | default: "" | strip -%}
+{%- assign md_src_check = md_src | downcase -%}
+{%- if md_src_check == "#" or md_src_check == "tbc" or md_src_check == "todo" or md_src_check == "none" or md_src_check == "null" -%}{%- assign md_src = "" -%}{%- endif -%}
+
+{%- assign md_desc = md_item.description | default: "" | strip_html | strip_newlines | strip -%}
+{%- assign md_caption = md_item.caption | default: "" | strip_html | strip_newlines | strip -%}
+{%- assign md_thumb = md_item.thumbnail | default: "" | strip -%}
+
+{%- assign md_level = md_item.audience_level | default: "" | downcase | strip -%}
+{%- case md_level -%}
+  {%- when "intro"        -%}{%- assign md_level_label = "Intro" -%}
+  {%- when "practitioner" -%}{%- assign md_level_label = "Practitioner" -%}
+  {%- when "advanced"     -%}{%- assign md_level_label = "Advanced" -%}
+  {%- else -%}{%- assign md_level = "" -%}{%- assign md_level_label = "" -%}
+{%- endcase -%}
+
+{%- comment -%} Lists: join + split accepts both YAML lists and "a, b" strings {%- endcomment -%}
+{%- assign md_people = "" | split: "" -%}
+{%- assign md_guests = "" | split: "" -%}
+{%- assign md_author_ids = "" -%}
+{%- assign md_raw_authors = md_item.authors | join: "," | split: "," -%}
+{%- for md_raw in md_raw_authors -%}
+  {%- assign md_aid = md_raw | strip -%}
+  {%- if md_aid == "" -%}{%- continue -%}{%- endif -%}
+  {%- assign md_person = site.data.people | where: "id", md_aid | first -%}
+  {%- if md_person -%}
+    {%- assign md_people = md_people | push: md_person -%}
+    {%- if md_author_ids != "" -%}{%- assign md_author_ids = md_author_ids | append: "," -%}{%- endif -%}
+    {%- assign md_author_ids = md_author_ids | append: md_person.id -%}
+  {%- else -%}
+    {%- assign md_aid_lower = md_aid | downcase -%}
+    {%- if md_aid == md_aid_lower -%}
+      {%- assign md_words = md_aid | replace: "-", " " | replace: "_", " " | split: " " -%}
+      {%- capture md_aid -%}{%- for w in md_words -%}{{ w | capitalize | append: " " }}{%- endfor -%}{%- endcapture -%}
+      {%- assign md_aid = md_aid | strip -%}
+    {%- endif -%}
+    {%- assign md_guests = md_guests | push: md_aid -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- assign md_tags = "" | split: "" -%}
+{%- assign md_raw_tags = md_item.tags | join: "," | split: "," -%}
+{%- for md_raw in md_raw_tags -%}
+  {%- assign md_tag = md_raw | strip -%}
+  {%- if md_tag != "" -%}{%- assign md_tags = md_tags | push: md_tag -%}{%- endif -%}
+{%- endfor -%}
+
+{%- assign md_event = nil -%}
+{%- assign md_event_id = md_item.event_id | default: "" | strip -%}
+{%- if md_event_id != "" -%}
+  {%- for md_cat in site.data.events.categories -%}
+    {%- assign md_found = md_cat.events | where: "id", md_event_id | first -%}
+    {%- if md_found -%}{%- assign md_event = md_found -%}{%- break -%}{%- endif -%}
+  {%- endfor -%}
+  {%- unless md_event -%}{%- assign md_event_id = "" -%}{%- endunless -%}
+{%- endif -%}
+
+{%- assign md_date = md_item.date | default: md_event.date | default: "" -%}

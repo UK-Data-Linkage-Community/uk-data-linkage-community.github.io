@@ -1,0 +1,9 @@
+{% comment %}
+  Loads the card/modal/filter system used by the materials grid, person
+  cards, and tutorial pages. Was never included anywhere — this is the fix.
+
+  The ?v= param busts the browser's cache on every build (site.time), so a
+  stale cards.js is never served. The old static_files mtime lookup
+  rendered an empty ?v=, which let browsers keep an outdated copy.
+{% endcomment %}
+<script src="{{ '/assets/js/cards.js' | relative_url }}?v={{ site.time | date: '%s' }}" defer></script>

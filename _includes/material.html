@@ -1,0 +1,125 @@
+{%- comment -%}
+  MATERIAL EMBED — drop any item from _data/materials.yml into a post or page.
+
+  Usage:
+    {% include material.html id="ukdlc-w1s1-mike-video" %}
+    {% include material.html id="ukdlc-w1s1-mike-video" display="window" %}
+    {% include material.html id="ukdlc-w1s1-mike-slides" display="link" text="Mike's slides" %}
+
+  Parameters:
+    id      : materials.yml item id (required unless item is given)
+    item    : a material object to render directly, e.g. from front matter (previews/tests)
+    display : button | link | card | small | window | full   (default: button)
+    text    : label for button/link modes (default: item title)
+
+  Display modes:
+    button — pill with type icon + title; opens the details modal
+    link   — inline text link, for mid-sentence use; opens the details modal
+    card   — full card, as on the materials page
+    small  — compact card
+    window — inline player/viewer with a title bar
+    full   — full-width player/viewer with title, authors, description and actions
+
+  Missing/odd fields are normalised by cards/material-data.html. With no
+  embeddable src, window/full collapse to a short "coming soon" strip rather
+  than an empty 16:9 frame. YouTube links work in any form.
+  Whitespace-trimmed throughout so link/button modes stay inline in markdown.
+{%- endcomment -%}
+
+{%- assign mat_id = include.id | default: "" | strip -%}
+{%- if include.item -%}{%- assign mat = include.item -%}{%- else -%}{%- assign mat = site.data.materials.items | where: "id", mat_id | first -%}{%- endif -%}
+
+{%- if mat == nil -%}
+  {%- if jekyll.environment == "development" -%}<span class="jk-material-missing">[material not found: {{ mat_id | escape }}]</span>{%- endif -%}
+{%- else -%}
+
+{%- include cards/material-data.html item=mat -%}
+{%- assign mat_mode = include.display | default: "button" | downcase | strip -%}
+{%- if mat_mode == "embedded" -%}{%- assign mat_mode = "window" -%}{%- endif -%}
+{%- assign mat_label = include.text | default: md_title | strip -%}
+
+{%- if mat_mode == "button" or mat_mode == "card" or mat_mode == "small" -%}
+  {%- if mat_mode == "button" and include.text -%}
+<span class="jk-card jk-card--button jk-card--type-{{ md_type }}" data-card-trigger="material" data-material-id="{{ md_id | escape }}" tabindex="0" role="button" aria-label="Open {{ md_title | escape }}"><span class="jk-card__type-icon" aria-hidden="true">{{ md_type_icon }}</span><span class="jk-card__title">{{ mat_label | escape }}</span></span>
+  {%- else -%}
+{% include cards/material-card.html item=mat display=mat_mode %}
+  {%- endif -%}
+
+{%- elsif mat_mode == "link" -%}
+<button type="button" class="jk-material-link jk-card--type-{{ md_type }}" data-card-trigger="material" data-material-id="{{ md_id | escape }}">{{ mat_label | escape }}<span class="jk-material-link__icon" aria-hidden="true">{{ md_type_icon }}</span></button>
+
+{%- else -%}
+  {%- comment -%} Resolve the embed: YouTube → privacy-enhanced iframe, video file → <video>, anything else → iframe {%- endcomment -%}
+  {%- assign yt_id = "" -%}
+  {%- if md_src contains "youtu.be/" -%}
+    {%- assign yt_id = md_src | split: "youtu.be/" | last | split: "?" | first -%}
+  {%- elsif md_src contains "youtube.com/watch" -%}
+    {%- assign yt_id = md_src | split: "v=" | last | split: "&" | first -%}
+  {%- elsif md_src contains "youtube.com/embed/" or md_src contains "youtube-nocookie.com/embed/" or md_src contains "youtube.com/shorts/" -%}
+    {%- assign yt_id = md_src | split: "/embed/" | last | split: "/shorts/" | last | split: "?" | first -%}
+  {%- endif -%}
+  {%- assign yt_id = yt_id | strip -%}
+  {%- assign mat_src_lower = md_src | downcase -%}
+  {%- assign is_file_video = false -%}
+  {%- if mat_src_lower contains ".mp4" or mat_src_lower contains ".webm" -%}{%- assign is_file_video = true -%}{%- endif -%}
+  {%- assign can_embed = false -%}
+  {%- if md_src != "" -%}
+    {%- if md_type == "video" or md_type == "slides" or md_type == "document" -%}{%- assign can_embed = true -%}{%- endif -%}
+  {%- endif -%}
+  {%- if md_src contains "://" -%}{%- assign mat_href = md_src -%}{%- else -%}{%- assign mat_href = md_src | relative_url -%}{%- endif -%}
+
+<figure class="jk-material-embed jk-material-embed--{{ mat_mode }}{% unless can_embed %} jk-material-embed--pending{% endunless %} jk-card--type-{{ md_type }}">
+  {%- if mat_mode == "full" %}
+  <figcaption class="jk-material-embed__head">
+    <span class="jk-card__type-badge jk-card--type-{{ md_type }}">{{ md_type_icon }} {{ md_type_label }}</span>
+    <span class="jk-material-embed__title">{{ md_title | escape }}</span>
+    {%- for person in md_people %}
+    <span class="jk-tag jk-tag--person" data-tag-type="person" data-person-id="{{ person.id | escape }}" tabindex="0" role="button">{{ person.name | escape }}</span>
+    {%- endfor %}
+    {%- for guest in md_guests %}
+    <span class="jk-tag jk-tag--guest">{{ guest | escape }}</span>
+    {%- endfor %}
+  </figcaption>
+  {%- endif %}
+
+  <div class="jk-material-embed__frame{% if md_type != 'video' %} jk-material-embed__frame--doc{% endif %}">
+    {%- if can_embed == false %}
+    <div class="jk-material-embed__pending">
+      <span class="jk-card__type-icon-lg" aria-hidden="true">{{ md_type_icon }}</span>
+      <span class="jk-material-embed__pending-text">{% if md_src == "" %}{{ md_type_label }} coming soon{% else %}{{ md_type_label }} — open for details{% endif %}</span>
+    </div>
+    {%- elsif yt_id != "" %}
+    <iframe class="fitvidsignore" src="https://www.youtube-nocookie.com/embed/{{ yt_id | uri_escape }}" title="{{ md_title | escape }}" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>
+    {%- elsif is_file_video %}
+    <video controls preload="metadata" playsinline><source src="{{ mat_href | escape }}"></video>
+    {%- else %}
+    <iframe src="{{ mat_href | escape }}" title="{{ md_title | escape }}" loading="lazy" allowfullscreen></iframe>
+    {%- endif %}
+  </div>
+
+  {%- if mat_mode == "full" %}
+  <div class="jk-material-embed__body">
+    {%- if md_desc != "" %}<p class="jk-material-embed__desc">{{ md_desc | escape }}</p>{% endif %}
+    <div class="jk-material-embed__actions">
+      <button type="button" class="jk-btn jk-btn--secondary" data-card-trigger="material" data-material-id="{{ md_id | escape }}">Details</button>
+      {%- if md_src != "" %}<a class="jk-btn jk-btn--primary" href="{{ mat_href | escape }}" target="_blank" rel="noopener">Open {{ md_type_label }} ↗</a>{% endif %}
+      {%- if md_event_id != "" %}<a class="jk-btn jk-btn--ghost" href="{{ '/resources/materials/' | relative_url }}?event={{ md_event_id | uri_escape }}">More from this event</a>{% endif %}
+    </div>
+  </div>
+  {%- else %}
+  <figcaption class="jk-material-embed__bar">
+    <button type="button" class="jk-card__info-btn" data-card-trigger="material" data-material-id="{{ md_id | escape }}" aria-label="More information about {{ md_title | escape }}">
+      <svg width="16" height="16" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><line x1="12" y1="10" x2="12" y2="16" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="7" r="1.2" fill="currentColor"/></svg>
+    </button>
+    <span class="jk-material-embed__title">{{ mat_label | escape }}</span>
+    {%- assign mat_names = md_people | map: "name" | concat: md_guests -%}
+    {%- if mat_names.size > 0 %}
+    <span class="jk-material-embed__authors">{{ mat_names | join: ", " | escape }}</span>
+    {%- endif %}
+    <span class="jk-card__type-badge jk-card--type-{{ md_type }}">{{ md_type_label }}</span>
+  </figcaption>
+  {%- endif %}
+</figure>
+{%- endif -%}
+
+{%- endif -%}

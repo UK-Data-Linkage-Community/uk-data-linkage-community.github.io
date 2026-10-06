@@ -1,0 +1,142 @@
+<style>
+/* Page-specific layout overrides — adjust to fit your theme */
+.jk-materials-page-wrap {
+  padding: 32px 0 64px;
+}
+
+/* Standalone page: sit 12px below the site header, matching the frame gap */
+.jk-materials-page-wrap--standalone {
+  padding-top: 0;
+}
+main.page-content:has(.jk-materials-page-wrap--standalone) {
+  padding-top: 12px !important; /* theme sets main padding with !important */
+}
+article.page:has(.jk-materials-page-wrap--standalone) > header {
+  display: none;
+}
+
+{% if include.breakout %}
+/* Break the finder out of the parent article's narrower max-width so it
+   spans the viewport even when the page itself isn't in "wide" mode. */
+.jk-materials-page-wrap--breakout {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+{% endif %}
+</style>
+
+<div class="jk-materials-page-wrap{% if include.breakout %} jk-materials-page-wrap--breakout{% endif %}{% if include.standalone %} jk-materials-page-wrap--standalone{% endif %}">
+  <div class="jk-materials-page" id="jk-materials-page">
+
+    <!-- ═══ FILTER PANEL ═══════════════════════════════════════════════ -->
+    <aside class="jk-filter-panel" aria-label="Filter materials">
+
+      <div class="jk-filter-panel__page-title">
+        {% assign heading_tag = include.heading_level | default: "h1" %}
+        <{{ heading_tag }}>Site Materials</{{ heading_tag }}>
+        <p class="jk-results-count" id="jk-results-count" aria-live="polite">
+          {{ site.data.materials.items | size }} results
+        </p>
+      </div>
+
+      <div class="jk-filter-bar">
+        <div class="jk-filter-group jk-filter-group--search">
+          <div class="jk-filter-group__label">Search</div>
+          <input type="search"
+                 class="jk-filter-search"
+                 id="jk-filter-search"
+                 placeholder="Title, description…"
+                 aria-label="Search materials"
+                 autocomplete="off"
+                 role="combobox"
+                 aria-expanded="false"
+                 aria-controls="jk-search-suggestions">
+          <ul class="jk-search-suggestions" id="jk-search-suggestions" role="listbox" hidden></ul>
+        </div>
+
+        <!-- Mobile only: collapses the filter groups -->
+        <button type="button" class="jk-filter-more__toggle" id="jk-filter-more-toggle"
+                aria-expanded="false" aria-controls="jk-filter-more-groups">
+          Filters
+        </button>
+      </div>
+
+      <div class="jk-active-filters" id="jk-active-filters" aria-label="Active filters" aria-live="polite"></div>
+
+      <div class="jk-filter-more__groups" id="jk-filter-more-groups">
+
+        <details class="jk-filter-group jk-filter-group--dropdown">
+          <summary class="jk-filter-group__label">Material Type</summary>
+          <div class="jk-filter-options" id="jk-filter-types" role="group" aria-label="Filter by type"></div>
+        </details>
+
+        <details class="jk-filter-group jk-filter-group--dropdown">
+          <summary class="jk-filter-group__label">Authors</summary>
+          <div class="jk-filter-options" id="jk-filter-authors" role="group" aria-label="Filter by author"></div>
+        </details>
+
+        <details class="jk-filter-group jk-filter-group--dropdown">
+          <summary class="jk-filter-group__label">Events</summary>
+          <div class="jk-filter-options" id="jk-filter-events" role="group" aria-label="Filter by event"></div>
+        </details>
+
+        <details class="jk-filter-group jk-filter-group--dropdown">
+          <summary class="jk-filter-group__label">Tags</summary>
+          <div class="jk-filter-options" id="jk-filter-tags" role="group" aria-label="Filter by tag"></div>
+        </details>
+
+        <details class="jk-filter-group jk-filter-group--dropdown">
+          <summary class="jk-filter-group__label">Audience Level</summary>
+          <div class="jk-filter-options" id="jk-filter-levels" role="group" aria-label="Filter by audience level"></div>
+        </details>
+
+        <button type="button" class="jk-filter-reset" id="jk-filter-reset">Clear all filters</button>
+      </div>
+    </aside>
+
+    <!-- ═══ RESULTS ════════════════════════════════════════════════════ -->
+    <div class="jk-materials-results">
+
+      <!-- Card grid -->
+      <div class="jk-card-grid" id="jk-card-grid">
+
+        {% comment %}
+          Tutorial write-up pages (collections/_tutorials) are deliberately
+          excluded here — they get their own dedicated index at
+          /resources/tutorials/. This grid is materials.yml only
+          (slides/video/document/notebook/code).
+        {% endcomment %}
+
+        {% for item in site.data.materials.items %}
+          {% include cards/material-data.html item=item %}
+          {% capture search_text %}{{ md_title }} {{ md_desc }} {{ md_tags | join: " " }} {{ md_people | map: "name" | join: " " }} {{ md_guests | join: " " }} {{ md_author_ids | replace: ",", " " }}{% endcapture %}
+
+          <div class="jk-mat-item"
+               data-type="{{ md_type }}"
+               data-authors="{{ md_author_ids | escape }}"
+               data-event="{{ md_event_id | escape }}"
+               data-tags="{{ md_tags | join: ',' | escape }}"
+               data-level="{{ md_level }}"
+               data-searchtext="{{ search_text | downcase | strip_newlines | escape }}">
+            {% include cards/material-card.html item=item display="card" %}
+          </div>
+        {% endfor %}
+
+        <!-- Empty state (hidden by default) -->
+        <div class="jk-materials-empty jk-hidden" id="jk-materials-empty" role="status">
+          <h3>No materials found</h3>
+          <p>Try adjusting your filters or <button class="jk-filter-reset" onclick="document.getElementById('jk-filter-reset').click()" style="background:none;border:none;cursor:pointer;color:var(--jk-accent);font-size:inherit;padding:0;text-decoration:underline">clearing all filters</button>.</p>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{% comment %} Include mode system and data blob {% endcomment %}
+{% include cards/card-modes.html %}

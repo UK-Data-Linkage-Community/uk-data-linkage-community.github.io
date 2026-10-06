@@ -32,3 +32,25 @@ items:
     caption: >
       Mike Edwards's slides on the current practices within SERP on data linkage.
 ```
+## Unpublished materials
+
+An item can be added before its file or link exists — set `src: ""`. It still appears in the materials finder and can be referenced from posts; embeds show a "coming soon" panel. Fill in `src` when the file is committed or the video is on YouTube (any YouTube link form works, e.g. `https://youtu.be/VIDEO_ID`).
+
+## Embedding materials in posts
+
+Reference any item from `_data/materials.yml` by its `id`:
+
+```liquid
+{% include material.html id="ukdlc-w1s1-mike-video" display="window" %}
+```
+
+| `display` | Result |
+|-----------|--------|
+| `button` (default) | Pill with type icon + title; opens the details modal |
+| `link` | Inline text link for mid-sentence use; opens the details modal |
+| `card` | Full card, as on the materials page |
+| `small` | Compact card |
+| `window` | Inline player/viewer with a title bar |
+| `full` | Full-width player/viewer with authors, description and actions |
+
+Optional `text="..."` sets the label for `button` and `link` modes.

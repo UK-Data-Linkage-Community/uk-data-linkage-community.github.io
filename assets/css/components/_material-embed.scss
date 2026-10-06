@@ -1,0 +1,157 @@
+/* ==========================================================================
+   MATERIAL EMBED — {% include material.html %} in posts/pages
+   Uses the --jk-* tokens defined with the card system in main.scss.
+   ========================================================================== */
+
+/* ── Link mode (inline, mid-sentence) ─────────── */
+.jk-material-link {
+  display: inline;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: var(--jk-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+.jk-material-link:hover { color: var(--jk-accent-hover); }
+.jk-material-link__icon {
+  margin-left: 0.25em;
+  font-size: 0.8em;
+  color: var(--jk-type-color, var(--jk-text-muted));
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* ── Window / full (shared) ───────────────────── */
+/* Theme styles every <figure> as a flex row with serif captions — reset both */
+.jk-material-embed {
+  display: block;
+  margin: 1.5rem 0;
+  border: 1px solid var(--jk-border);
+  border-radius: var(--jk-radius-lg);
+  overflow: hidden;
+  background: var(--jk-bg);
+  box-shadow: var(--jk-shadow);
+}
+.jk-material-embed--window { max-width: 720px; }
+
+.jk-material-embed figcaption {
+  margin: 0;
+  font-family: inherit;
+  color: var(--jk-text);
+}
+
+.jk-material-embed__frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+.jk-material-embed__frame--doc {
+  aspect-ratio: 4 / 3;
+  background: var(--jk-surface);
+}
+.jk-material-embed__frame iframe,
+.jk-material-embed__frame video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: none;
+  display: block;
+}
+
+/* Placeholder while src is empty ("coming soon") */
+.jk-material-embed__pending {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--jk-type-bg, var(--jk-surface));
+  color: var(--jk-type-color, var(--jk-text-muted));
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/* Nothing to embed yet: collapse the 16:9 frame to a short strip */
+.jk-material-embed--pending .jk-material-embed__frame {
+  aspect-ratio: auto;
+  background: var(--jk-type-bg, var(--jk-surface));
+}
+.jk-material-embed--pending .jk-material-embed__pending {
+  position: static;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+}
+.jk-material-embed--pending .jk-card__type-icon-lg { font-size: 1.6rem; }
+
+/* Title bar (window) */
+.jk-material-embed__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--jk-border);
+  font-size: 0.9rem;
+}
+.jk-material-embed__bar .jk-card__type-badge {
+  position: static;
+  margin-left: auto;
+}
+.jk-material-embed__title {
+  font-weight: 600;
+  color: var(--jk-text);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.jk-material-embed__authors {
+  font-size: 0.8rem;
+  color: var(--jk-text-muted);
+}
+
+/* Header + body (full) */
+.jk-material-embed__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--jk-border);
+}
+.jk-material-embed__head .jk-card__type-badge { position: static; }
+.jk-material-embed__head .jk-material-embed__title { font-size: 1.05rem; margin-right: 4px; }
+
+.jk-material-embed__body { padding: 12px 16px 16px; }
+.jk-material-embed__desc {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  color: var(--jk-text-muted);
+}
+.jk-material-embed__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Author id with no people.yml entry — plain, non-interactive */
+.jk-tag--guest {
+  background: var(--jk-surface);
+  color: var(--jk-text-muted);
+  border-color: var(--jk-border);
+  cursor: default;
+}
+
+.jk-material-missing {
+  color: #c0392b;
+  font-family: monospace;
+  font-size: 0.85em;
+}

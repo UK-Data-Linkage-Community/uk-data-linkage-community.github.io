@@ -4,12 +4,9 @@
   <head>
     {% include head.html %}
     {% include head/custom.html %}
-    {% include cards/card-modes.html %}
   </head>
 
   <script src="{{ '/assets/js/progress.js' | relative_url }}"></script>
-  {% include cards/card-modes.html %}
-  <script src="/assets/js/cards.js"></script>
   <script>
   window.MathJax = {
     tex: {
@@ -29,6 +26,9 @@
           {{ content }}
         </div>
       </main>
+
+    {% comment %} Card data + modal for every page; skipped where the materials finder already renders it {% endcomment %}
+    {% unless content contains 'id="jk-site-data"' %}{% include cards/card-modes.html %}{% endunless %}
 
     <div id="footer" class="page__footer">
       <footer>
