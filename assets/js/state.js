@@ -12,6 +12,9 @@ export const state = {
   //   "pill" (default)     — collapsed to a small clickable pill
   //   "hidden"             — analogy is not rendered at all
   analogyDisplay: "pill",
+  // Remembered so re-renders (e.g. switching to plain language) don't
+  // snap the "other labels" disclosure shut.
+  hiddenLabelsOpen: false,
   activeSection: null,
   activeConceptId: null,
   activeFilter: null,
@@ -46,14 +49,38 @@ function buildLabelIndex() {
     };
     add(c.prefLabel);
     (c.altLabel || []).forEach(add);
+    (c.hiddenLabel || []).forEach(add);
   });
 }
 
+// Hidden labels (abbreviations, misspellings, variants) are never offered
+// as synonyms, but they are searchable — that's their whole SKOS purpose.
 function buildSearchIndex() {
   data.skos.concepts.forEach(c => {
     allTerms.push({ term: c.prefLabel, id: c.id });
-    (c.altLabel || []).forEach(alt => allTerms.push({ term: alt, id: c.id }));
+    (c.altLabel || []).forEach(alt => allTerms.push({ term: String(alt), id: c.id }));
+    (c.hiddenLabel || []).forEach(h => allTerms.push({ term: String(h), id: c.id }));
   });
+}
+
+// `conflicts` may be a single string, a list of strings, or a list of
+// { field, note, confusedWith } objects. Normalise to the object form, with
+// `fields` and `confusedWith` always arrays.
+export function getConflicts(concept) {
+  const raw = concept.conflicts;
+  if (!raw) return [];
+  const list = Array.isArray(raw) ? raw : [raw];
+  const asArray = v => (v == null ? [] : Array.isArray(v) ? v : [v]);
+
+  return list
+    .map(item => typeof item === "string"
+      ? { fields: [], note: item, confusedWith: [] }
+      : {
+          fields: asArray(item.field ?? item.fields),
+          note: item.note || "",
+          confusedWith: asArray(item.confusedWith),
+        })
+    .filter(c => c.note || c.confusedWith.length);
 }
 
 export function getDefinitionText(concept) {

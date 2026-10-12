@@ -1,4 +1,4 @@
-import { data, state, initState, conceptMap, allTerms, renderDefinitionBlock } from "./state.js";
+import { data, state, initState, conceptMap, allTerms, renderDefinitionBlock, linkifyDefinition, getConflicts } from "./state.js";
 import { initPopovers, viewSettingsPopover, filterPopover, initAkaPopover } from "./popovers.js";
 import { initSidebar } from "./sidebar.js";
 import { initPipelinePanel, clearPipelineActive } from "./pipeline-panel.js";
@@ -166,6 +166,17 @@ document.addEventListener("DOMContentLoaded", function () {
          </button>`
       : "";
 
+    const hiddenLabels = concept.hiddenLabel || [];
+    const hiddenHtml = hiddenLabels.length
+      ? `<details class="hidden-labels"${state.hiddenLabelsOpen ? " open" : ""}>
+           <summary>Other labels you may see <span class="hidden-labels-count">${hiddenLabels.length}</span></summary>
+           <p class="hidden-labels-hint">Abbreviations, shorthand and variant spellings that refer to this term.</p>
+           <div class="label-chips">
+             ${hiddenLabels.map(h => `<span class="hidden-label">${h}</span>`).join("")}
+           </div>
+         </details>`
+      : "";
+
     const tagHtml = (concept.tags || [])
       .map(t => `<span class="tag-chip tag-chip--${t}" data-tag="${t}">${t}</span>`)
       .join("");
@@ -174,12 +185,16 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="concept-detail-inner">
         <div class="concept-detail-body">
           <div class="concept-detail-header">
-            <h3>${concept.prefLabel}</h3>
+            <h3>${concept.prefLabel}
+              <span class="pref-badge" title="The preferred, standard term used in this glossary">Preferred term</span>
+            </h3>
             ${altHtml}
           </div>
+          ${hiddenHtml}
           <div class="clamp-block" id="def-clamp">
             <p class="concept-def clamp-content">${renderDefinitionBlock(concept)}</p>
           </div>
+          ${renderConflicts(concept, makeLinks)}
           ${relationRows.length
             ? `<div class="clamp-block" id="rel-clamp">
                  <div class="concept-relations clamp-content">
@@ -202,9 +217,44 @@ document.addEventListener("DOMContentLoaded", function () {
         : document.getElementById("graph-panel-body")
     );
 
+    content.querySelector(".hidden-labels")?.addEventListener("toggle", e => {
+      state.hiddenLabelsOpen = e.currentTarget.open;
+    });
+
     attachContentLinkHandlers();
     initClamp(content.querySelector("#def-clamp"), 4);
     initClamp(content.querySelector("#rel-clamp"), 3);
+  }
+
+  function renderConflicts(concept, makeLinks) {
+    const conflicts = getConflicts(concept);
+    if (!conflicts.length) return "";
+
+    const items = conflicts.map(c => {
+      const fieldsHtml = c.fields.length
+        ? `<div class="conflict-fields">${c.fields.map(f => `<span class="conflict-field">${f}</span>`).join("")}</div>`
+        : "";
+      const noteHtml = c.note
+        ? `<p class="conflict-note">${linkifyDefinition(c.note)}</p>`
+        : "";
+      const withHtml = c.confusedWith.length
+        ? `<div class="conflict-with"><span class="conflict-with-label">Often confused with</span> ${makeLinks(c.confusedWith)}</div>`
+        : "";
+      return `<li class="conflict">${fieldsHtml}${noteHtml}${withHtml}</li>`;
+    }).join("");
+
+    return `
+      <section class="concept-conflicts" aria-labelledby="conflicts-title-${concept.id}">
+        <h4 class="conflicts-title" id="conflicts-title-${concept.id}">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          Where this term gets confused
+        </h4>
+        <ul class="conflict-list">${items}</ul>
+      </section>`;
   }
 
   function showEmptyDetail() {
